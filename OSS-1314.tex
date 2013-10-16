@@ -1,0 +1,94 @@
+\documentclass[a4paper, 11pt]{article}
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{.100in}
+\setlength{\textwidth}{6.25in}
+\usepackage [dutch] {babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{gensymb}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\begin{document}
+
+\begin{titlepage}
+\title{Ontwerp van Software Systemen}
+\author{}
+\end{titlepage}
+
+
+
+\maketitle
+\newpage
+\tableofcontents
+\pagebreak
+
+\section*{Inleiding}
+
+% Een inleiding: beschrijf hierin jullie algemene impressie van het systeem, de manier waarop
+% jullie de analyse hebben aangepakt, etc.
+
+In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java. Om beter de linken tussen de klassen te begrijpen werd er gebruik gemaakt van X-Ray en agileJ structureviews. Hierna werd voor verdere analyse gebruik gemaakt van Design Pattern Detection Tool en voor visualisatie van de klassendiagrammas en sequence diagrams werd er gebruik gemaakt van Visual Paradigm.
+
+
+\section{Ontwerpdocumentatie}
+
+De klasse die de main methode bevat in het JUnit project is JUnitCore. JUnitCore is een facade voor het uitvoeren van testen. Via de run() methoden kunnen testen worden uitgevoerd. JUnitCore gebruikt de klasse Runner via de methode run(runner) die niet mag worden uitgevoerd. Deze wordt gebruikt bij het testen. De runner test en verwittigd de RunNotifier als er interessante gebeurtenissen voorvallen. 
+
+
+
+
+
+\section{Evaluatie van het ontwerp}
+
+%Een evaluatie van het ontwerp. Wat zijn sterke en zwakke punten van het ontwerp. Bespreek
+%ook het gebruik (of het niet-gebruik) van patronen. Geef opnieuw sterke en zwakke punten
+%van het ontwerp op dit vlak.
+
+\section{Analyse tools en belangrijke resultaten}
+Agilj filters gebruikt, Codecity, Xray
+Statements wordt gebruikt om alle annotaties uit te voeren
+.runner en .runners
+
+\section{Evaluatie testen}
+
+\section{Samenvatting}
+
+\textsc{jaja}
+\section{projectbeheer}
+
+
+\newpage
+\begin{flushleft}
+\begin{thebibliography}{4}
+
+\bibitem{X-Ray}
+\textit{X-Ray}
+\begin{scriptsize}
+geraadpleegd op 11/10/2013 via: \mbox{http://xray.inf.usi.ch/xray.php} en \mbox{https://marketplace.eclipse.org/content/x-ray-software-visualization}
+\end{scriptsize}
+
+\bibitem{AgileJ Structureviews}
+\textit{AgileJ Structureviews}
+\begin{scriptsize}
+geraadpleegd op 11/10/2013 via: \mbox{http://www.agilej.com/}
+\end{scriptsize}
+
+\bibitem{Design Pattern Detection Tool}
+\textit{Design Pattern Detection Tool}
+\begin{scriptsize}
+geraadpleegd op 15/10/2013 via: \mbox{http://java.uom.gr/~nikos/pattern-detection.html} versie  Design Pattern detection Tool (version 4.5 - build 28/05/2010)
+\end{scriptsize}
+
+\end{thebibliography}
+\end{flushleft}
+
+\end{document}
+
+
+
