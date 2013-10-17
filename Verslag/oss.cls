@@ -55,11 +55,11 @@
  %   \end{minipage}\hfill%
       \begin{minipage}{0.8\textwidth}%
         \begin{flushright}%
-         {\Large\em Team:} {\LARGE\bf \theteam} \\[6pt] %
+         {\Large\em Team:} {\Large \sc \theteam} \\[6pt] %
           {\Large\sc \themembers\\}%
         \end{flushright}%
       \end{minipage}\\%
-      \vspace{20mm}%
+      \vspace{30mm}%
       {\large Academiejaar 2013 -- 2014}%
     \end{center}%
   \end{titlepage}%
