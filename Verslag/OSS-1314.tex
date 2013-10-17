@@ -16,10 +16,10 @@
 \begin{document}
 
 \team{6} % teamkleur
-\members{Joren Verspeurt (r0258417)\\
-         Sophie Marien (s0216517)\\
-         Stef Noten (s0211264)\\
-         Toon Nolten (r0258654) } % teamleden
+\members{Joren Verspeurt {\small \texttt{(r0258417)} } \\
+         Sophie Marien {\small \texttt{(s0216517)}}\\
+         Stef Noten {\small \texttt{(s0211264)}}\\
+         Toon Nolten {\small \texttt{(r0258654)}} } % teamleden
 
 \maketitlepage
 \newpage
@@ -75,8 +75,9 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 
 \begin{description}
 
-\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de inkomende dependenties niet getoond worden, alleen de uitgaande dependenties.  \\
-Via \emph{Codecity} hebben we meer inzicht gekregen in de afwezigheid van \emph{Godklassen} en ..
+\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de klassen zeer uitgespreid worden weergegeven. \\
+\emph{CodeCity} geeft een goed beeld maar er is weinig flexibiliteit. Er kunnen packages verborgen worden maar dan is er een witruimte op de plaats van de package. Het werd vooral gebruikt om een overview te krijgen van het project. Via \emph{CodeCity} kon er ook gekeken worden naar de dependenties.
+%TODO Foto van codeCity
 
 \begin{figure}[hb!]
 	\centering
@@ -85,8 +86,8 @@ Via \emph{Codecity} hebben we meer inzicht gekregen in de afwezigheid van \emph{
 	\label{fig:X-Ray}
 \end{figure}
 
-\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.\\
-Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ gegenereert hebben. De klassendiagrammas die gegenereerd waren, bevatten alle methodes en velden waardoor het overzicht niet echt duidelijk was. Via filters konden deze methoden gefilterd worden. Ook kon er via de filters bepaald worden welke soort klasssen andere kleuren konden krijgen. AgileJ laat geen associaties zien, maar probeert dit te tonen door het aantal ... 
+\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via \emph{AgileJ}.\\
+Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph{AgileJ} gegenereerd hebben. De klassendiagramma's die gegenereerd waren, bevatten alle methodes en velden waardoor het overzicht niet echt duidelijk was. Via filters konden deze methoden gefilterd worden. Ook kon er via de filters bepaald worden welke soort klassen andere kleuren konden krijgen. \emph{AgileJ} laat geen associaties zien, maar probeert dit te tonen door het aantal ... 
 
 
 \begin{figure}[hb!]
@@ -96,7 +97,7 @@ Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ 
 	\label{fig:AgileJKlassendia}
 \end{figure}
 
-\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}
+\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}. 
 
 \begin{figure}[hb!]
 	\centering
@@ -126,11 +127,6 @@ Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ 
 
 \end{description}
 
-
-\section{Analyse tools en belangrijke resultaten}
-Agilj filters gebruikt, Codecity, Xray
-Statements wordt gebruikt om alle annotaties uit te voeren
-.runner en .runners
 
 \section{Evaluatie testen}
 
