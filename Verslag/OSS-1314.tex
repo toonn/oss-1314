@@ -69,6 +69,53 @@ De klasse die de main methode bevat in het JUnit project is JUnitCore. JUnitCore
 %ook het gebruik (of het niet-gebruik) van patronen. Geef opnieuw sterke en zwakke punten
 %van het ontwerp op dit vlak.
 
+\subsection{Sterke en zwakke punten}
+
+\subsection{Gebruik van patronen}
+
+Er worden verschillende software design patronen gebruikt in JUnit. 
+Hieronder volgt een overzicht van een aantal verschillende patronen en voorbeelden van waar ze gebruikt worden.
+
+\subsubsection{Factory Method}
+In de klasse \emph{runners.model.RunnerBuilder} bevindt zich een Factory Method om \emph{Runner}s aan te maken, namelijk \emph{runnerForClass()}. 
+In de documentatie wordt ook aangegeven dat de methode in een subklasse ge\"implementeerd moet worden om de juiste Runner terug te geven.
+
+\subsubsection{Observer}
+De structuur \emph{Runner}-\emph{runner.RunNotifier}-\emph{runner.RunListener} kan gezien worden als een vorm van Observer-structuur. 
+De Runner klasse wordt ge\"instanti\"eerd met een \emph{RunNotifier}, die notificatiemethoden bevat die aangeroepen worden door de \emph{Runner}. 
+Aan de \emph{RunNotifier} kan dan een \emph{RunListener} worden toegevoegd (via de \emph{Runner}, de \emph{addListener()}-methode van \emph{RunNotifier} is wel \{public}, maar de documentatie geeft aan dat deze enkel voor intern gebruik is en dat de listener moet worden toegevoegd door de \{Runner}). 
+Dit maakt het mogelijk om tijdens het uitvoeren van een testrun op verschillende manieren te reageren op gebeurtenissen die kunnen voorkomen tijdens het uitvoeren van tests (zoals wanneer een test begint of eindigt, een Exception gegooid wordt, ...).
+
+\subsubsection{Composite}
+Het Composite patroon wordt gebruikt in een aantal structuren. Een eerste voorbeeld hiervan is de Interface \{rules.TestRule}, verschillende implementerende Leaf-klassen en de compositie \emph{rules.RuleChain}. 
+\{RuleChain} implementeert \emph{TestRule} en bevat zelf kinderen die ook \emph{TestRule}-objecten zijn.
+\\
+Ook de structuur \emph{runner.Runner} - \{internal.runners.ErrorReportingRunner},... - \emph{runners.ParentRunner} is een voorbeeld van een Composite patroon. 
+Een \emph{ParentRunner} kan verschillende kinderen bevatten die ook \emph{Runner}s zijn. 
+Op deze manier kan het gedrag van de \emph{Runner} tijdens het uitvoeren van tests aangepast worden (bijvoorbeeld om slim om te gaan met gegooide Exceptions).
+\\
+Het is misschien ook interessant om te vermelden dat de ontwerpers van JUnit zelf vermelden dat de klasse \emph{runner.Description} niet als Composite ge\"implementeerd is omdat er geen logica in uitgevoerd wordt, ze bevat enkel informatie.
+
+\subsubsection{Strategy}
+De ontwerpers vermelden zelf in de documentatie van de klasse \emph{Computer} dat deze bedoeld is als Strategy maar het is niet erg duidelijk aangezien er (buiten de klasse \emph{experimental.ParallelComputer}) maar 1 klasse Computer is en er dus maar 1 Strategy is.
+\\
+Iets gelijkaardig is waar voor \emph{runners.model.RunnerScheduler}, hier wordt ook expliciet vermeld dat het bedoeld is als Strategy maar de enige plaatsen waar gebruik gemaakt wordt van het patroon is in enkele methoden die anonieme inwendige klassen defini\"eren.
+
+\subsubsection{Command}
+Het Command patroon is terug te vinden in veel van de klassen van de \emph{rules} package. 
+Een goed voorbeeld hiervan is \emph{rules.ExternalResource}, die toestaat om voor een test een externe bron in te laden. 
+Deze functionaliteit is afgezonderd in de \{ExternalResource} klasse samen met methoden om voor en na het inladen iets te doen, een vorm van omkadering die typisch is voor het Command patroon. 
+
+\subsubsection{Visitor}
+Dit patroon is niet echt op een zuivere manier toegepast, maar het kan herkend worden in de klassen \emph{Filter} en \emph{Filterable} in het \emph{runner.manipulation} package. 
+In dit geval is de \emph{Filter} de Visitor die uitbreidingen van de klasse \emph{runner.Description} bezoekt. 
+Er worden dan \emph{Description}s gefilterd van tests die niet uitgevoerd moeten worden. 
+\\
+Sortable is een analoge vorm van pseudo-Visitor die kan toegepast worden op een \emph{Description}-hi\"erarchie.
+\\
+De reden dat het geen echte instantie van het Visitor patroon is, is dat er in \emph{Filter} geen onderscheid gemaakt wordt tussen verschillende soorten \emph{Filterable} objecten, alleen of ze \emph{Filterable} zijn of niet.
+
+
 \section{Beschrijving van de analyse tools en evaluatie hiervan}
 
 Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillende tools zijn \emph{X-ray} \cite{X-Ray}, \emph{AgileJ Structureviews} \cite{AgileJ Structureviews} , \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{InFusion Hydrogen}. Om \emph{X-Ray} beter de begrijpen werd er ook nog gekeken naar \emph{CodeCity} \cite{CodeCity}.
