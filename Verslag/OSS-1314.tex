@@ -7,7 +7,6 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{fullpage}
-\usepackage{listings}
 \usepackage{color}
 \usepackage{soul}
 \usepackage{gensymb}
@@ -32,10 +31,31 @@
 % Een inleiding: beschrijf hierin jullie algemene impressie van het systeem, de manier waarop
 % jullie de analyse hebben aangepakt, etc.
 
-In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java. Om beter de linken tussen de klassen te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Hierna werd voor verdere analyse gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{CodeCity} \cite{CodeCity}. Voor de visualisatie van de klassendiagrammas en sequence diagrams werd er gebruik gemaakt van \emph{Visual Paradigm}.
+In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java.
 
+Het was in het begin niet altijd even makkelijk om visualisatietools te vinden die we ook daadwerkelijk werkend kregen. Om een eerste beeld te krijgen van het systeem bekeken we daarom ondertussen ook al de Javadoc van JUnit. Deze gaf ons een eerste zicht op de structuur. We ontdekten snel dat er in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.x) die erbij zit voor backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit hebben we enkel gekeken naar de huidige versie (exclusief de testen).
+
+CodeCity was de eerste tool die we werkend kregen. Hiermee stelden we vast dat er veel klassen zijn die erg klein zijn (drie methodes of minder). Er zijn ook relatief veel kleine packages. Verder zijn er geen duidelijke problemen vast te stellen: CodeCity vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. 
+
+Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes, die bovendien heel weinig doen.
+
+Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.
+
+Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupling. De functionaliteit is verdeeld over heel veel klassen, die elk slechts een kleine taak hebben. Een aantal verantwoordelijkheden zijn daarom moeilijk thuis te wijzen aan een specifieke klasse, omdat ze door samenwerking van verschillende klassen gerealiseerd worden.
 
 \section{Ontwerpdocumentatie}
+
+De JUnit-code bestaat uit twee afzonderlijke delen. Het package \em{junit} is een oudere versie die aanwezig is omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \em{org.junit} bevat de huidige versie (v4.11). De twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
+
+De kern van JUnit is de org.junit.Runner. Deze is verantwoordelijk 
+
+\subsection{Runners}
+
+\subsection{Statements}
+
+\subsection{}
+
+\subsection{Standaard JUnit configuratie}
 
 De klasse die de main methode bevat in het JUnit project is JUnitCore. JUnitCore is een facade voor het uitvoeren van testen. Via de run() methoden kunnen testen worden uitgevoerd. JUnitCore gebruikt de klasse Runner via de methode run(runner) die niet mag worden uitgevoerd. Deze wordt gebruikt bij het testen. De runner test en verwittigd de RunNotifier als er interessante gebeurtenissen voorvallen. 
 
