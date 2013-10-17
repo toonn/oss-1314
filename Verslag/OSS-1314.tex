@@ -45,13 +45,38 @@ Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupli
 
 \section{Ontwerpdocumentatie}
 
-De JUnit-code bestaat uit twee afzonderlijke delen. Het package \em{junit} is een oudere versie die aanwezig is omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \em{org.junit} bevat de huidige versie (v4.11). De twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
+De JUnit-code bestaat uit twee afzonderlijke delen. Het package \emph{junit} behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \emph{org.junit} bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
 
-De kern van JUnit is de org.junit.Runner. Deze is verantwoordelijk 
+Naast het oudere package \emph{junit} zijn er in het huidige package \emph{org.junit} ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.
 
-\subsection{Runners}
+De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk voor het draaien van een of meerdere testen. Binnen JUnit zijn er verschillende implementaties van deze klasse voorzien. 
 
-\subsection{Statements}
+\subsection{Uitvoering van testen: Runners}
+
+De \emph{org.junit.Runner} klasse is de kern van JUnit. In deze abstracte klasse is een interface vastgelegd voor alle klassen die tests willen draaien. De methode \emph{run(RunNotifier)} op deze klasse dient aangeroepen te worden om de test(en) te draaien die de runner voorstelt. De meegegeven \emph{RunNotifier} wordt door de emph{Runner} aangeroepen bij events in de testflow. Ge\"interesseerde objecten kunnen zich inschrijven bij deze \emph{RunNotifier} om op de hoogte gehouden te worden van de voortgang van de testrun (Observable patroon).
+
+Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse, in figuur \ref{fig:diagrams:Runner} is een selectie te zien. De interessantste is de \emph{org.junit.runners.ParentRunner}. Deze klasse maakt het mogelijk om een hi\"erarchie te maken voor het runnen van testen: hij bevat children die zelf opnieuw gerunned kunnen worden. Hij laat ook toe om zijn childtesten te sorteren en filteren (met aparte \emph{Filter} en \emph{Sorter} klassen).
+%
+%\begin{figure}[hb!]
+%	\centering
+%	\includegraphics[width=0.65\textwidth]{ClassDiagramRunner}
+%	\caption{Klassediagramma van de belangrijkste \emph{Runner}s.}
+%	\label{fig:diagrams:Runner}
+%\end{figure}
+
+Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite}, die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner}, die een \emph{Runner} voorstelt voor een enkele testklasse, met een verzameling van testmethodes als children. Dit is de \emph{Runner} die de eigenlijke testmethodes uitvoert.
+
+Backwards compatibiliteit met versie v3.x wordt ondersteund door aangepaste \emph{Runner}s die een v3.x test wrappen.
+
+\subsection{Aanmaken van Runners: Requests en Computers}
+
+Het is mogelijk om een \emph{Runner} rechtstreeks aan te maken, maar in JUnit is het de bedoeling dat een \emph{Runner} gecre\"eerd wordt met behulp van de klasse \emph{org.junit.runner.Request}. Deze stelt een beschrijving voor van tests die uitgevoerd moeten worden, door middel van een \emph{Runner} die er aan kan opgevraagd worden. Een \emph{Request} kan aangemaakt worden vanuit een enkele klasse of een reeks klassen. Achter de schermen wordt er via een \emph{org.junit.interal.builders.AllDefaultPossibilitiesBuilder} een \emph{Runner} gecre\"eerd voor de opgegeven klasse of reeks van klassen.
+
+In dit proces zit ook nog een \emph{org.junit.runner.Computer} verwerkt. Dit is een strategie voor het schedulen van \emph{Runner}s. Deze kunnen namelijk serieel gedraaid worden of parallel. Deze laatste functie is echter nog experimenteel.
+
+\subsection{Uitvoeren van Runners: Statements}
+
+De \emph{ParentRunner} is zoals gezegd de belangrijkste \emph{Runner}-implementatie. Achter de schermen voert deze zijn children uit via \emph{org.junit.runners.model.Statement}s, of het nu gaat om een verzameling van \emph{Runner}s, een verzameling van methodes, of een verzameling van een ander type.
 
 \subsection{}
 
@@ -75,9 +100,11 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 
 \begin{description}
 
+
 \item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de klassen zeer uitgespreid worden weergegeven. \\
 \emph{CodeCity} geeft een goed beeld maar er is weinig flexibiliteit. Er kunnen packages verborgen worden maar dan is er een witruimte op de plaats van de package. Het werd vooral gebruikt om een overview te krijgen van het project. Via \emph{CodeCity} kon er ook gekeken worden naar de dependenties. 
 %TODO Foto van codeCity
+
 
 \begin{figure}[hb!]
 	\centering
