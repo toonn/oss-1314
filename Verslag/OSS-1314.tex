@@ -33,7 +33,7 @@
 % Een inleiding: beschrijf hierin jullie algemene impressie van het systeem, de manier waarop
 % jullie de analyse hebben aangepakt, etc.
 
-In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java. Om beter de linken tussen de klassen te begrijpen werd er gebruik gemaakt van \textit{X-Ray} \cite{X-Ray} en \textit{AgileJ Structureviews} \cite{AgileJ Structureviews}. Hierna werd voor verdere analyse gebruik gemaakt van \textit{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \textit{CodeCity} \cite{CodeCity}. Voor de visualisatie van de klassendiagrammas en sequence diagrams werd er gebruik gemaakt van \textit{Visual Paradigm}.
+In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java. Om beter de linken tussen de klassen te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Hierna werd voor verdere analyse gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{CodeCity} \cite{CodeCity}. Voor de visualisatie van de klassendiagrammas en sequence diagrams werd er gebruik gemaakt van \emph{Visual Paradigm}.
 
 
 \section{Ontwerpdocumentatie}
@@ -52,11 +52,11 @@ De klasse die de main methode bevat in het JUnit project is JUnitCore. JUnitCore
 
 \section{Beschrijving van de analyse tools en evaluatie hiervan}
 
-Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillende tools zijn \textit{X-ray} \cite{X-Ray}, \textit{AgileJ Structureviews} \cite{AgileJ Structureviews}, \textit{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \textit{CodeCity} \cite{CodeCity}.
+Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillende tools zijn \emph{X-ray} \cite{X-Ray}, \emph{AgileJ Structureviews} \cite{AgileJ Structureviews} , \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{InFusion Hydrogen}. Om \emph{X-Ray} beter de begrijpen werd er ook nog gekeken naar \emph{CodeCity} \cite{CodeCity}.
 
 \begin{description}
 
-\item \textit{X-Ray}: X-Ray is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \label{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De lengte van een rechthoek geeft het aantal methodes weer en de breedte de  ... . Overerving wordt weergegeven via een boomstructuur. Met X-Ray kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het typpe klasse mee: Abstract, Concrete, Interface en Internal Classes. 
+\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De lengte van een rechthoek geeft het aantal methodes weer en de breedte de  ... . Overerving wordt weergegeven via een boomstructuur. Met X-Ray kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het typpe klasse mee: Abstract, Concrete, Interface en Internal Classes. X-Inkomende dependencies liet X-Ray niet zien, alleen uitgaande dependecies.   
 
 \begin{figure}[hb!]
 	\centering
@@ -65,7 +65,7 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 	\label{fig:X-Ray}
 \end{figure}
 
-\item \textit{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.
+\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.
 
 
 \begin{figure}[hb!]
@@ -75,7 +75,10 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 	\label{fig:AgileJKlassendia}
 \end{figure}
 
-\item \textit{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns.
+\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns.
+
+
+
 
 \end{description}
 
@@ -99,25 +102,25 @@ Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengeste
 \begin{thebibliography}{4}
 
 \bibitem{X-Ray}
-\textit{X-Ray}
+\emph{X-Ray}
 \begin{scriptsize}
 geraadpleegd op 11/10/2013 via: \mbox{http://xray.inf.usi.ch/xray.php} en \mbox{https://marketplace.eclipse.org/content/x-ray-software-visualization}
 \end{scriptsize}
 
 \bibitem{AgileJ Structureviews}
-\textit{AgileJ Structureviews}
+\emph{AgileJ Structureviews}
 \begin{scriptsize}
 geraadpleegd op 11/10/2013 via: \mbox{http://www.agilej.com/}
 \end{scriptsize}
 
 \bibitem{Design Pattern Detection Tool}
-\textit{Design Pattern Detection Tool}
+\emph{Design Pattern Detection Tool}
 \begin{scriptsize}
 geraadpleegd op 15/10/2013 via: \mbox{http://java.uom.gr/~nikos/pattern-detection.html} versie  Design Pattern detection Tool (version 4.5 - build 28/05/2010)
 \end{scriptsize}
 
 \bibitem{CodeCity}
-\textit{CodeCity}
+\emph{CodeCity}
 \begin{scriptsize}
 geraadpleegd op 9/10/2013 via: \mbox{http://www.inf.usi.ch/phd/wettel/codecity.html} 
 \end{scriptsize}
