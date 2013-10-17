@@ -76,7 +76,7 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 \begin{description}
 
 \item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de klassen zeer uitgespreid worden weergegeven. \\
-\emph{CodeCity} geeft een goed beeld maar er is weinig flexibiliteit. Er kunnen packages verborgen worden maar dan is er een witruimte op de plaats van de package. Het werd vooral gebruikt om een overview te krijgen van het project. Via \emph{CodeCity} kon er ook gekeken worden naar de dependenties.
+\emph{CodeCity} geeft een goed beeld maar er is weinig flexibiliteit. Er kunnen packages verborgen worden maar dan is er een witruimte op de plaats van de package. Het werd vooral gebruikt om een overview te krijgen van het project. Via \emph{CodeCity} kon er ook gekeken worden naar de dependenties. Er is een afwezigheid aan GodKlassen aangepast.
 %TODO Foto van codeCity
 
 \begin{figure}[hb!]
@@ -87,10 +87,10 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 \end{figure}
 
 \item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via \emph{AgileJ}.\\
-Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph{AgileJ} gegenereerd hebben. De klassendiagramma's die gegenereerd waren, bevatten alle methodes en velden waardoor het overzicht niet echt duidelijk was. Via filters konden deze methoden gefilterd worden. Ook kon er via de filters bepaald worden welke soort klassen andere kleuren konden krijgen. \emph{AgileJ} laat geen associaties zien, maar probeert dit te tonen door het aantal ... 
+Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph{AgileJ} gegenereerd hebben. De klassendiagramma's die gegenereerd werden via AgileJ bevatte alle methodes en velden waardoor er geen duidelijk overzicht was. Via filters konden deze methoden gefilterd worden. Een pluspunt aan het programma was dat het onderscheid tussen abstracte of concrete klassen bepaald kon worden door het gebruik van filters.  Een nadeel aan \emph{AgileJ} is dat het geen associaties zien, maar probeert dit te tonen door het aantal associaties met een klasse. Per package kan er een klassendiagramma gegenereerd worden. 
 
 
-\begin{figure}[hb!]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.65\textwidth]{AgileJKlassendiagramma}
 	\caption{AgileJ Sturcutureviews: klassendiagramma}
@@ -99,16 +99,18 @@ Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph
 
 \item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}. 
 
-\begin{figure}[hb!]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.65\textwidth]{Patterns1}
 	\caption{Overzicht van de patterns}
 	\label{fig:DesignPatterns}
 \end{figure}
 
-\item \emph{InFusion}: InFusion is een tool die een interpretatie geeft van het design van het programma en een overview pyramide kan opstellen die de interpretatie van de klassen hierarchies, de klassen en de methodes kan weergeven. Het genereert ook een design flaws perspective van het programma. Deze twee interpretaties zijn te zien op de figuur \ref{fig:InFusion}.
+\item \emph{InFusion}: InFusion is een tool die een interpretatie van het design van JUnit geeft en een overview piramide kan opstellen die de interpretatie van de klassen hierarchie\"en, de klassen en de methodes kan weergeven. Het genereert ook een design flaws perspective van het programma. Deze twee interpretaties zijn te zien op de figuur \ref{fig:InFusion}.
 
-\begin{figure}
+
+
+\begin{figure}[h!]
 \centering
 	\begin{subfigure}[h]{0.65\textwidth}
 		\centering
@@ -134,10 +136,62 @@ Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph
 
 \section{Projectbeheer}
 
-Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. In de eerste week zijn we samengekomen om samen de opdracht te lezen en de verschillende tools onder elkaar te verdelen. 
+Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. In de eerste week zijn we bijeengekomen om samen de opdracht te lezen en de verschillende visualisatie tools op te zoeken en onder elkaar te verdelen. 
 
 Er werd steeds in een tabel bijgehouden wie wanneer aan wat had gewerkt. Dit gaf eveneens een zicht op wat er al klaar was en wat nog moest gebeuren. \\
-Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
+Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd per persoon per onderdeel. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
+
+%TODO laatste week aanvullen!!
+\begin{table}[h]
+\begin{center}
+    \begin{tabular}{ r | c  c  c  c  c  c}
+     & Joren & Toon & Stef & Sophie \\ \hline
+    Algemeen & 9u00 & 9u00 & 8u55 & 7u15\\
+   	Tools & 10u00 & 22u10 & 12u00 & 9u00 \\
+	Analyse & 14u00 & 25u05 & 9u00 & 8u00 \\
+	Ontwerp & 00u00 & 00u00 & 00u00 & 00u00 \\
+	Implementeren & 00u00 & 00u00 & 00u00 & 00u00\\
+	Verslag & 11u30 & 7u00 & 17u10 & 15u00 \\
+	Totaal & & & & 
+    \end{tabular}
+    \caption{Overzicht werkuren per onderdeel}
+    \label{tab:werkuren}
+\end{center}
+\end{table}
+
+
+\begin{figure}[h!]
+        \centering
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_2}
+                \caption{Joren}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_3}
+                \caption{Toon}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_4}
+                \caption{Stef}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_5}
+                \caption{Sophie}
+        \end{subfigure}%
+                \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{legende}
+                \caption{Legende}
+        \end{subfigure}%
+
+
+ \caption{Weergave van de werkverdeling}
+\label{fig:werkverdeling}
+\end{figure}
 
 \newpage
 \begin{flushleft}
