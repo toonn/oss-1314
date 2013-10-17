@@ -1,4 +1,4 @@
-\documentclass[a4paper, 11pt]{article}
+\documentclass[i1]{oss}
 \setlength{\topmargin}{-.5in}
 \setlength{\textheight}{9in}
 \setlength{\oddsidemargin}{.100in}
@@ -16,14 +16,13 @@
 
 \begin{document}
 
-\begin{titlepage}
-\title{Ontwerp van Software Systemen}
-\author{}
-\end{titlepage}
+\team{6} % teamkleur
+\members{Joren Verspeurt (r0258417)\\
+         Sophie Marien (s0216517)\\
+         Stef Noten (s0211264)\\
+         Toon Nolten (r0258654) } % teamleden
 
-
-
-\maketitle
+\maketitlepage
 \newpage
 \tableofcontents
 \pagebreak
@@ -56,28 +55,53 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillend
 
 \begin{description}
 
-\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De lengte van een rechthoek geeft het aantal methodes weer en de breedte de  ... . Overerving wordt weergegeven via een boomstructuur. Met X-Ray kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het typpe klasse mee: Abstract, Concrete, Interface en Internal Classes. X-Inkomende dependencies liet X-Ray niet zien, alleen uitgaande dependecies.   
+\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de inkomende dependenties niet getoond worden, alleen de uitgaande dependenties.  \\
+Via \emph{Codecity} hebben we meer inzicht gekregen in de afwezigheid van \emph{Godklassen} en ..
 
 \begin{figure}[hb!]
 	\centering
-	\includegraphics[width=0.52\textwidth]{XRayComplexity}
+	\includegraphics[width=0.65\textwidth]{XRayComplexity}
 	\caption{X-Ray: Complexiteit}
 	\label{fig:X-Ray}
 \end{figure}
 
-\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.
+\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.\\
+Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ gegenereert hebben. De klassendiagrammas die gegenereerd waren, bevatten alle methodes en velden waardoor het overzicht niet echt duidelijk was. Via filters konden deze methoden gefilterd worden. Ook kon er via de filters bepaald worden welke soort klasssen andere kleuren konden krijgen. AgileJ laat geen associaties zien, maar probeert dit te tonen door het aantal ... 
 
 
 \begin{figure}[hb!]
 	\centering
-	\includegraphics[width=0.52\textwidth]{AgileJKlassendiagramma}
+	\includegraphics[width=0.65\textwidth]{AgileJKlassendiagramma}
 	\caption{AgileJ Sturcutureviews: klassendiagramma}
 	\label{fig:AgileJKlassendia}
 \end{figure}
 
-\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns.
+\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}
 
+\begin{figure}[hb!]
+	\centering
+	\includegraphics[width=0.65\textwidth]{Patterns1}
+	\caption{Overzicht van de patterns}
+	\label{fig:DesignPatterns}
+\end{figure}
 
+\item \emph{InFusion}: InFusion is een tool die een interpretatie geeft van het design van het programma en een overview pyramide kan opstellen die de interpretatie van de klassen hierarchies, de klassen en de methodes kan weergeven. Het genereert ook een design flaws perspective van het programma. Deze twee interpretaties zijn te zien op de figuur \ref{fig:InFusion}.
+
+\begin{figure}
+\centering
+	\begin{subfigure}[h]{0.65\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{InFusion1}
+		\caption{Overview Pyramid}
+	\end{subfigure}
+	\begin{subfigure}[h]{0.65\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{InFusion2}
+		\caption{Design flaw perspective}
+	\end{subfigure}
+\caption{Screenshots van InFusion}
+\label{fig:InFusion}
+\end{figure}
 
 
 \end{description}
@@ -92,10 +116,12 @@ Statements wordt gebruikt om alle annotaties uit te voeren
 
 \section{Samenvatting}
 
-\section{projectbeheer}
+\section{Projectbeheer}
 
-Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. 
+Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. In de eerste week zijn we samengekomen om samen de opdracht te lezen en de verschillende tools onder elkaar te verdelen. 
 
+Er werd steeds in een tabel bijgehouden wie wanneer aan wat had gewerkt. Dit gaf eveneens een zicht op wat er al klaar was en wat nog moest gebeuren. \\
+Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
 
 \newpage
 \begin{flushleft}
@@ -117,6 +143,12 @@ geraadpleegd op 11/10/2013 via: \mbox{http://www.agilej.com/}
 \emph{Design Pattern Detection Tool}
 \begin{scriptsize}
 geraadpleegd op 15/10/2013 via: \mbox{http://java.uom.gr/~nikos/pattern-detection.html} versie  Design Pattern detection Tool (version 4.5 - build 28/05/2010)
+\end{scriptsize}
+
+\bibitem{InFusion}
+\emph{InFusion}
+\begin{scriptsize}
+geraadpleegd op 17/10/2013 via: \mbox{http://www.intooitus.com/products/infusion/download} versie InFusion Hydrogen v1.8.0
 \end{scriptsize}
 
 \bibitem{CodeCity}
