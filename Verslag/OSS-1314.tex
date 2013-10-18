@@ -31,17 +31,19 @@
 % Een inleiding: beschrijf hierin jullie algemene impressie van het systeem, de manier waarop
 % jullie de analyse hebben aangepakt, etc.
 
-In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java.
+%TODO Het Package
+In dit project wordt JUnit ontleed via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java.\\
 
-Het was in het begin niet altijd even makkelijk om visualisatietools te vinden die we ook daadwerkelijk werkend kregen. Om een eerste beeld te krijgen van het systeem bekeken we daarom ondertussen ook al de Javadoc van JUnit. Deze gaf ons een eerste zicht op de structuur. We ontdekten snel dat er in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.x) die erbij zit voor backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit hebben we enkel gekeken naar de huidige versie (exclusief de testen).
 
-CodeCity was de eerste tool die we werkend kregen. Hiermee stelden we vast dat er veel klassen zijn die erg klein zijn (drie methodes of minder). Er zijn ook relatief veel kleine packages. Verder zijn er geen duidelijke problemen vast te stellen: CodeCity vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. 
+Het was in het begin niet altijd even makkelijk om visualisatietools te vinden die we ook daadwerkelijk werkend kregen. De Javadoc van JUnit was daarom handig om een eerste beeld te krijgen van het systeem. Door het lezen van deze Javadoc kregen we een beter zicht op de structuur van JUnit. Hieruit konden we afleiden dar in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.x) die in het project zit voor een backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit werd enkel gekeken naar de huidige versie (exclusief de testen).\\
 
-Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes, die bovendien heel weinig doen.
+De eerste tool die gebruikt werd om JUnit te analyseren was \emph{CodeCity}. Hiermee kon er al direct worden vastgesteld dat JUnit bestaat uit veel klassen die erg klein zijn (drie methodes of minder). Verder werd er ook vastgesteld dat er ook relatief veel kleine packages zijn. Er zijn geen duidelijke problemen vast te stellen bij \emph{CodeCity}. De tool vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. \\
 
-Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.
+Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Deze twee tools bevestigde Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes, die bovendien heel weinig doen.\\
 
-Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupling. De functionaliteit is verdeeld over heel veel klassen, die elk slechts een kleine taak hebben. Een aantal verantwoordelijkheden zijn daarom moeilijk thuis te wijzen aan een specifieke klasse, omdat ze door samenwerking van verschillende klassen gerealiseerd worden.
+Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.\\
+
+Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupling. De functionaliteit is verdeeld over heel veel klassen, die elk slechts een kleine taak hebben. Een aantal verantwoordelijkheden zijn daarom moeilijk thuis te brengen aan een specifieke klasse, omdat ze door samenwerking van verschillende klassen gerealiseerd worden.\\
 
 \section{Ontwerpdocumentatie}
 
