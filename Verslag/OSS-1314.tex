@@ -55,9 +55,28 @@ De kern van JUnit is de org.junit.Runner. Deze is verantwoordelijk
 
 \subsection{}
 
-\subsection{Standaard JUnit configuratie}
+\subsection{Standaard JUnit uitvoering}
 
-De klasse die de main methode bevat in het JUnit project is JUnitCore. JUnitCore is een facade voor het uitvoeren van testen. Via de run() methoden kunnen testen worden uitgevoerd. JUnitCore gebruikt de klasse Runner via de methode run(runner) die niet mag worden uitgevoerd. Deze wordt gebruikt bij het testen. De runner test en verwittigd de RunNotifier als er interessante gebeurtenissen voorvallen. 
+De klasse die de main methode bevat in het JUnit project is \emph{JUnitCore}.
+\emph{JUnitCore} is een facade voor het uitvoeren van testen.
+In figuur \ref{fig:junitsequence} is het sequence diagram weergegeven.
+\emph{JUnitCore} implementeert weinig functionaliteit.
+Via de ``run()'' methoden wordt de uitvoering van de testen gestart.
+Deze testen worden eigenlijk uitgevoerd in een \emph{Suite}.
+De manier waarop deze \emph{Suite} verkregen wordt is niet eenvoudig.
+\emph{JUnitCore} maakt een statische oproep naar \emph{Request},
+\emph{Request} maakt dan een \emph{Computer} en een
+\emph{AllDefaultPossibilitiesBuilder}, daarna maakt de \emph{Computer}
+een \emph{Suite} aan.
+Deze \emph{Suite} maakt gebruikt van de \emph{AllDefaultPossibilitiesBuilder}
+om een \emph{RunnerBuilder} te verkrijgen (dit is niet in het diagram
+ge\"expliciteerd), de \emph{AllDefaultPossibilitiesBuilder} vult deze in met
+bvb. een \emph{IgnoreBuilder} die ervoor zorgt dat een test niet uitgevoerd
+wordt.
+De statische oproep in \emph{Request} cre\"eert dan een \emph{Request}-object
+dat de aangemaakte \emph{Suite} als runner bevat.
+Om de tests daadwerkelijk te starten vraagt \emph{JUnitCore} de runner op
+van de \emph{Request} en start deze met ``run()''.
 
 
 
