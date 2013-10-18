@@ -16,10 +16,10 @@
 \begin{document}
 
 \team{6} % teamkleur
-\members{Joren Verspeurt (r0258417)\\
-         Sophie Marien (s0216517)\\
-         Stef Noten (s0211264)\\
-         Toon Nolten (r0258654) } % teamleden
+\members{Joren Verspeurt {\small \texttt{(r0258417)} } \\
+         Sophie Marien {\small \texttt{(s0216517)}}\\
+         Stef Noten {\small \texttt{(s0211264)}}\\
+         Toon Nolten {\small \texttt{(r0258654)}} } % teamleden
 
 \maketitlepage
 \newpage
@@ -31,27 +31,54 @@
 % Een inleiding: beschrijf hierin jullie algemene impressie van het systeem, de manier waarop
 % jullie de analyse hebben aangepakt, etc.
 
-In dit project moeten we JUnit ontleden via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java.
+%TODO Het Package
+In dit project wordt JUnit ontleed via analyse tools die JUnit gaan visualiseren. JUnit is een testing en regressie testing framework in Java.\\
 
-Het was in het begin niet altijd even makkelijk om visualisatietools te vinden die we ook daadwerkelijk werkend kregen. Om een eerste beeld te krijgen van het systeem bekeken we daarom ondertussen ook al de Javadoc van JUnit. Deze gaf ons een eerste zicht op de structuur. We ontdekten snel dat er in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.x) die erbij zit voor backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit hebben we enkel gekeken naar de huidige versie (exclusief de testen).
 
-CodeCity was de eerste tool die we werkend kregen. Hiermee stelden we vast dat er veel klassen zijn die erg klein zijn (drie methodes of minder). Er zijn ook relatief veel kleine packages. Verder zijn er geen duidelijke problemen vast te stellen: CodeCity vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. 
+Het was in het begin niet altijd even makkelijk om visualisatietools te vinden die we ook daadwerkelijk werkend kregen. De Javadoc van JUnit was daarom handig om een eerste beeld te krijgen van het systeem. Door het lezen van deze Javadoc kregen we een beter zicht op de structuur van JUnit. Hieruit konden we afleiden dar in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.x) die in het project zit voor een backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit werd enkel gekeken naar de huidige versie (exclusief de testen).\\
 
-Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes, die bovendien heel weinig doen.
+De eerste tool die gebruikt werd om JUnit te analyseren was \emph{CodeCity}. Hiermee kon er al direct worden vastgesteld dat JUnit bestaat uit veel klassen die erg klein zijn (drie methodes of minder). Verder werd er ook vastgesteld dat er ook relatief veel kleine packages zijn. Er zijn geen duidelijke problemen vast te stellen bij \emph{CodeCity}. De tool vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. \\
 
-Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.
+Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Deze twee tools bevestigde er ook met \emph{X-RAy} Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes,  bovendien heel weinig doen.\\
 
-Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupling. De functionaliteit is verdeeld over heel veel klassen, die elk slechts een kleine taak hebben. Een aantal verantwoordelijkheden zijn daarom moeilijk thuis te wijzen aan een specifieke klasse, omdat ze door samenwerking van verschillende klassen gerealiseerd worden.
+Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.\\
+
+Onze eerste impressie van JUnit is dat er gestreefd is naar een heel lage coupling. De functionaliteit is verdeeld over heel veel klassen, die elk slechts een kleine taak hebben. Een aantal verantwoordelijkheden zijn daarom moeilijk thuis te brengen aan een specifieke klasse, omdat ze door samenwerking van verschillende klassen gerealiseerd worden.\\
 
 \section{Ontwerpdocumentatie}
 
-De JUnit-code bestaat uit twee afzonderlijke delen. Het package \em{junit} is een oudere versie die aanwezig is omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \em{org.junit} bevat de huidige versie (v4.11). De twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
+De JUnit-code bestaat uit twee afzonderlijke delen. Het package \emph{junit} behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \emph{org.junit} bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
 
-De kern van JUnit is de org.junit.Runner. Deze is verantwoordelijk 
+Naast het oudere package \emph{junit} zijn er in het huidige package \emph{org.junit} ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.
 
-\subsection{Runners}
+De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk voor het draaien van een of meerdere testen. Binnen JUnit zijn er verschillende implementaties van deze klasse voorzien. 
 
-\subsection{Statements}
+\subsection{Uitvoering van testen: Runners}
+
+De \emph{org.junit.Runner} klasse is de kern van JUnit. In deze abstracte klasse is een interface vastgelegd voor alle klassen die tests willen draaien. De methode \emph{run(RunNotifier)} op deze klasse dient aangeroepen te worden om de test(en) te draaien die de runner voorstelt. De meegegeven \emph{RunNotifier} wordt door de emph{Runner} aangeroepen bij events in de testflow. Ge\"interesseerde objecten kunnen zich inschrijven bij deze \emph{RunNotifier} om op de hoogte gehouden te worden van de voortgang van de testrun (Observable patroon).
+
+Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse, in figuur \ref{fig:diagrams:Runner} is een selectie te zien. De interessantste is de \emph{org.junit.runners.ParentRunner}. Deze klasse maakt het mogelijk om een hi\"erarchie te maken voor het runnen van testen: hij bevat children die zelf opnieuw gerunned kunnen worden. Hij laat ook toe om zijn childtesten te sorteren en filteren (met aparte \emph{Filter} en \emph{Sorter} klassen).
+%
+%\begin{figure}[hb!]
+%	\centering
+%	\includegraphics[width=0.65\textwidth]{ClassDiagramRunner}
+%	\caption{Klassediagramma van de belangrijkste \emph{Runner}s.}
+%	\label{fig:diagrams:Runner}
+%\end{figure}
+
+Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite}, die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner}, die een \emph{Runner} voorstelt voor een enkele testklasse, met een verzameling van testmethodes als children. Dit is de \emph{Runner} die de eigenlijke testmethodes uitvoert.
+
+Backwards compatibiliteit met versie v3.x wordt ondersteund door aangepaste \emph{Runner}s die een v3.x test wrappen.
+
+\subsection{Aanmaken van Runners: Requests en Computers}
+
+Het is mogelijk om een \emph{Runner} rechtstreeks aan te maken, maar in JUnit is het de bedoeling dat een \emph{Runner} gecre\"eerd wordt met behulp van de klasse \emph{org.junit.runner.Request}. Deze stelt een beschrijving voor van tests die uitgevoerd moeten worden, door middel van een \emph{Runner} die er aan kan opgevraagd worden. Een \emph{Request} kan aangemaakt worden vanuit een enkele klasse of een reeks klassen. Achter de schermen wordt er via een \emph{org.junit.interal.builders.AllDefaultPossibilitiesBuilder} een \emph{Runner} gecre\"eerd voor de opgegeven klasse of reeks van klassen.
+
+In dit proces zit ook nog een \emph{org.junit.runner.Computer} verwerkt. Dit is een strategie voor het schedulen van \emph{Runner}s. Deze kunnen namelijk serieel gedraaid worden of parallel. Deze laatste functie is echter nog experimenteel.
+
+\subsection{Uitvoeren van Runners: Statements}
+
+De \emph{ParentRunner} is zoals gezegd de belangrijkste \emph{Runner}-implementatie. Achter de schermen voert deze zijn children uit via \emph{org.junit.runners.model.Statement}s, of het nu gaat om een verzameling van \emph{Runner}s, een verzameling van methodes, of een verzameling van een ander type.
 
 \subsection{}
 
@@ -88,45 +115,97 @@ van de \emph{Request} en start deze met ``run()''.
 %ook het gebruik (of het niet-gebruik) van patronen. Geef opnieuw sterke en zwakke punten
 %van het ontwerp op dit vlak.
 
+\subsection{Sterke en zwakke punten}
+
+\subsection{Gebruik van patronen}
+
+Er worden verschillende software design patronen gebruikt in JUnit. 
+Hieronder volgt een overzicht van een aantal verschillende patronen en voorbeelden van waar ze gebruikt worden.
+
+\subsubsection{Factory Method}
+In de klasse \emph{runners.model.RunnerBuilder} bevindt zich een Factory Method om \emph{Runner}s aan te maken, namelijk \emph{runnerForClass()}. 
+In de documentatie wordt ook aangegeven dat de methode in een subklasse ge\"implementeerd moet worden om de juiste Runner terug te geven.
+
+\subsubsection{Observer}
+De structuur \emph{Runner}-\emph{runner.RunNotifier}-\emph{runner.RunListener} kan gezien worden als een vorm van Observer-structuur. 
+De Runner klasse wordt ge\"instanti\"eerd met een \emph{RunNotifier}, die notificatiemethoden bevat die aangeroepen worden door de \emph{Runner}. 
+Aan de \emph{RunNotifier} kan dan een \emph{RunListener} worden toegevoegd (via de \emph{Runner}, de \emph{addListener()}-methode van \emph{RunNotifier} is wel \emph{public}, maar de documentatie geeft aan dat deze enkel voor intern gebruik is en dat de listener moet worden toegevoegd door de \emph{Runner}). 
+Dit maakt het mogelijk om tijdens het uitvoeren van een testrun op verschillende manieren te reageren op gebeurtenissen die kunnen voorkomen tijdens het uitvoeren van tests (zoals wanneer een test begint of eindigt, een Exception gegooid wordt, ...).
+
+\subsubsection{Composite}
+Het Composite patroon wordt gebruikt in een aantal structuren. Een eerste voorbeeld hiervan is de Interface \emph{rules.TestRule}, verschillende implementerende Leaf-klassen en de compositie \emph{rules.RuleChain}. 
+\emph{RuleChain} implementeert \emph{TestRule} en bevat zelf kinderen die ook \emph{TestRule}-objecten zijn.
+\\
+Ook de structuur \emph{runner.Runner} - \emph{internal.runners.ErrorReportingRunner},... - \emph{runners.ParentRunner} is een voorbeeld van een Composite patroon. 
+Een \emph{ParentRunner} kan verschillende kinderen bevatten die ook \emph{Runner}s zijn. 
+Op deze manier kan het gedrag van de \emph{Runner} tijdens het uitvoeren van tests aangepast worden (bijvoorbeeld om slim om te gaan met gegooide Exceptions).
+\\
+Het is misschien ook interessant om te vermelden dat de ontwerpers van JUnit zelf vermelden dat de klasse \emph{runner.Description} niet als Composite ge\"implementeerd is omdat er geen logica in uitgevoerd wordt, ze bevat enkel informatie.
+
+\subsubsection{Strategy}
+De ontwerpers vermelden zelf in de documentatie van de klasse \emph{Computer} dat deze bedoeld is als Strategy maar het is niet erg duidelijk aangezien er (buiten de klasse \emph{experimental.ParallelComputer}) maar 1 klasse Computer is en er dus maar 1 Strategy is.
+\\
+Iets gelijkaardig is waar voor \emph{runners.model.RunnerScheduler}, hier wordt ook expliciet vermeld dat het bedoeld is als Strategy maar de enige plaatsen waar gebruik gemaakt wordt van het patroon is in enkele methoden die anonieme inwendige klassen defini\"eren.
+
+\subsubsection{Command}
+Het Command patroon is terug te vinden in veel van de klassen van de \emph{rules} package. 
+Een goed voorbeeld hiervan is \emph{rules.ExternalResource}, die toestaat om voor een test een externe bron in te laden. 
+Deze functionaliteit is afgezonderd in de \emph{ExternalResource} klasse samen met methoden om voor en na het inladen iets te doen, een vorm van omkadering die typisch is voor het Command patroon. 
+
+\subsubsection{Visitor}
+Dit patroon is niet echt op een zuivere manier toegepast, maar het kan herkend worden in de klassen \emph{Filter} en \emph{Filterable} in het \emph{runner.manipulation} package. 
+In dit geval is de \emph{Filter} de Visitor die uitbreidingen van de klasse \emph{runner.Description} bezoekt. 
+Er worden dan \emph{Description}s gefilterd van tests die niet uitgevoerd moeten worden. 
+\\
+Sortable is een analoge vorm van pseudo-Visitor die kan toegepast worden op een \emph{Description}-hi\"erarchie.
+\\
+De reden dat het geen echte instantie van het Visitor patroon is, is dat er in \emph{Filter} geen onderscheid gemaakt wordt tussen verschillende soorten \emph{Filterable} objecten, alleen of ze \emph{Filterable} zijn of niet.
+
+
 \section{Beschrijving van de analyse tools en evaluatie hiervan}
 
 Voor de analyse van JUnit werden er vier analyse tools gebruikt. De verschillende tools zijn \emph{X-ray} \cite{X-Ray}, \emph{AgileJ Structureviews} \cite{AgileJ Structureviews} , \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{InFusion Hydrogen}. Om \emph{X-Ray} beter de begrijpen werd er ook nog gekeken naar \emph{CodeCity} \cite{CodeCity}.
 
 \begin{description}
 
-\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de inkomende dependenties niet getoond worden, alleen de uitgaande dependenties.  \\
-Via \emph{Codecity} hebben we meer inzicht gekregen in de afwezigheid van \emph{Godklassen} en ..
+
+\item \emph{X-Ray}: \emph{X-Ray} is een visualisatie tool die de complexiteit van de klassen weergeeft. Figuur \ref{fig:X-Ray} geeft dit weer. De rechthoeken geven de klassen weer. De breedte van een rechthoek geeft het aantal methodes weer en de lengte het aantal lijnen code. Overerving wordt weergegeven via een boomstructuur. Met \emph{X-Ray }kan je ook opzoeken wie de parents zijn van een klasse of de childs. Via kleuren geven ze ook het type klasse mee: Abstract, Concrete, Interface en Internal Classes. Door een klasse te selecteren kan men de dependenties zien van deze klassen via rode lijnen die deze klasse verbind met de dependentie klassen. Het nadeel aan \emph{X-Ray} is dat de klassen zeer uitgespreid worden weergegeven. \\
+\emph{CodeCity} geeft een goed beeld maar er is weinig flexibiliteit. Er kunnen packages verborgen worden maar dan is er een witruimte op de plaats van de package. Het werd vooral gebruikt om een overview te krijgen van het project. Via \emph{CodeCity} kon er ook gekeken worden naar de dependenties. 
+%TODO Foto van codeCity
+
 
 \begin{figure}[hb!]
 	\centering
-	\includegraphics[width=0.65\textwidth]{XRayComplexity}
-	\caption{X-Ray: Complexiteit}
+	\includegraphics[width=0.70\textwidth]{XRayComplexity}
+	\caption{X-Ray: polymetric view}
 	\label{fig:X-Ray}
 \end{figure}
 
-\item \emph{AgileJ Structureviews}: AgileJ Structureviews is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via AgileJ.\\
-Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ gegenereert hebben. De klassendiagrammas die gegenereerd waren, bevatten alle methodes en velden waardoor het overzicht niet echt duidelijk was. Via filters konden deze methoden gefilterd worden. Ook kon er via de filters bepaald worden welke soort klasssen andere kleuren konden krijgen. AgileJ laat geen associaties zien, maar probeert dit te tonen door het aantal ... 
+\item \emph{AgileJ Structureviews}: \emph{AgileJ Structureviews} is een visualistatie tool die klassendiagrammas kan genereren. Figuur \label{fig:AgileJklassendia} geeft een voorbeeld visualisatie weer van een klassendiagramma die gegenereerd is via \emph{AgileJ}.\\
+Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph{AgileJ} gegenereerd hebben. De klassendiagramma's die gegenereerd werden via \emph{AgileJ} bevatte alle methodes en velden waardoor er geen duidelijk overzicht was. Via filters konden deze methoden gefilterd worden. Een pluspunt aan het programma was dat het onderscheid tussen abstracte of concrete klassen bepaald kon worden door het gebruik van filters.  Een nadeel aan \emph{AgileJ} is dat het geen associaties zien, maar probeert dit te tonen door het aantal associaties met een klasse. Per package kan er een klassendiagramma gegenereerd worden. 
 
 
-\begin{figure}[hb!]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.65\textwidth]{AgileJKlassendiagramma}
 	\caption{AgileJ Sturcutureviews: klassendiagramma}
 	\label{fig:AgileJKlassendia}
 \end{figure}
 
-\item \emph{Design Pattern Detection Tool}: Design Pattern Detection Tool is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}
+\item \emph{Design Pattern Detection Tool}: \emph{Design Pattern Detection Tool} is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}. 
 
-\begin{figure}[hb!]
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.65\textwidth]{Patterns1}
 	\caption{Overzicht van de patterns}
 	\label{fig:DesignPatterns}
 \end{figure}
 
-\item \emph{InFusion}: InFusion is een tool die een interpretatie geeft van het design van het programma en een overview pyramide kan opstellen die de interpretatie van de klassen hierarchies, de klassen en de methodes kan weergeven. Het genereert ook een design flaws perspective van het programma. Deze twee interpretaties zijn te zien op de figuur \ref{fig:InFusion}.
+\item \emph{InFusion}: \emph{InFusion} is een tool die een interpretatie van het design van JUnit geeft en een overview piramide kan opstellen die de interpretatie van de klassen hierarchie\"en, de klassen en de methodes kan weergeven. Het genereert ook een design flaws perspective van het programma. Deze twee interpretaties zijn te zien op de figuur \ref{fig:InFusion}.
 
-\begin{figure}
+
+
+\begin{figure}[h!]
 \centering
 	\begin{subfigure}[h]{0.65\textwidth}
 		\centering
@@ -146,21 +225,68 @@ Onze klassendiagrammas zijn gebaseerd op de klassendiagrammas die we via AgileJ 
 \end{description}
 
 
-\section{Analyse tools en belangrijke resultaten}
-Agilj filters gebruikt, Codecity, Xray
-Statements wordt gebruikt om alle annotaties uit te voeren
-.runner en .runners
-
 \section{Evaluatie testen}
 
 \section{Samenvatting}
 
 \section{Projectbeheer}
 
-Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. In de eerste week zijn we samengekomen om samen de opdracht te lezen en de verschillende tools onder elkaar te verdelen. 
+Wij zijn vrij laat begonnen aan het project omdat onze groep nog niet samengesteld was in het begin van de eerste week. In de eerste week zijn we bijeengekomen om samen de opdracht te lezen en de verschillende visualisatie tools op te zoeken en onder elkaar te verdelen. 
 
 Er werd steeds in een tabel bijgehouden wie wanneer aan wat had gewerkt. Dit gaf eveneens een zicht op wat er al klaar was en wat nog moest gebeuren. \\
-Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
+Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd per persoon per onderdeel. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
+
+%TODO laatste week aanvullen!!
+\begin{table}[h]
+\begin{center}
+    \begin{tabular}{ r | c  c  c  c  c  c}
+     & Joren & Toon & Stef & Sophie \\ \hline
+    Algemeen & 9u00 & 9u00 & 8u55 & 7u15\\
+   	Tools & 10u00 & 22u10 & 12u00 & 9u00 \\
+	Analyse & 14u00 & 25u05 & 9u00 & 8u00 \\
+	Ontwerp & 00u00 & 00u00 & 00u00 & 00u00 \\
+	Implementeren & 00u00 & 00u00 & 00u00 & 00u00\\
+	Verslag & 11u30 & 7u00 & 17u10 & 15u00 \\
+	Totaal & & & & 
+    \end{tabular}
+    \caption{Overzicht werkuren per onderdeel}
+    \label{tab:werkuren}
+\end{center}
+\end{table}
+
+%TODO figuren updaten
+\begin{figure}[h!]
+        \centering
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_2}
+                \caption{Joren}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_3}
+                \caption{Toon}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_4}
+                \caption{Stef}
+        \end{subfigure}%
+        \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{chart_5}
+                \caption{Sophie}
+        \end{subfigure}%
+                \begin{subfigure}[hb]{0.15\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{legende}
+                \caption{Legende}
+        \end{subfigure}%
+
+
+ \caption{Weergave van de werkverdeling}
+\label{fig:werkverdeling}
+\end{figure}
 
 \newpage
 \begin{flushleft}
