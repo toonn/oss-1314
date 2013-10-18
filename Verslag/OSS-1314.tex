@@ -58,13 +58,13 @@ De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk
 De \emph{org.junit.Runner} klasse is de kern van JUnit. In deze abstracte klasse is een interface vastgelegd voor alle klassen die tests willen draaien. De methode \emph{run(RunNotifier)} op deze klasse dient aangeroepen te worden om de test(en) te draaien die de runner voorstelt. De meegegeven \emph{RunNotifier} wordt door de emph{Runner} aangeroepen bij events in de testflow. Ge\"interesseerde objecten kunnen zich inschrijven bij deze \emph{RunNotifier} om op de hoogte gehouden te worden van de voortgang van de testrun (Observable patroon).
 
 Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse, in figuur \ref{fig:diagrams:Runner} is een selectie te zien. De interessantste is de \emph{org.junit.runners.ParentRunner}. Deze klasse maakt het mogelijk om een hi\"erarchie te maken voor het runnen van testen: hij bevat children die zelf opnieuw gerunned kunnen worden. Hij laat ook toe om zijn childtesten te sorteren en filteren (met aparte \emph{Filter} en \emph{Sorter} klassen).
-%
-%\begin{figure}[hb!]
-%	\centering
-%	\includegraphics[width=0.65\textwidth]{ClassDiagramRunner}
-%	\caption{Klassediagramma van de belangrijkste \emph{Runner}s.}
-%	\label{fig:diagrams:Runner}
-%\end{figure}
+
+\begin{figure}[hb!]
+	\centering
+	\includegraphics[width=0.65\textwidth]{ClassDiagramRunner}
+	\caption{Klassendiagramma van de belangrijkste \emph{Runner}s.}
+	\label{fig:diagrams:Runner}
+\end{figure}
 
 Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite}, die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner}, die een \emph{Runner} voorstelt voor een enkele testklasse, met een verzameling van testmethodes als children. Dit is de \emph{Runner} die de eigenlijke testmethodes uitvoert.
 
@@ -76,9 +76,29 @@ Het is mogelijk om een \emph{Runner} rechtstreeks aan te maken, maar in JUnit is
 
 In dit proces zit ook nog een \emph{org.junit.runner.Computer} verwerkt. Dit is een strategie voor het schedulen van \emph{Runner}s. Deze kunnen namelijk serieel gedraaid worden of parallel. Deze laatste functie is echter nog experimenteel.
 
-\subsection{Uitvoeren van Runners: Statements}
+\subsection{Uitvoeren van Runners: Statements en Rules}
 
-De \emph{ParentRunner} is zoals gezegd de belangrijkste \emph{Runner}-implementatie. Achter de schermen voert deze zijn children uit via \emph{org.junit.runners.model.Statement}s, of het nu gaat om een verzameling van \emph{Runner}s, een verzameling van methodes, of een verzameling van een ander type.
+Een \emph{org.junit.runners.model.Statement} stelt acties voor die genomen worden bij het aanroepen van zijn methode \emph{evaluate()}. Met meerdere \emph{Statement}s wordt het mogelijk om een uitvoering te regelen en te manipuleren. In een \emph{Statement} kan bijvoorbeeld met behulp van reflectie een methode-aanroep gedaan worden om een testmethode uit te voeren. Deze \emph{Statement}s kunnen gewrapped worden door andere \emph{Statement}s om zo hun gedrag uit te breiden of te veranderen.
+
+Een flexibelere manier om het gedrag van een test te veranderen is het gebruik van \emph{org.junit.rules.TestRule}s. Deze hebben een methode \emph{apply(Statement, Description)} die een \emph{Statement} teruggeeft. Op deze manier kan het wijzigen of wrappen van \emph{Statement}s dus via overerving van een \emph{TestRule} gedaan worden. In JUnit wordt er een onderscheid gemaakt tussen een \emph{org.junit.Rule}, die gespecificeerd wordt als annotatie op velden en methodes, en een \emph{org.junit.ClassRule}, die gespecificeerd wordt als annotatie op klassen.
+
+\emph{ParentRunner} is de belangrijkste \emph{Runner}-implementatie. Achter de schermen worden de childrunners, childtesten of andere children uitgevoerd door ze in een \emph{Statement} te plaatsen. Deze \emph{Statement} wordt echter niet rechtstreeks uitgevoerd, ze wordt eerst gewrapped door andere \emph{Statement}s. \emph{ParentRunner} gebruikt de volgende wrapper \emph{Statement}s:
+
+\begin{description}
+\item[RunBefores] voert methodes uit voor de uitvoer van de gewrapte \emph{Statement}. Deze worden gespecificeerd door een \emph{@Before}-annotatie die geplaatst wordt op een testmethode of testklasse.
+\item[RunAfters] analoog, maar wordt uitgevoerd na de gewrapte statement en gespecificeerd door een \emph{@After}-annotatie.
+\item[RunRules] voert \emph{TestRule}s uit op de \emph{Statement} om zo een gewijzigde \emph{Statement} te bekomen die het gedrag voorstelt van deze \emph{TestRule}s.
+\end{description}
+
+De \emph{BlockJUnit4ClassRunner}-klasse, die methodes als children heeft, voert zijn methodes ook uit in een \emph{Statement}. Hierin wordt voor elke testmethode een nieuwe instantie aangemaakt van de testklasse, om isolatie van de verschillende testmethodes te bekomen. Deze \emph{Statement} wordt opnieuw gewrapped, hier door de \emph{Statement}s:
+
+\begin{description}
+\item[ExpectException] werpt een fout op als de gewrapte \emph{Statement} niet de verwachte exception opwerpt, zodat de test faalt.
+\item[FailOnTimeout] werpt een fout op als de gewrapte \emph{Statement} te lang doet over zijn uitvoer, zodat de test faalt.
+\item[RunBefores, RunAfters en RunRules] werken hetzelfde als bij \emph{ParentRunner}.
+\end{description}
+
+De eerste vier zijn hierbij als deprecated gedeclareerd, zodat het eigenlijk aangeraden is om voor gewijzigde uitvoer altijd \emph{TestRule}s te gebruiken.
 
 \subsection{}
 
