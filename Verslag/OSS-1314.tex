@@ -45,17 +45,17 @@ De eerste impressie die we van JUnit kregen is dat er gemiddeld een lage couplin
 
 \section{Ontwerpdocumentatie}
 
-De JUnit-code bestaat uit twee afzonderlijke delen. Het package \emph{junit} behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \emph{org.junit} bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.
+De JUnit-code bestaat uit twee afzonderlijke delen. Het package \emph{junit} behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \emph{org.junit} bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.\\
 
-Naast het oudere package \emph{junit} zijn er in het huidige package \emph{org.junit} ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.
+Naast het oudere package \emph{junit} zijn er in het huidige package \emph{org.junit} ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.\\
 
-De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk voor het draaien van een of meerdere testen. Binnen JUnit zijn er verschillende implementaties van deze klasse voorzien. 
+De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk voor het draaien van een of meerdere testen. Binnen JUnit zijn er verschillende implementaties van deze klasse voorzien. \\
 
 \subsection{Uitvoering van testen: Runners}
 
-De \emph{org.junit.Runner} klasse is de kern van JUnit. In deze abstracte klasse is een interface vastgelegd voor alle klassen die tests willen draaien. De methode \emph{run(RunNotifier)} op deze klasse dient aangeroepen te worden om de test(en) te draaien die de runner voorstelt. De meegegeven \emph{RunNotifier} wordt door de emph{Runner} aangeroepen bij events in de testflow. Ge\"interesseerde objecten kunnen zich inschrijven bij deze \emph{RunNotifier} om op de hoogte gehouden te worden van de voortgang van de testrun (Observable patroon).
+De \emph{org.junit.Runner} klasse is de kern van JUnit. In deze abstracte klasse is een interface vastgelegd voor alle klassen die testen willen draaien. De methode \emph{run(RunNotifier)} op deze klasse dient aangeroepen te worden om de test(en) te draaien die de runner voorstelt. De meegegeven \emph{RunNotifier} wordt door de \emph{Runner} aangeroepen bij events in de testflow. Ge\"interesseerde objecten kunnen zich inschrijven bij deze \emph{RunNotifier} om op de hoogte gehouden te worden van de vooruitgang van de testrun (Observable pattern).\\
 
-Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse, in figuur \ref{fig:diagrams:Runner} is een selectie te zien. De interessantste is de \emph{org.junit.runners.ParentRunner}. Deze klasse maakt het mogelijk om een hi\"erarchie te maken voor het runnen van testen: hij bevat children die zelf opnieuw gerunned kunnen worden. Hij laat ook toe om zijn childtesten te sorteren en filteren (met aparte \emph{Filter} en \emph{Sorter} klassen).
+Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse. In figuur \ref{fig:diagrams:Runner} is een selectie te zien. De interessantste klasse is de \emph{org.junit.runners.ParentRunner}. Deze klasse maakt het mogelijk om een hi\"erarchie te maken voor het runnen van testen: hij bevat children die zelf opnieuw gerunned kunnen worden. Hij laat ook toe om zijn childtesten te sorteren en filteren (met aparte \emph{Filter} en \emph{Sorter} klassen).\\
 
 \begin{figure}[hb!]
 	\centering
@@ -64,31 +64,31 @@ Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse, in fi
 	\label{fig:diagrams:Runner}
 \end{figure}
 
-Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite}, die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner}, die een \emph{Runner} voorstelt voor een enkele testklasse, met een verzameling van testmethodes als children. Dit is de \emph{Runner} die de eigenlijke testmethodes uitvoert.
+Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite} die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner} die een \emph{Runner} voorstelt voor een enkele testklasse met een verzameling van testmethodes als children. Hier is het de \emph{Runner} die de eigenlijke testmethodes uitvoert.\\
 
-Backwards compatibiliteit met versie v3.x wordt ondersteund door aangepaste \emph{Runner}s die een v3.x test wrappen.
+Backwards compatibiliteit met versie v3.8 wordt ondersteund door aangepaste \emph{Runner}s die een v3.8 test wrappen.
 
 \subsection{Aanmaken van Runners: Requests en Computers}
 
-Het is mogelijk om een \emph{Runner} rechtstreeks aan te maken, maar in JUnit is het de bedoeling dat een \emph{Runner} gecre\"eerd wordt met behulp van de klasse \emph{org.junit.runner.Request}. Deze stelt een beschrijving voor van tests die uitgevoerd moeten worden, door middel van een \emph{Runner} die er aan kan opgevraagd worden. Een \emph{Request} kan aangemaakt worden vanuit een enkele klasse of een reeks klassen. Achter de schermen wordt er via een \emph{org.junit.interal.builders.AllDefaultPossibilitiesBuilder} een \emph{Runner} gecre\"eerd voor de opgegeven klasse of reeks van klassen.
+Het is mogelijk om een \emph{Runner} rechtstreeks aan te maken maar in JUnit is het de bedoeling dat een \emph{Runner} gecre\"eerd wordt met behulp van de klasse \emph{org.junit.runner.Request}. Deze stelt een beschrijving voor van testen die uitgevoerd moeten worden door middel van een \emph{Runner} die er aan kan opgevraagd worden. Een \emph{Request} kan aangemaakt worden vanuit een enkele klasse of een reeks klassen. Achter de schermen wordt er via een \emph{org.junit.interal.builders.AllDefaultPossibilitiesBuilder} een \emph{Runner} gecre\"eerd voor de opgegeven klasse of reeks van klassen.\\
 
-In dit proces zit ook nog een \emph{org.junit.runner.Computer} verwerkt. Dit is een strategie voor het schedulen van \emph{Runner}s. Deze kunnen namelijk serieel gedraaid worden of parallel. Deze laatste functie is echter nog experimenteel.
+In dit proces zit ook nog een \emph{org.junit.runner.Computer} verwerkt. Dit is een strategie voor het schedulen van \emph{Runner}s. Deze kunnen namelijk serieel gedraaid worden of parallel. Deze laatste functie is echter nog experimenteel.\\
 
 \subsection{Uitvoeren van Runners: Statements en Rules}
 
-Een \emph{org.junit.runners.model.Statement} stelt acties voor die genomen worden bij het aanroepen van zijn methode \emph{evaluate()}. Met meerdere \emph{Statement}s wordt het mogelijk om een uitvoering te regelen en te manipuleren. In een \emph{Statement} kan bijvoorbeeld met behulp van reflectie een methode-aanroep gedaan worden om een testmethode uit te voeren. Deze \emph{Statement}s kunnen gewrapped worden door andere \emph{Statement}s om zo hun gedrag uit te breiden of te veranderen.
+Een \emph{org.junit.runners.model.Statement} stelt acties voor die genomen worden bij het aanroepen van zijn methode \emph{evaluate()}. Met meerdere \emph{Statement}s wordt het mogelijk om een uitvoering te regelen en te manipuleren. In een \emph{Statement} kan bijvoorbeeld met behulp van reflectie een methode-aanroep gedaan worden om een testmethode uit te voeren. Deze \emph{Statement}s kunnen gewrapped worden door andere \emph{Statement}s om zo hun gedrag uit te breiden of te veranderen.\\
 
-Een flexibelere manier om het gedrag van een test te veranderen is het gebruik van \emph{org.junit.rules.TestRule}s. Deze hebben een methode \emph{apply(Statement, Description)} die een \emph{Statement} teruggeeft. Op deze manier kan het wijzigen of wrappen van \emph{Statement}s dus via overerving van een \emph{TestRule} gedaan worden. In JUnit wordt er een onderscheid gemaakt tussen een \emph{org.junit.Rule}, die gespecificeerd wordt als annotatie op velden en methodes, en een \emph{org.junit.ClassRule}, die gespecificeerd wordt als annotatie op klassen.
+Een flexibelere manier om het gedrag van een test te veranderen is het gebruik van \emph{org.junit.rules.TestRule}s. Deze hebben een methode \emph{apply(Statement, Description)} die een \emph{Statement} teruggeeft. Op deze manier kan het wijzigen of wrappen van \emph{Statement}s dus via overerving van een \emph{TestRule} gedaan worden. In JUnit wordt er een onderscheid gemaakt tussen een \emph{org.junit.Rule}, die gespecificeerd wordt als annotatie op velden en methodes, en een \emph{org.junit.ClassRule}, die gespecificeerd wordt als annotatie op klassen.\\
 
 \emph{ParentRunner} is de belangrijkste \emph{Runner}-implementatie. Achter de schermen worden de childrunners, childtesten of andere children uitgevoerd door ze in een \emph{Statement} te plaatsen. Deze \emph{Statement} wordt echter niet rechtstreeks uitgevoerd, ze wordt eerst gewrapped door andere \emph{Statement}s. \emph{ParentRunner} gebruikt de volgende wrapper \emph{Statement}s:
 
 \begin{description}
 \item[RunBefores] voert methodes uit voor de uitvoer van de gewrapte \emph{Statement}. Deze worden gespecificeerd door een \emph{@Before}-annotatie die geplaatst wordt op een testmethode of testklasse.
-\item[RunAfters] analoog, maar wordt uitgevoerd na de gewrapte statement en gespecificeerd door een \emph{@After}-annotatie.
+\item[RunAfters] werkt analoog als de vorige maar wordt uitgevoerd na de gewrapte statement en gespecificeerd door een \emph{@After}-annotatie.
 \item[RunRules] voert \emph{TestRule}s uit op de \emph{Statement} om zo een gewijzigde \emph{Statement} te bekomen die het gedrag voorstelt van deze \emph{TestRule}s.
 \end{description}
 
-De \emph{BlockJUnit4ClassRunner}-klasse, die methodes als children heeft, voert zijn methodes ook uit in een \emph{Statement}. Hierin wordt voor elke testmethode een nieuwe instantie aangemaakt van de testklasse, om isolatie van de verschillende testmethodes te bekomen. Deze \emph{Statement} wordt opnieuw gewrapped, hier door de \emph{Statement}s:
+De \emph{BlockJUnit4ClassRunner}-klasse, die methodes als children heeft, voert zijn methodes ook uit in een \emph{Statement}. Hierin wordt voor elke testmethode een nieuwe instantie aangemaakt van de testklasse om isolatie van de verschillende testmethodes te bekomen. Deze \emph{Statement} wordt opnieuw gewrapped, hier door de \emph{Statement}s:
 
 \begin{description}
 \item[ExpectException] werpt een fout op als de gewrapte \emph{Statement} niet de verwachte exception opwerpt, zodat de test faalt.
@@ -98,32 +98,18 @@ De \emph{BlockJUnit4ClassRunner}-klasse, die methodes als children heeft, voert 
 
 De eerste vier zijn hierbij als deprecated gedeclareerd, zodat het eigenlijk aangeraden is om voor gewijzigde uitvoer altijd \emph{TestRule}s te gebruiken.
 
-\subsection{}
 
 \subsection{Standaard JUnit uitvoering}
 
-De klasse die de main methode bevat in het JUnit project is \emph{JUnitCore}.
-\emph{JUnitCore} is een facade voor het uitvoeren van testen.
-In figuur \ref{fig:junitsequence} is het sequence diagram weergegeven.
-\emph{JUnitCore} implementeert weinig functionaliteit.
-Via de ``run()'' methoden wordt de uitvoering van de testen gestart.
-Deze testen worden eigenlijk uitgevoerd in een \emph{Suite}.
-De manier waarop deze \emph{Suite} verkregen wordt is niet eenvoudig.
-\emph{JUnitCore} maakt een statische oproep naar \emph{Request},
-\emph{Request} maakt dan een \emph{Computer} en een
-\emph{AllDefaultPossibilitiesBuilder}, daarna maakt de \emph{Computer}
-een \emph{Suite} aan.
-Deze \emph{Suite} maakt gebruikt van de \emph{AllDefaultPossibilitiesBuilder}
-om een \emph{RunnerBuilder} te verkrijgen (dit is niet in het diagram
-ge\"expliciteerd), de \emph{AllDefaultPossibilitiesBuilder} vult deze in met
-bvb. een \emph{IgnoreBuilder} die ervoor zorgt dat een test niet uitgevoerd
-wordt.
-De statische oproep in \emph{Request} cre\"eert dan een \emph{Request}-object
-dat de aangemaakte \emph{Suite} als runner bevat.
-Om de tests daadwerkelijk te starten vraagt \emph{JUnitCore} de runner op
-van de \emph{Request} en start deze met ``run()''.
+De klasse die de main methode bevat in het JUnit project is \emph{JUnitCore}. \emph{JUnitCore} is een facade voor het uitvoeren van testen. In figuur \ref{fig:junitsequence} is het sequence diagram weergegeven. \emph{JUnitCore} implementeert weinig functionaliteit. Via de \emph{run()} methoden wordt de uitvoering van de testen gestart. Deze testen worden eigenlijk uitgevoerd in een \emph{Suite}. De manier waarop deze \emph{Suite} verkregen wordt is niet eenvoudig. \emph{JUnitCore} maakt een statische oproep naar \emph{Request}, \emph{Request} maakt dan een \emph{Computer} en een \emph{AllDefaultPossibilitiesBuilder}, daarna maakt de \emph{Computer} een \emph{Suite} aan. Deze \emph{Suite} maakt gebruikt van de \emph{AllDefaultPossibilitiesBuilder} om een \emph{RunnerBuilder} te verkrijgen (dit is niet in het diagram ge\"expliciteerd), de \emph{AllDefaultPossibilitiesBuilder} vult deze in met bvb. een \emph{IgnoreBuilder} die ervoor zorgt dat een test niet uitgevoerd wordt. De statische oproep in \emph{Request} cre\"eert dan een \emph{Request}-object dat de aangemaakte \emph{Suite} als runner bevat. Om de tests daadwerkelijk te starten vraagt \emph{JUnitCore} de runner op van de \emph{Request} en start deze met \emph{run()}.
 
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.65\textwidth]{JUnitCoreSequenceDiagram}
+	\caption{Sequence Diagram van JUnitCore}
+	\label{fig:junitsequence}
+\end{figure}
 
 
 
@@ -201,7 +187,7 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt namelijk: \emph{
 
 \begin{figure}[hb!]
 	\centering
-	\includegraphics[width=0.70\textwidth]{XRayComplexity}
+	\includegraphics[width=\textwidth]{XRayComplexity}
 	\caption{X-Ray: polymetric view}
 	\label{fig:X-Ray}
 \end{figure}
@@ -269,13 +255,13 @@ Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd pe
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
      & Joren & Toon & Stef & Sophie \\ \hline
-    Algemeen & 9u00 & 9u00 & 8u55 & 7u15\\
-   	Tools & 10u00 & 22u10 & 12u00 & 9u00 \\
-	Analyse & 14u00 & 25u05 & 9u00 & 8u00 \\
+    Algemeen & 2u00 & 2u00 & 2u00 & 2u00\\
+   	Tools & 8u30 & 8u30 & 8u00 & 4u30 \\
+	Analyse & 6u00 & 6u00 & 8u15 & 8u00 \\
 	Ontwerp & 00u00 & 00u00 & 00u00 & 00u00 \\
 	Implementeren & 00u00 & 00u00 & 00u00 & 00u00\\
-	Verslag & 11u30 & 7u00 & 17u10 & 15u00 \\
-	Totaal & & & & 
+	Verslag & 13u00 & 13u00 & 13u00 & 13u00 \\
+	Totaal 29u30 & 29u30 & 31u15 & 27u30  
     \end{tabular}
     \caption{Overzicht werkuren per onderdeel}
     \label{tab:werkuren}
@@ -285,27 +271,27 @@ Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd pe
 %TODO figuren updaten
 \begin{figure}[h!]
         \centering
-        \begin{subfigure}[hb]{0.15\textwidth}
+        \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{chart_2}
                 \caption{Joren}
         \end{subfigure}%
-        \begin{subfigure}[hb]{0.15\textwidth}
+        \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{chart_3}
                 \caption{Toon}
         \end{subfigure}%
-        \begin{subfigure}[hb]{0.15\textwidth}
+        \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{chart_4}
                 \caption{Stef}
         \end{subfigure}%
-        \begin{subfigure}[hb]{0.15\textwidth}
+        \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{chart_5}
                 \caption{Sophie}
         \end{subfigure}%
-                \begin{subfigure}[hb]{0.15\textwidth}
+                \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{legende}
                 \caption{Legende}
