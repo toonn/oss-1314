@@ -39,7 +39,7 @@ Het was in het begin niet altijd even makkelijk om visualisatietools te vinden d
 
 De eerste tool die gebruikt werd om JUnit te analyseren was \emph{CodeCity}. Hiermee kon er al direct worden vastgesteld dat JUnit bestaat uit veel klassen die erg klein zijn (drie methodes of minder). Verder werd er ook vastgesteld dat er ook relatief veel kleine packages zijn. Er zijn geen duidelijke problemen vast te stellen bij \emph{CodeCity}. De tool vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. \\
 
-Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Deze twee tools bevestigde Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes, die bovendien heel weinig doen.\\
+Om de linken tussen de klassen beter te begrijpen werd er gebruik gemaakt van \emph{X-Ray} \cite{X-Ray} en \emph{AgileJ Structureviews} \cite{AgileJ Structureviews}. Deze twee tools bevestigde er ook met \emph{X-RAy} Met deze tools ontdekten we meer mogelijke problemen: er zijn veel klassen met weinig methodes,  bovendien heel weinig doen.\\
 
 Voor verdere analyse werd gebruik gemaakt van \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool}. Deze tool werd als hulpmiddel gebruikt bij het zoeken naar toegepaste design patterns. Hiermee werd het makkelijker om belangrijke verscholen design patterns te vinden.\\
 
@@ -110,14 +110,14 @@ In de documentatie wordt ook aangegeven dat de methode in een subklasse ge\"impl
 \subsubsection{Observer}
 De structuur \emph{Runner}-\emph{runner.RunNotifier}-\emph{runner.RunListener} kan gezien worden als een vorm van Observer-structuur. 
 De Runner klasse wordt ge\"instanti\"eerd met een \emph{RunNotifier}, die notificatiemethoden bevat die aangeroepen worden door de \emph{Runner}. 
-Aan de \emph{RunNotifier} kan dan een \emph{RunListener} worden toegevoegd (via de \emph{Runner}, de \emph{addListener()}-methode van \emph{RunNotifier} is wel \{public}, maar de documentatie geeft aan dat deze enkel voor intern gebruik is en dat de listener moet worden toegevoegd door de \{Runner}). 
+Aan de \emph{RunNotifier} kan dan een \emph{RunListener} worden toegevoegd (via de \emph{Runner}, de \emph{addListener()}-methode van \emph{RunNotifier} is wel \emph{public}, maar de documentatie geeft aan dat deze enkel voor intern gebruik is en dat de listener moet worden toegevoegd door de \emph{Runner}). 
 Dit maakt het mogelijk om tijdens het uitvoeren van een testrun op verschillende manieren te reageren op gebeurtenissen die kunnen voorkomen tijdens het uitvoeren van tests (zoals wanneer een test begint of eindigt, een Exception gegooid wordt, ...).
 
 \subsubsection{Composite}
-Het Composite patroon wordt gebruikt in een aantal structuren. Een eerste voorbeeld hiervan is de Interface \{rules.TestRule}, verschillende implementerende Leaf-klassen en de compositie \emph{rules.RuleChain}. 
-\{RuleChain} implementeert \emph{TestRule} en bevat zelf kinderen die ook \emph{TestRule}-objecten zijn.
+Het Composite patroon wordt gebruikt in een aantal structuren. Een eerste voorbeeld hiervan is de Interface \emph{rules.TestRule}, verschillende implementerende Leaf-klassen en de compositie \emph{rules.RuleChain}. 
+\emph{RuleChain} implementeert \emph{TestRule} en bevat zelf kinderen die ook \emph{TestRule}-objecten zijn.
 \\
-Ook de structuur \emph{runner.Runner} - \{internal.runners.ErrorReportingRunner},... - \emph{runners.ParentRunner} is een voorbeeld van een Composite patroon. 
+Ook de structuur \emph{runner.Runner} - \emph{internal.runners.ErrorReportingRunner},... - \emph{runners.ParentRunner} is een voorbeeld van een Composite patroon. 
 Een \emph{ParentRunner} kan verschillende kinderen bevatten die ook \emph{Runner}s zijn. 
 Op deze manier kan het gedrag van de \emph{Runner} tijdens het uitvoeren van tests aangepast worden (bijvoorbeeld om slim om te gaan met gegooide Exceptions).
 \\
@@ -131,7 +131,7 @@ Iets gelijkaardig is waar voor \emph{runners.model.RunnerScheduler}, hier wordt 
 \subsubsection{Command}
 Het Command patroon is terug te vinden in veel van de klassen van de \emph{rules} package. 
 Een goed voorbeeld hiervan is \emph{rules.ExternalResource}, die toestaat om voor een test een externe bron in te laden. 
-Deze functionaliteit is afgezonderd in de \{ExternalResource} klasse samen met methoden om voor en na het inladen iets te doen, een vorm van omkadering die typisch is voor het Command patroon. 
+Deze functionaliteit is afgezonderd in de \emph{ExternalResource} klasse samen met methoden om voor en na het inladen iets te doen, een vorm van omkadering die typisch is voor het Command patroon. 
 
 \subsubsection{Visitor}
 Dit patroon is niet echt op een zuivere manier toegepast, maar het kan herkend worden in de klassen \emph{Filter} en \emph{Filterable} in het \emph{runner.manipulation} package. 
