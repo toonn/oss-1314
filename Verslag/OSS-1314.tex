@@ -12,6 +12,7 @@
 \usepackage{gensymb}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage[section]{placeins}
 
 \begin{document}
 
@@ -19,7 +20,8 @@
 \members{Joren Verspeurt {\small \texttt{(r0258417)} } \\
          Sophie Marien {\small \texttt{(s0216517)}}\\
          Stef Noten {\small \texttt{(s0211264)}}\\
-         Toon Nolten {\small \texttt{(r0258654)}} } % teamleden
+         Toon Nolten {\small \texttt{(r0258654)}} \\
+         Begeleider: Mario H. C. T.} % teamleden
 
 \maketitlepage
 \newpage
@@ -37,7 +39,7 @@ In dit project wordt JUnit geanalyseerd met behulp van visualisatie tools. JUnit
 
 Om een eerste inzicht te krijgen in JUnit werd de javadoc geraadpleegd. Door het gericht doorzoeken van deze Javadoc kon een beter zicht op de structuur van JUnit verkregen worden. Hieruit werd dan afgeleid dat er in de source van JUnit twee bijna volledig onafhankelijke versies zitten. Het package junit is een oudere versie (3.8) die in het project zit voor backwards compatibility. Het package org.junit bevat de eigenlijke code van de te analyseren versie. Bij het analyseren van het ontwerp van JUnit werd enkel gekeken naar de huidige versie (exclusief de testen). De testen werden afzonderlijk behandeld.\\
 
-De eerste tool die gebruikt werd om JUnit te analyseren was \emph{CodeCity}. Hiermee kon al direct worden vastgesteld dat JUnit bestaat uit veel klassen die erg klein zijn (drie methodes of minder). Verder werd ook vastgesteld dat er ook relatief veel kleine packages zijn. Er zijn geen duidelijke problemen vast te stellen bij \emph{CodeCity}. De tool vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. \\
+De eerste tool die gebruikt werd om JUnit te analyseren was \emph{CodeCity}. Hiermee kon al direct worden vastgesteld dat JUnit bestaat uit veel klassen die erg klein zijn (drie methodes of minder). Verder werd ook vastgesteld dat er ook relatief veel kleine packages zijn. Er zijn geen duidelijke problemen vast te stellen met \emph{CodeCity}. De tool vindt in JUnit geen anti-patterns, zoals o.a. God, Brain of Data classes. \\
 
 Voor de verdere analyse werden er andere tools gebruikt en werd er ook manueel door de code genavigeerd om beter inzicht te verwerven. \\
 
@@ -45,9 +47,9 @@ De eerste impressie die we van JUnit kregen is dat er gemiddeld een lage couplin
 
 \section{Ontwerpdocumentatie}
 
-De JUnit-code bestaat uit twee afzonderlijke delen. Het package \emph{junit} behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package \emph{org.junit} bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.\\
+De JUnit-code bestaat uit twee afzonderlijke delen. Het package junit behoort tot versie v3.x, dit is aanwezig omwille van backwards compatibility, zodat testsuites voor JUnit v3.x nog gedraaid kunnen worden. Het package org.junit bevat de huidige versie (v4.11). Deze twee pakketten zijn bijna volledig onafhankelijk, op een paar klassen na die toelaten om v3.x testen te draaien onder de nieuwere v4.11 architectuur.\\
 
-Naast het oudere package \emph{junit} zijn er in het huidige package \emph{org.junit} ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.\\
+Naast het oudere package junit zijn er in het huidige package org.junit ook een groot aantal klassen gedeclareerd als deprecated, zodat ook dezen eigenlijk niet meer tot het huidige design behoren. De code bevat ook het package \emph{org.junit.experimental}, dat klassen bevat voor features die nog niet stabiel genoeg zijn om tot de offici\"ele release te behoren.\\
 
 De kern van JUnit is de \emph{org.junit.Runner} klasse. Deze is verantwoordelijk voor het draaien van een of meerdere testen. Binnen JUnit zijn er verschillende implementaties van deze klasse voorzien. \\
 
@@ -64,7 +66,7 @@ Er zijn verschillende implementaties aanwezig van de \emph{Runner} klasse. In fi
 	\label{fig:diagrams:Runner}
 \end{figure}
 
-Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite} die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner} die een \emph{Runner} voorstelt voor een enkele testklasse met een verzameling van testmethodes als children. Hier is het de \emph{Runner} die de eigenlijke testmethodes uitvoert.\\
+Er zijn twee belangrijke klassen die van de \emph{ParentRunner}-klasse overerven. Enerzijds is er de klasse \emph{org.junit.runners.Suite} die een verzameling van \emph{Runner}s voorstelt en zo een hi\"erarchie in de uitvoer van testen toelaat. Anderzijds is er \emph{org.junit.runners.BlockJUnit4Runner} die een \emph{Runner} voorstelt voor een enkele testklasse met een verzameling van testmethodes als children. Dit is de \emph{Runner} die de eigenlijke testmethodes uitvoert.\\
 
 Backwards compatibiliteit met versie v3.8 wordt ondersteund door aangepaste \emph{Runner}s die een v3.8 test wrappen.
 
@@ -106,12 +108,12 @@ De klasse die de main methode bevat in het JUnit project is \emph{JUnitCore}. \e
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.65\textwidth]{JUnitCoreSequenceDiagram}
+	\includegraphics[width=\textwidth]{JUnitCoreSequenceDiagram}
 	\caption{Sequence Diagram van JUnitCore}
 	\label{fig:junitsequence}
 \end{figure}
 
-
+\newpage
 
 \section{Evaluatie van het ontwerp}
 
@@ -121,7 +123,26 @@ De klasse die de main methode bevat in het JUnit project is \emph{JUnitCore}. \e
 
 \subsection{Sterke en zwakke punten}
 
-\subsection{Gebruik van patronen}
+\subsubsection{Sterke punten}
+\begin{description}
+\item JUnit wordt gebruikt om zichzelf te testen door het principe van het testframework om te draaien. Hiermee kunnen ze dan nagaan of het testframework in alle gevallen de juiste output geeft. 
+
+\item Op sommige plaatsen zoals in de klasse \emph{JUnit4} is er aan gedacht om het project flexibel te maken en uitbreidbaar, maar dit is niet geimplementeerd. Met deze klasse zou het gemakkelijk zijn om de default \emph{Runner} te wijzigen. Het is handig dat ze eraan gedacht hebben, maar ze hebben dit niet verder doorgetrokken.
+
+\item Het is eenvoudig om nieuwe \emph{TestRule}s te implementeren en gebruiken die de uitvoering van de testen kunnen manipuleren.
+
+\item Een \emph{RunListener} laat toe om eenvoudig verscheidene gebruikersinterfaces te laten samenwerken met JUnit. Zo is het eenvoudig een tekstuele interface te genereren, maar een grafische interface kan evenzeer.  
+\end{description}
+
+\subsubsection{Zwakke punten}
+\begin{description}
+\item Er worden veel indirecties gebruikt doorheen het programma die vaak helemaal niet nodig zijn. Dit maakt de structuur onnodig ingewikkeld en het wordt moeilijker om de logica van de uitvoering te volgen. Bijvoorbeeld bij de start van het programma in \emph{JUnitCore} worden er heel veel stappen gezet vooraleer men tot een runner komt. Veel van deze stappen zijn overbodig of horen minder verspreid ge"implementeerd te zijn. De verantwoordelijkheid van het laden van een runner wordt zo verspreid over \emph{Request}, \emph{Computer}, \emph{RunnerBuilder} en \emph{JUnitCore}. 
+
+\item In de structuur van JUnit is het moeilijk om zelf functionaliteit te implementeren omdat veel types hardcoded zijn. Zo is het bijvoorbeeld onmogelijk om een eigen \emph{RunnerBuilder} te gebruiken in een \emph{Request} zonder aanpassingen aan de huidige implementatie van \emph{Request}. Nu wordt er overal een \emph{AllDefaultPossibilitiesBuilder} gebruikt terwijl het nuttig zou kunnen zijn om er zelf een op te geven.
+
+\end{description}
+
+\subsection{Gebruik van patterns}
 
 Er worden verschillende software design patterns gebruikt in JUnit. 
 Hieronder volgt een overzicht van een aantal design patterns en voorbeelden van waar ze gebruikt worden.
@@ -176,7 +197,7 @@ Het gaat hier niet om een echte instantie van het Visitor pattern omdat er in \e
 
 \section{Beschrijving en evaluatie van de analyse tools}
 
-Voor de analyse van JUnit werden er vier analyse tools gebruikt namelijk: \emph{X-Ray} \cite{X-Ray}, \emph{AgileJ Structureviews} \cite{AgileJ Structureviews} , \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{InFusion} \cite{Infusion}. Om \emph{X-Ray} beter de begrijpen werd er ook nog gekeken naar \emph{CodeCity} \cite{CodeCity}.
+Voor de analyse van JUnit werden er vier analyse tools gebruikt namelijk: \emph{X-Ray} \cite{X-Ray}, \emph{AgileJ Structureviews} \cite{AgileJ Structureviews} , \emph{Design Pattern Detection Tool} \cite{Design Pattern Detection Tool} en \emph{InFusion} \cite{inFusion}. Om \emph{X-Ray} beter de begrijpen werd er ook nog gekeken naar \emph{CodeCity} \cite{CodeCity}.
 
 
 \subsection{X-Ray} 
@@ -185,7 +206,7 @@ Voor de analyse van JUnit werden er vier analyse tools gebruikt namelijk: \emph{
 %TODO Foto van codeCity
 
 
-\begin{figure}[hb!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\textwidth]{XRayComplexity}
 	\caption{X-Ray: polymetric view}
@@ -198,15 +219,15 @@ Onze klassendiagramma's zijn gebaseerd op de klassendiagramma's die we via \emph
 
 
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.65\textwidth]{AgileJKlassendiagramma}
-	\caption{AgileJ Sturcutureviews: klassendiagramma}
+	\caption{AgileJ Structureviews: klassendiagramma}
 	\label{fig:AgileJKlassendia}
 \end{figure}
 
 \subsection{Design Pattern Detection Tool}
-\emph{Design Pattern Detection Tool} is een tool die het programma gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}. Deze tool werkt op de gecompileerde code. Het maakt een graph aan van de verschillende klassen en gebruikt graph matching om de patterns te herkennen.  Dit geeft gemengde resultaten. Sommige van de herkende patterns zijn correct, andere lijken oppervlakkig op het gewenste pattern maar komen er bij nader inzien niet mee overeen. 
+\emph{Design Pattern Detection Tool} is een tool die de broncode gaat checken op bepaalde patterns. Een overzicht van de patterns die gevonden zijn via de tool is te zien op de figuur \ref{fig:DesignPatterns}. Deze tool werkt op de gecompileerde code. Het maakt een graph aan van de verschillende klassen en gebruikt graph matching om de patterns te herkennen.  Dit geeft gemengde resultaten. Sommige van de herkende patterns zijn correct, andere lijken oppervlakkig op het gewenste pattern maar komen er bij nader inzien niet mee overeen. 
 Deze tool is vooral een goede leidraad om patterns te beginnen zoeken in JUnit.\\
 
 \begin{figure}[h!]
@@ -217,7 +238,7 @@ Deze tool is vooral een goede leidraad om patterns te beginnen zoeken in JUnit.\
 \end{figure}
 
 \subsection{InFusion}
-\emph{InFusion} berekent een groot aantal metrics die niet allemaal even verstaanbaar zijn. Dit wordt samengevat in een overview piramid. InFusion berekent ook allerlei scores die vermoedelijke code smells identificeren. Het bied ook een polymetric view aan waarin verschillende perspectieven genomen kunnen worden zoals coupling, complexity en encapsulation. De kleuren van de polymetric view passen zich aan aan de verschillende perspectieven. Een voorbeeld screenshot van InFusion wordt weergegeven in figuur~\ref{fig:InFusion}.
+\emph{InFusion} berekent een groot aantal metrics die niet allemaal even verstaanbaar zijn. Dit wordt samengevat in een overview pyramid. InFusion berekent ook allerlei scores die vermoedelijke code smells identificeren. Het bied ook een polymetric view aan waarin verschillende perspectieven genomen kunnen worden zoals coupling, complexity en encapsulation. De kleuren van de polymetric view passen zich aan aan de verschillende perspectieven. Een voorbeeld screenshot van InFusion wordt weergegeven in figuur~\ref{fig:InFusion}.
 
 
 \begin{figure}[h!]
@@ -244,9 +265,12 @@ JUnit heeft een behoorlijk aantal testen (2391 in de beschouwde versie). Deze te
 \\
 Opvallend hierbij is dat sommige tests ontworpen zijn om te falen, niet uitgevoerd te worden omdat er exceptions opgegooid worden of genegeerd te worden. Dit maakt het lastig om een goed overzicht te krijgen op de testen maar het verbetert in dit specifieke geval wel de kwaliteit omdat zo meer gevallen gedekt worden.
 \\
-Een ander opvallend punt is dat hoewel sommige van de subpackages van bijvoorbeeld \emph{experimental} 100\% code coverage hebben hebben sommige van de iets belangrijkere klassen (zoals bijvoorbeeld \emph{Assert}) een relatief lage code coverage.
-
+Een ander opvallend punt is dat hoewel sommige van de subpackages van bijvoorbeeld \emph{experimental} 100\% code coverage hebben. Sommige van de iets belangrijkere klassen (zoals bijvoorbeeld \emph{Assert}) een relatief lage code coverage hebben.
 \section{Samenvatting}
+
+Uit de analyse van JUnit is gebleken dat sommige onderdelen gemakkelijk uitbreidbaar zijn, maar anderen zijn erg vastgeroest. Er zijn een aantal klassen die zeer hoge koppeling met elkaar vertonen. 
+Op vlak van testen schrijven en gebruiken is het goed ontworpen, maar op vlak van uitbreidbaarheid binnen het framework zelf kan zeker nog verbetering komen.   
+
 
 \section{Projectbeheer}
 
@@ -257,17 +281,17 @@ Er werd steeds in een tabel bijgehouden wie wanneer aan wat had gewerkt. Dit gaf
 Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd per persoon per onderdeel. Figuur~\ref{fig:werkverdeling} toont wie aan welke aspecten van het project heeft gewerkt.
 
 %TODO laatste week aanvullen!!
-\begin{table}[h]
+\begin{table}[h!]
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
      & Joren & Toon & Stef & Sophie \\ \hline
     Algemeen & 2u00 & 2u00 & 2u00 & 2u00\\
    	Tools & 8u30 & 8u30 & 8u00 & 4u30 \\
-	Analyse & 6u00 & 6u00 & 8u15 & 8u00 \\
+	Analyse & 10u00 & 10u00 & 12u15 & 12u00 \\
 	Ontwerp & 00u00 & 00u00 & 00u00 & 00u00 \\
 	Implementeren & 00u00 & 00u00 & 00u00 & 00u00\\
-	Verslag & 13u00 & 13u00 & 13u00 & 13u00 \\
-	Totaal 29u30 & 29u30 & 31u15 & 27u30  
+	Verslag & 9u00 & 9u00 & 9u00 & 9u00 \\
+	Totaal & 29u30 & 29u30 & 31u15 & 27u30  
     \end{tabular}
     \caption{Overzicht werkuren per onderdeel}
     \label{tab:werkuren}
@@ -309,6 +333,7 @@ Tabel~\ref{tab:werkuren} geeft weer hoeveel tijd in het project gestoken werd pe
 \end{figure}
 
 \newpage
+
 \begin{flushleft}
 \begin{thebibliography}{4}
 

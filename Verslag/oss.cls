@@ -19,16 +19,16 @@
 \def\thepagelimit{100}
 \DeclareOption{i1}{%
   \def\thetitle{Verslag: iteratie 1}%
-  \def\thepagelimit{10}}
+  \def\thepagelimit{100}}
 \DeclareOption{tt2}{%
   \def\thetitle{verslag: iteratie 2}%
-  \def\thepagelimit{15}}
+  \def\thepagelimit{100}}
 \DeclareOption{tt3}{%
   \def\thetitle{Verslag: iteratie 3}%
-  \def\thepagelimit{20}}
+  \def\thepagelimit{100}}
 \DeclareOption{eind}{%
   \def\thetitle{ Eindverslag}%
-  \def\thepagelimit{30}}
+  \def\thepagelimit{100}}
 \ProcessOptions
 \LoadClass[10pt,a4paper]{article}
 \RequirePackage[dutch]{babel}
