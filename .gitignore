@@ -43,6 +43,7 @@ Thumbs.db
 ##########################
 .metadata
 bin
+.settings
 
 # Specifiek voor latex #
 ########################
