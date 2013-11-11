@@ -10,8 +10,14 @@ public class TestFailureCollector extends DataCollector<Failure> {
 
 	@Override
 	public void startCollecting(TestCollectionInfo testCollectionInfo) {
-		testCollectionInfo.getRunNotifier().addListener(this.runListener);
+		testCollectionInfo.addTestRunListener(runListener);
 	}
+	
+	@Override
+	public void stopCollecting(TestCollectionInfo testCollectionInfo) {
+		testCollectionInfo.removeTestRunListener(runListener);
+	}
+	
 	
 	protected class FailureListener extends RunListener {
 

@@ -29,4 +29,5 @@ public abstract class DataCollector<DataT> {
 	
 	public abstract void startCollecting(TestCollectionInfo testCollectionInfo);
 	
+	public abstract void stopCollecting(TestCollectionInfo testCollectionInfo);
 }
