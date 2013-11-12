@@ -16,7 +16,7 @@ public class CodeChangeCollector extends DataCollector<String> {
 	public void startCollecting(TestCollectionInfo testCollectionInfo) {
 		try {
 			WatchService watchService = FileSystems.getDefault().newWatchService();
-			Path codePath = FileSystems.getDefault().getPath(testCollectionInfo.getCodeDirectory().getPath(),(String[]) null);
+			Path codePath = FileSystems.getDefault().getPath(testCollectionInfo.getSourceDirectory().getPath(),(String[]) null);
 			codePath.register(watchService,ENTRY_MODIFY);
 			JDepend jDepend = new JDepend();
 			jDepend.addDirectory(testCollectionInfo.getTestDirectory().getPath());
@@ -30,6 +30,11 @@ public class CodeChangeCollector extends DataCollector<String> {
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Override
+	public void stopCollecting(TestCollectionInfo testCollectionInfo) {
+		// TODO Auto-generated method stub
 	}
 
 }
