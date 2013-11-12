@@ -13,6 +13,8 @@ public class FailureTraceCollector extends DataCollector<MethodCallTrace> {
 	protected MethodCallTrace currentMethodCallTrace = null;
 	protected RunListener testListener = null;
 	protected MethodCallMonitor methodCallMonitor = null;
+	
+	
 	@Override
 	public void startCollecting(final TestCollectionInfo testCollectionInfo) {
 		OSSRewriter.setUserExclusionFilter(new Predicate<String>() {

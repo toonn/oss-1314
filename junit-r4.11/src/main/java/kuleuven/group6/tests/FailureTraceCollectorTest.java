@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
-import be.kuleuven.cs.ossrewriter.OSSRewriter;
 import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.FailureTraceCollector;
@@ -12,8 +11,7 @@ import kuleuven.group6.collectors.MethodCallTrace;
 import kuleuven.group6.tests.testsubject.source.Dummy;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import kuleuven.group6.tests.testsubject.tests.TestsLocator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
@@ -33,8 +31,11 @@ public class FailureTraceCollectorTest {
 		
 		failureTraceCollector = new FailureTraceCollector();
 		failureTraceCollector.startCollecting(testCollectionInfo);
-		
-		OSSRewriter.retransformAllClasses();
+	}
+	
+	@After
+	public void tearDownTestEnvironment() {
+		failureTraceCollector.stopCollecting(testCollectionInfo);
 	}
 	
 	@Test
@@ -50,9 +51,10 @@ public class FailureTraceCollectorTest {
 		
 		MethodCallTrace collectedData = listener.getLastCollectedData();
 		String[] actualMethods = collectedData.getMethodCalls().toArray(new String[] { });
+		String dummyClass = Dummy.class.getName().replace('.', '/');
 		String[] expectedMethods = {
-			"kuleuven/group6/tests/testsubject/source/Dummy.<init>()V",
-			"kuleuven/group6/tests/testsubject/source/Dummy.dummyMethod()V",
+			dummyClass + ".<init>()V",
+			dummyClass + ".dummyMethod()V",
 		};
 		assertArrayEquals(expectedMethods, actualMethods);
 		
