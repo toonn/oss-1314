@@ -7,7 +7,7 @@ import org.junit.runner.Description;
 public class LastFailureDate extends AbstractTestCharacteristic<Date> 
 	implements ITestStatistic<Date> {
 
-	protected LastFailureDate(Description testDescription, Date lastFailureDate) {
+	public LastFailureDate(Description testDescription, Date lastFailureDate) {
 		super(testDescription, lastFailureDate);
 	}
 

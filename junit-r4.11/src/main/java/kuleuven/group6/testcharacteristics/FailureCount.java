@@ -4,7 +4,7 @@ import org.junit.runner.Description;
 
 public class FailureCount extends AbstractTestCharacteristic<Integer> implements ITestStatistic<Integer> {
 
-	protected FailureCount(Description testDescription, int failureCount) {
+	public FailureCount(Description testDescription, int failureCount) {
 		super(testDescription, failureCount);
 	}
 	
