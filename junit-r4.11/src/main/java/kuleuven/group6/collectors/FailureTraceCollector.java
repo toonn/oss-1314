@@ -8,6 +8,11 @@ import kuleuven.group6.TestCollectionInfo;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class FailureTraceCollector extends DataCollector<MethodCallTrace> {
 
 	protected MethodCallTrace currentMethodCallTrace = null;

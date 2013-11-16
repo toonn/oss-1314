@@ -10,6 +10,11 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import jdepend.framework.*;
 import kuleuven.group6.TestCollectionInfo;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class CodeChangeCollector extends DataCollector<String> {
 
 	@Override

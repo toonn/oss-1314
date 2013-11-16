@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class MethodCallTrace {
 
 	protected Collection<String> methodCalls = new ArrayList<String>();

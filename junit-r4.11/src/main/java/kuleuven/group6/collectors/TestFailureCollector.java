@@ -4,6 +4,11 @@ import kuleuven.group6.TestCollectionInfo;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class TestFailureCollector extends DataCollector<Failure> {
 
 	protected RunListener runListener = new FailureListener();
