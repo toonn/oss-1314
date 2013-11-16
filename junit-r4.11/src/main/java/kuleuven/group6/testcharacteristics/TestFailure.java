@@ -6,7 +6,7 @@ import org.junit.runner.notification.Failure;
 public class TestFailure extends AbstractTestCharacteristic<Failure>
 	implements ITestData<Failure> {
 
-	protected TestFailure(Description testDescription, Failure failure) {
+	public TestFailure(Description testDescription, Failure failure) {
 		super(testDescription, failure);
 	}
 

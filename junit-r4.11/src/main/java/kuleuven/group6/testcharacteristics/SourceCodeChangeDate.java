@@ -7,7 +7,7 @@ import org.junit.runner.Description;
 public class SourceCodeChangeDate extends AbstractTestCharacteristic<Date>
 		implements ITestData<Date> {
 
-	protected SourceCodeChangeDate(Description testDescription, Date sourceCodeChangeDate) {
+	public SourceCodeChangeDate(Description testDescription, Date sourceCodeChangeDate) {
 		super(testDescription, sourceCodeChangeDate);
 	}
 
