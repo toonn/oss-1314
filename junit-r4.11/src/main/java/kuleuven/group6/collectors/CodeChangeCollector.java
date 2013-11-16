@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.WatchService;
+import java.util.Collection;
 import java.util.HashSet;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -21,10 +22,14 @@ public class CodeChangeCollector extends DataCollector<String> {
 			JDepend jDepend = new JDepend();
 			jDepend.addDirectory(testCollectionInfo.getTestDirectory().getPath());
 			HashSet<JavaClass> classSet = new HashSet<JavaClass>(jDepend.analyze());
-			//TODO something like this:
+			HashSet<JavaClass> importedClasses = new HashSet<JavaClass>();
 			for(JavaClass jc : classSet){
-				jc.getImportedPackages();
+				HashSet<JavaPackage> ic = new HashSet<JavaPackage>((Collection<JavaPackage>)jc.getImportedPackages());
+				for(JavaPackage jp : ic){
+					importedClasses.addAll((Collection<JavaClass>)jp.getClasses());
+				}
 			}
+
 			
 		} catch (IOException e) {
 			e.printStackTrace();
