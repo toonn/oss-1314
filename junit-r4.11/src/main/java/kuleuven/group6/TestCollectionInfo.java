@@ -8,6 +8,11 @@ import java.util.Collections;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * 
+ * @author team 6
+ *
+ */
 public class TestCollectionInfo {
 	
 	protected File testDirectory;

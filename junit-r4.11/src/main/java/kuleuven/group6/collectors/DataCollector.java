@@ -6,6 +6,12 @@ import java.util.HashSet;
 import kuleuven.group6.TestCollectionInfo;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ * @param <DataT>
+ */
 public abstract class DataCollector<DataT> {
 
 	protected Collection<DataCollectedListener<DataT>> listeners = new HashSet<DataCollectedListener<DataT>>();
