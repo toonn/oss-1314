@@ -1,0 +1,70 @@
+\documentclass[i1]{oss}
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{.100in}
+\setlength{\textwidth}{6.25in}
+\usepackage [dutch] {babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{gensymb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[section]{placeins}
+
+\begin{document}
+
+\members{Joren Verspeurt {\small \texttt{(r0258417)} } \\
+         Sophie Marien {\small \texttt{(s0216517)}}\\
+         Stef Noten {\small \texttt{(s0211264)}}\\
+         Toon Nolten {\small \texttt{(r0258654)}} \\
+         Begeleider: Mario H. C. T.} % teamleden
+
+\maketitlepage
+\newpage
+\tableofcontents
+\pagebreak
+
+\section*{Inleiding}
+
+Daemon met een policy en een testinformation Klasse en een Statistic information 
+
+Pattern Model-View-Controller
+View:  GUI, CLI, passive view
+Controller:
+Input besturingsview, handeld input/output
+Model: Daemon, Policy, TestInfomation, DataCollector, Statistic, TestRun
+Daemon is bedoeld als interface voor het model
+
+Verantwoordelijkheden
+Policy: ordening, filtering
+Statistic: berekent de statistieken, legt een strategie vast om data op te vragen.
+TestInformation:  Houdt de statistieken bij (alles dat uit de collectors wordt opgevraagd)
+DataCollector: Data verzameling, inpluggen in een TestRun, change code bijhouden (apart in een andere Collector)
+Daemon:  Starten van TestRuns
+TestRun:  runnen van testen
+
+Implementaties:
+Policy als Composit/Decorator/Strategy
+We weten niet zeker of het een composit is want er werd getwijfeld tussen Composit en Decorator Pattern. 
+Statistic en DataCollector zijn een Strategy
+TestInfomation
+Eerst mapte Description met een lijst van tuples. Dit is veranderd naar TestSummary
+Map<Description,OrderedSet<TestSummary>>
+	TestSummary	-Map<Collector, Object>
+			- TestID
+
+
+We streven voor low-coupling. Deamon weet alleen maar af van de actieve policies en de policies waarvoor hem op dat moment de statistieken gaat berekenen, de TestRuns en de TestInformation. Daemon weet wat hij moet weten en niet te veel. 
+
+Verslag: beginnen met de analyse van wat we nodig hebben en daarna uitleggen hoe we dit oplossen en analyseren en bediscussiëren.
+
+ 
+
+
+\end{document}
+
+
+
