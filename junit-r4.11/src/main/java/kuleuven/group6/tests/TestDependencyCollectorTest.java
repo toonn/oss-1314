@@ -6,8 +6,8 @@ import java.io.File;
 
 import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
-import kuleuven.group6.collectors.FailureTraceCollector;
-import kuleuven.group6.collectors.MethodCallTrace;
+import kuleuven.group6.collectors.TestDependencyCollector;
+import kuleuven.group6.testcharacteristics.MethodCalls;
 import kuleuven.group6.tests.testsubject.source.Dummy;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import kuleuven.group6.tests.testsubject.tests.TestsLocator;
@@ -15,11 +15,11 @@ import org.junit.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-public class FailureTraceCollectorTest {
+public class TestDependencyCollectorTest {
 
 	protected TestCollectionInfo testCollectionInfo;
 	protected RunNotifier runNotifier;
-	protected FailureTraceCollector failureTraceCollector;
+	protected TestDependencyCollector failureTraceCollector;
 	
 	@Before
 	public void initializeTestEnvironment() {
@@ -27,15 +27,16 @@ public class FailureTraceCollectorTest {
 		
 		File subjectSourceDirectory = new File(SourceLocator.getLocation());
 		File subjectTestsDirectory = new File(TestsLocator.getLocation());
+		// TODO remove the need of TestCollectionInfo
 		testCollectionInfo = new TestCollectionInfo(subjectTestsDirectory, subjectSourceDirectory, runNotifier);
 		
-		failureTraceCollector = new FailureTraceCollector();
-		failureTraceCollector.startCollecting(testCollectionInfo);
+		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), runNotifier);
+		failureTraceCollector.startCollecting();
 	}
 	
 	@After
 	public void tearDownTestEnvironment() {
-		failureTraceCollector.stopCollecting(testCollectionInfo);
+		failureTraceCollector.stopCollecting();
 	}
 	
 	@Test
@@ -49,8 +50,8 @@ public class FailureTraceCollectorTest {
 		testSubject.dummyMethod();
 		runNotifier.fireTestFinished(description);
 		
-		MethodCallTrace collectedData = listener.getLastCollectedData();
-		String[] actualMethods = collectedData.getMethodCalls().toArray(new String[] { });
+		MethodCalls methodCalls = listener.getLastCollectedMethodCalls();
+		String[] actualMethods = methodCalls.getValue().getMethodCalls().toArray(new String[] { });
 		String dummyClass = Dummy.class.getName().replace('.', '/');
 		String[] expectedMethods = {
 			dummyClass + ".<init>()V",
@@ -58,26 +59,20 @@ public class FailureTraceCollectorTest {
 		};
 		assertArrayEquals(expectedMethods, actualMethods);
 		
-		assertEquals(description, listener.getLastCollectedDescription());
+		assertEquals(description, methodCalls.getTestDescription());
 	}
 
 	
-	protected class CallTraceListener implements DataCollectedListener<MethodCallTrace> {
+	protected class CallTraceListener implements DataCollectedListener<MethodCalls> {
 
-		protected MethodCallTrace lastCollectedData = null;
-		protected Description lastCollectedDescription = null;
+		protected MethodCalls lastCollectedMethodCalls = null;
 		
-		public MethodCallTrace getLastCollectedData() {
-			return lastCollectedData;
+		public MethodCalls getLastCollectedMethodCalls() {
+			return lastCollectedMethodCalls;
 		}
 		
-		public Description getLastCollectedDescription() {
-			return lastCollectedDescription;
-		}
-		
-		public void dataCollected(Description identifier, MethodCallTrace data) {
-			lastCollectedData = data;
-			lastCollectedDescription = identifier;
+		public void dataCollected(MethodCalls methodCalls) {
+			lastCollectedMethodCalls = methodCalls;
 		}
 		
 	}
