@@ -8,14 +8,11 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.runner.Description;
 import static java.nio.file.StandardWatchEventKinds.*;
-import jdepend.framework.*;
 import kuleuven.group6.testcharacteristics.CodeChange;
 
 /**
@@ -24,7 +21,6 @@ import kuleuven.group6.testcharacteristics.CodeChange;
  *
  */
 public class CodeChangeCollector extends DataCollector<CodeChange> {
-	protected HashSet<JavaClass> importedClasses;
 	protected WatchService watchService;
 	protected Description suiteDescription;
 	private File codeDir;
@@ -48,7 +44,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			registerPath(testDir);
 			registerPath(codeDir);
 			//Start watching directories
-			ccwt = new CodeChangeWatchThread(this,importedClasses,watchService);
+			ccwt = new CodeChangeWatchThread(this,watchService);
 			ccwt.run();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -57,12 +53,10 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	}
 
 	private class CodeChangeWatchThread extends Thread {
-		private HashSet<JavaClass> importedClasses;
 		private WatchService watchService;
 		private CodeChangeCollector parent;
 
-		public CodeChangeWatchThread(CodeChangeCollector parent, HashSet<JavaClass> importedClasses, WatchService watchService) {
-			this.importedClasses = importedClasses;
+		public CodeChangeWatchThread(CodeChangeCollector parent, WatchService watchService) {
 			this.watchService = watchService;
 			this.parent = parent;
 		}
@@ -75,7 +69,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 					List<Path> paths = new ArrayList<Path>();
 					//We know the WatchEvent<T>s will be WatchEvent<Path>s because of the 
 					//kinds of events that we registered
-					for(WatchEvent event : key.pollEvents()){
+					for(@SuppressWarnings("rawtypes") WatchEvent event : key.pollEvents()){
 						if(event.kind().type().equals(Path.class)){
 							paths.add((Path)event.context());
 						}
