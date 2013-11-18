@@ -2,8 +2,8 @@ package kuleuven.group6.policies;
 
 import java.util.Comparator;
 
+import kuleuven.group6.statistics.IStatisticManager;
 import kuleuven.group6.statistics.Statistic;
-import kuleuven.group6.statistics.StatisticManager;
 import kuleuven.group6.testcharacteristics.FailureCount;
 
 
@@ -13,7 +13,7 @@ public class FrequentFailureFirst extends SortingPolicy {
 	
 	protected final Statistic<FailureCount> statistic;
 
-	public FrequentFailureFirst(StatisticManager statMan) {
+	public FrequentFailureFirst(IStatisticManager statMan) {
 		this.statistic = statMan.getStatistic(FailureCount.class);
 	}
 	
