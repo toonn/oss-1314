@@ -24,7 +24,7 @@ public class MethodCalls implements ITestData {
 		return testDescription;
 	}
 
-	public Collection<String> getMethodCalls() {
+	public Collection<String> getMethodNames() {
 		return methodCalls;
 	}
 	

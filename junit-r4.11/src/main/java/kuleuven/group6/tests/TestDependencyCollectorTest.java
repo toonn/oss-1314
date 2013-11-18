@@ -51,7 +51,7 @@ public class TestDependencyCollectorTest {
 		runNotifier.fireTestFinished(description);
 		
 		MethodCalls methodCalls = listener.getLastCollectedMethodCalls();
-		String[] actualMethods = methodCalls.getValue().getMethodCalls().toArray(new String[] { });
+		String[] actualMethods = methodCalls.getMethodNames().toArray(new String[] { });
 		String dummyClass = Dummy.class.getName().replace('.', '/');
 		String[] expectedMethods = {
 			dummyClass + ".<init>()V",
@@ -71,6 +71,7 @@ public class TestDependencyCollectorTest {
 			return lastCollectedMethodCalls;
 		}
 		
+		@Override
 		public void dataCollected(MethodCalls methodCalls) {
 			lastCollectedMethodCalls = methodCalls;
 		}

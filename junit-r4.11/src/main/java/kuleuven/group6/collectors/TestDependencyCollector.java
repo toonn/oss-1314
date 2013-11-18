@@ -1,5 +1,6 @@
 package kuleuven.group6.collectors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import be.kuleuven.cs.ossrewriter.Monitor;
@@ -24,7 +25,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
 	protected RunNotifier runNotifier;
 	protected RunListener testListener;
-	protected MethodCallTrace currentMethodCallTrace = null;
+	protected Collection<String> currentMethodCalls = null;
 	protected MethodCallMonitor methodCallMonitor = null;
 	
 	/**
@@ -41,6 +42,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	
 	private void setupOssRewriter(final Collection<String> sourceClassNames) {
 		OSSRewriter.setUserExclusionFilter(new Predicate<String>() {
+			@Override
 			public boolean apply(String className) {
 				// A nested class (denoted after a $ sign) is defined in its parent class file. 
 				int indexOfDollar = className.indexOf('$');
@@ -80,12 +82,12 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
 		@Override
 		public void testStarted(Description description) {
-			currentMethodCallTrace = new MethodCallTrace();
+			currentMethodCalls = new ArrayList<String>();
 		}
 
 		@Override
 		public void testFinished(Description description) {
-			onDataCollected(new MethodCalls(description, currentMethodCallTrace));
+			onDataCollected(new MethodCalls(description, currentMethodCalls));
 		}
 		
 	}
@@ -94,7 +96,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
 		@Override
 		public void enterMethod(String methodName) {
-			currentMethodCallTrace.addMethodCall(methodName);
+			currentMethodCalls.add(methodName);
 		}
 		
 	}
