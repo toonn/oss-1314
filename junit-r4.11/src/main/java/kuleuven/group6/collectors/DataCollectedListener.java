@@ -8,7 +8,7 @@ import kuleuven.group6.testcharacteristics.ITestData;
  *
  * @param <DataT>
  */
-public interface DataCollectedListener<TestDataT extends ITestData<?>> {
+public interface DataCollectedListener<TestDataT extends ITestData> {
 
 	public void dataCollected(TestDataT data);
 	

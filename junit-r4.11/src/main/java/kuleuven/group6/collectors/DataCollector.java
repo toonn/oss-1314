@@ -11,22 +11,22 @@ import kuleuven.group6.testcharacteristics.ITestData;
  *
  * @param <TestDataT>
  */
-public abstract class DataCollector<TestDataT extends ITestData<?>> {
+public abstract class DataCollector<TestDataT extends ITestData> {
 
-	protected Collection<DataCollectedListener<TestDataT>> listeners = new HashSet<DataCollectedListener<TestDataT>>();
+	protected Collection<DataCollectedListener<? super TestDataT>> listeners = new HashSet<>();
 	
 
-	public void addListener(DataCollectedListener<TestDataT> listener) {
+	public void addListener(DataCollectedListener<? super TestDataT> listener) {
 		this.listeners.add(listener);
 	}
 	
-	public void removeListener(DataCollectedListener<TestDataT> listener) {
+	public void removeListener(DataCollectedListener<? super TestDataT> listener) {
 		this.listeners.remove(listener);
 	}
 	
 	
 	protected void onDataCollected(TestDataT data) {
-		for (DataCollectedListener<TestDataT> listener : this.listeners) {
+		for (DataCollectedListener<? super TestDataT> listener : this.listeners) {
 			listener.dataCollected(data);
 		}
 	}
