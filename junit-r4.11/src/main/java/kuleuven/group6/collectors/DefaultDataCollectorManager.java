@@ -3,7 +3,9 @@ package kuleuven.group6.collectors;
 import java.util.HashMap;
 import java.util.Map;
 
+import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.ITestData;
+import kuleuven.group6.testcharacteristics.TestFailure;
 
 /**
  * 
@@ -14,8 +16,9 @@ public class DefaultDataCollectorManager implements IDataCollectorManager {
 
 	protected Map<Class<? extends ITestData>, DataCollector<? extends ITestData>> collectors = new HashMap<>();
 	
-	public DefaultDataCollectorManager() {
-		// TODO: default collectors toevoegen
+	public DefaultDataCollectorManager(RunNotificationSubscriber runNotificationSubscriber) {
+		collectors.put(TestFailure.class, new TestFailureCollector(runNotificationSubscriber));
+		// TODO: andere default collectors toevoegen
 	}
 
 	@Override
