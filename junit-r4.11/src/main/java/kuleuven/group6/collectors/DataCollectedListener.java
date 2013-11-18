@@ -1,6 +1,6 @@
 package kuleuven.group6.collectors;
 
-import org.junit.runner.Description;
+import kuleuven.group6.testcharacteristics.ITestData;
 
 /**
  * 
@@ -8,8 +8,8 @@ import org.junit.runner.Description;
  *
  * @param <DataT>
  */
-public interface DataCollectedListener<DataT> {
+public interface DataCollectedListener<TestDataT extends ITestData> {
 
-	public void dataCollected(Description identifier, DataT data);
+	public void dataCollected(TestDataT data);
 	
 }

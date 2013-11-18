@@ -3,37 +3,37 @@ package kuleuven.group6.collectors;
 import java.util.Collection;
 import java.util.HashSet;
 
-import kuleuven.group6.TestCollectionInfo;
-import org.junit.runner.Description;
+import kuleuven.group6.testcharacteristics.ITestData;
 
 /**
  * 
  * @author Team 6
  *
- * @param <DataT>
+ * @param <TestDataT>
  */
-public abstract class DataCollector<DataT> {
+public abstract class DataCollector<TestDataT extends ITestData> {
 
-	protected Collection<DataCollectedListener<DataT>> listeners = new HashSet<DataCollectedListener<DataT>>();
+	protected Collection<DataCollectedListener<? super TestDataT>> listeners = new HashSet<>();
 	
 
-	public void addListener(DataCollectedListener<DataT> listener) {
+	public void addListener(DataCollectedListener<? super TestDataT> listener) {
 		this.listeners.add(listener);
 	}
 	
-	public void removeListener(DataCollectedListener<DataT> listener) {
+	public void removeListener(DataCollectedListener<? super TestDataT> listener) {
 		this.listeners.remove(listener);
 	}
 	
 	
-	protected void onDataCollected(Description identifier, DataT data) {
-		for (DataCollectedListener<DataT> listener : this.listeners) {
-			listener.dataCollected(identifier, data);
+	protected void onDataCollected(TestDataT data) {
+		for (DataCollectedListener<? super TestDataT> listener : this.listeners) {
+			listener.dataCollected(data);
 		}
 	}
 	
 	
-	public abstract void startCollecting(TestCollectionInfo testCollectionInfo);
+	public abstract void startCollecting();
 	
-	public abstract void stopCollecting(TestCollectionInfo testCollectionInfo);
+	public abstract void stopCollecting();
+	
 }
