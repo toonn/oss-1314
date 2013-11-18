@@ -1,9 +1,9 @@
 package kuleuven.group6.collectors;
 
+import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.TestFailure;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
-import org.junit.runner.notification.RunNotifier;
 
 /**
  * 
@@ -12,21 +12,21 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestFailureCollector extends DataCollector<TestFailure> {
 
-	protected RunNotifier runNotifier;
+	protected RunNotificationSubscriber runNotificationSubscriber;
 	protected RunListener runListener = new FailureListener();
 	
-	public TestFailureCollector(RunNotifier runNotifier) {
-		this.runNotifier = runNotifier;
+	public TestFailureCollector(RunNotificationSubscriber runNotificationSubscriber) {
+		this.runNotificationSubscriber = runNotificationSubscriber;
 	}
 
 	@Override
 	public void startCollecting() {
-		runNotifier.addListener(runListener);
+		runNotificationSubscriber.addListener(runListener);
 	}
 	
 	@Override
 	public void stopCollecting() {
-		runNotifier.removeListener(runListener);
+		runNotificationSubscriber.removeListener(runListener);
 	}
 	
 	
