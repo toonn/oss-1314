@@ -47,8 +47,6 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			//Initiate the WatchService and WatchKeys by registering the test and code paths
 			registerPath(testDir);
 			registerPath(codeDir);
-			//Extract dependencies using JDepend
-			extractDependencies(testDir);
 			//Start watching directories
 			ccwt = new CodeChangeWatchThread(this,importedClasses,watchService);
 			ccwt.run();
@@ -86,20 +84,6 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
-		}
-	}
-
-	protected void extractDependencies(File file)
-			throws IOException {
-		JDepend jDepend = new JDepend();
-		jDepend.addDirectory(file.getPath());
-		HashSet<JavaClass> classSet = new HashSet<JavaClass>(jDepend.analyze());
-		importedClasses = new HashSet<JavaClass>();
-		for(JavaClass jc : classSet){
-			HashSet<JavaPackage> ic = new HashSet<JavaPackage>((Collection<JavaPackage>)jc.getImportedPackages());
-			for(JavaPackage jp : ic){
-				importedClasses.addAll((Collection<JavaClass>)jp.getClasses());
 			}
 		}
 	}
