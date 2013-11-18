@@ -5,6 +5,11 @@ import java.util.Collections;
 
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class MethodCalls implements ITestData {
 
 	protected final Description testDescription;

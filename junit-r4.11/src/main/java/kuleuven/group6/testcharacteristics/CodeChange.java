@@ -4,6 +4,11 @@ import java.util.Date;
 
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class CodeChange implements ITestData {
 
 	protected final Description testDescription;

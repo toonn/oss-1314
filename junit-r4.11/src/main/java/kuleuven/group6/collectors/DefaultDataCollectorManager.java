@@ -5,6 +5,11 @@ import java.util.Map;
 
 import kuleuven.group6.testcharacteristics.ITestData;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class DefaultDataCollectorManager implements IDataCollectorManager {
 
 	protected Map<Class<? extends ITestData>, DataCollector<? extends ITestData>> collectors = new HashMap<>();
