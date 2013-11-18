@@ -11,7 +11,6 @@ import java.util.HashSet;
 import static java.nio.file.StandardWatchEventKinds.*;
 import jdepend.framework.*;
 import kuleuven.group6.TestCollectionInfo;
-import kuleuven.group6.testcharacteristics.SourceCodeChangeDate;
 
 /**
  * 

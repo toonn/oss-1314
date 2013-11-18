@@ -3,6 +3,8 @@ package kuleuven.group6.tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
@@ -57,6 +59,12 @@ public class TestDependencyCollectorTest {
 			dummyClass + ".<init>()V",
 			dummyClass + ".dummyMethod()V",
 		};
+		Collection<String> temp = new ArrayList<String>();
+		for (String method : actualMethods) {
+			if (!method.contains("jacoco"))
+				temp.add(method);
+		}
+		actualMethods = temp.toArray(new String[] {});
 		assertArrayEquals(expectedMethods, actualMethods);
 		
 		assertEquals(description, methodCalls.getTestDescription());
