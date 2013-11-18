@@ -29,13 +29,10 @@ public class DefaultDataCollectorManager implements IDataCollectorManager {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends ITestData> DataCollector<T> findCollector(Class<T> testDataClass) {
-		for (Class<? extends ITestData> entryTestDataClass : collectors.keySet()) {
-			if (entryTestDataClass.equals(testDataClass)) {
-				return (DataCollector<T>)collectors.get(entryTestDataClass);
-			}
-		}
+		if (! collectors.containsKey(testDataClass))
+			throw new NoSuitableCollectorException(testDataClass);
 		
-		throw new NoSuitableCollectorException(testDataClass);
+		return (DataCollector<T>) collectors.get(testDataClass);
 	}
 	
 }
