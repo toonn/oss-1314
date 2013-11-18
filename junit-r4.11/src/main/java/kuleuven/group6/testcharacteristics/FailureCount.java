@@ -17,6 +17,7 @@ public class FailureCount implements ITestStatistic {
 		this.failureCount = failureCount;
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}

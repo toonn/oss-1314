@@ -13,6 +13,7 @@ public class FailureTrace implements ITestStatistic {
 		
 	}
 	
+	@Override
 	public Description getTestDescription() {
 		// TODO Auto-generated method stub
 		return null;

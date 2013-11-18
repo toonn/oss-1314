@@ -19,6 +19,7 @@ public class LastDependencyChange implements ITestStatistic {
 		this.date = lastDependencyChangeDate;
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}

@@ -19,6 +19,7 @@ public class TestFailure implements ITestData {
 		this.failure = failure;
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}

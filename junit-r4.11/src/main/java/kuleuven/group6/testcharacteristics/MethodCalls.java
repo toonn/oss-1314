@@ -20,6 +20,7 @@ public class MethodCalls implements ITestData {
 		this.methodCalls = Collections.unmodifiableCollection(methodCalls);
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}

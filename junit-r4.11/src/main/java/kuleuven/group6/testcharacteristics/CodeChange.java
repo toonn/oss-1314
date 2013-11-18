@@ -21,6 +21,7 @@ public class CodeChange implements ITestData {
 		this.date = sourceCodeChangeDate;
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}

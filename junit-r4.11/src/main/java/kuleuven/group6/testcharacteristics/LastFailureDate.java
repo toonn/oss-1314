@@ -19,6 +19,7 @@ public class LastFailureDate implements ITestStatistic {
 		this.lastFailureDate = lastFailureDate;
 	}
 
+	@Override
 	public Description getTestDescription() {
 		return testDescription;
 	}
