@@ -40,7 +40,7 @@
 Het \emph{JUnit} systeem wordt uitgebreid om een automatische test deamon te maken. Deze uitbreiding wordt uitgevoerd op de achtergrond en moet code van een bepaald project in de gaten houden. Wanneer er code gewijzigt wordt in het project dan zal deamon tests uitvoeren en de ontwikkelaar van deze testen op de hoogte brengen.\\
 
 
-
+Voor het ontwerp streven we naar lage coupling. Deamon weet alleen maar af van de actieve policies en de policies waarvoor hem op dat moment de statistieken gaat berekenen. Daemon weet wat hij moet weten en niet te veel. Andere belangrijke klassen zijn \textit{Policy}, \textit{Statistic}, \textit{DataCollector}, \textit{AbstractTestCharacteristics}.
 
 
 %----------------------------------------------------------------------------------------
@@ -50,12 +50,34 @@ Het \emph{JUnit} systeem wordt uitgebreid om een automatische test deamon te mak
 \label{ssec:Ontwerp}
 %Klassendiagram en interactie diagrammen
 
-
+In deze sectie bespreken we het algemene ontwerp en de ontwerpbeslissingen. In de eerste subsectie wordt het klassendiagram besproken samen met een aantal verschillen met het vorige klassendiagram.
+In de tweede sectie worden de interactiediagrammas besproken die 
 
 %-------------KLASSENDIAGRAMMA-------------------------------
 \subsection{Klassendiagramma}
 \label{ssec:Klassendiagramma}
 
+
+
+%figuur oud klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{klassendiagramOud}
+    \caption{Grafische User Interface}
+	\label{fig:gui}
+\end{center}
+\end{figure}
+
+
+
+%figuur nieuw klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{klassendiagram}
+    \caption{Grafische User Interface}
+	\label{fig:gui}
+\end{center}
+\end{figure}
 
 %-------------Interactie Diagrammas-------------------------------
 \subsection{Interactie diagrammas}
@@ -188,7 +210,7 @@ Map<Description,OrderedSet<TestSummary>>
 			- TestID
 
 
-We streven voor low-coupling. Deamon weet alleen maar af van de actieve policies en de policies waarvoor hem op dat moment de statistieken gaat berekenen, de TestRuns en de TestInformation. Daemon weet wat hij moet weten en niet te veel. 
+We streven voor low-coupling. 
 
 Verslag: beginnen met de analyse van wat we nodig hebben en daarna uitleggen hoe we dit oplossen en analyseren en bediscussiëren.
 
