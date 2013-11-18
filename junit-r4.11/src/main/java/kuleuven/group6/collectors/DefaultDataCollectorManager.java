@@ -32,7 +32,7 @@ public class DefaultDataCollectorManager implements IDataCollectorManager {
 			}
 		}
 		
-		throw new RuntimeException();
+		throw new NoSuitableCollectorException(testDataClass);
 	}
 	
 }

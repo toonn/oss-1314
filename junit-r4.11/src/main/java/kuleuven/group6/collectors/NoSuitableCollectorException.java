@@ -11,8 +11,8 @@ public class NoSuitableCollectorException extends RuntimeException {
 
 	private static final long serialVersionUID= 1L;
 	
-	public NoSuitableCollectorException(ITestData testData) {
-		super("No collector was found that can produce data of the type \"" + testData.getClass().getSimpleName() + "\"");
+	public NoSuitableCollectorException(Class<? extends ITestData> testDataClass) {
+		super("No collector was found that can produce data of the type \"" + testDataClass.getSimpleName() + "\"");
 	}
 	
 }
