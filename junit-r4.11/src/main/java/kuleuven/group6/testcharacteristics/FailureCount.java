@@ -25,5 +25,10 @@ public class FailureCount implements ITestStatistic {
 	public int getFailureCount() {
 		return failureCount;
 	}
+	
+	public FailureCount increment() {
+		int incrementedFailureCount = getFailureCount() + 1;
+		return new FailureCount(getTestDescription(), incrementedFailureCount); 
+	}
 
 }

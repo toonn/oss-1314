@@ -11,7 +11,15 @@ public abstract class Statistic<TestStatisticT extends ITestStatistic> {
 	protected Map<Description, TestStatisticT> statistics;
 
 	public TestStatisticT getTestStatistic(Description description) {
-		return statistics.get(description);
+		TestStatisticT stat;
+		if (statistics.containsKey(description))
+			stat = statistics.get(description);
+		else if (!description.getChildren().isEmpty())
+			stat = composeTestStatistic(description);
+		else
+			stat = getDefaultTestStatistic(description);
+		
+		return stat;
 	}
 	
 	protected void putTestStatistic(TestStatisticT testStatistic) {

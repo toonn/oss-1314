@@ -7,7 +7,7 @@ import kuleuven.group6.collectors.IDataCollectorManager;
 import kuleuven.group6.testcharacteristics.FailureCount;
 import kuleuven.group6.testcharacteristics.TestFailure;
 
-public class FailureCountStatistic extends Statistic<FailureCount> {
+public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 
 	public FailureCountStatistic(IDataCollectorManager dataCollectorManager) {
 		dataCollectorManager.subscribe(TestFailure.class, new FailureCountListener());
@@ -23,18 +23,12 @@ public class FailureCountStatistic extends Statistic<FailureCount> {
 	}
 
 	@Override
-	protected FailureCount composeTestStatistic(Description description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected FailureCount getDefaultTestStatistic(Description description) {
-		// TODO Auto-generated method stub
-		return null;
+		putTestStatistic(new FailureCount(description, 0));
+		return getTestStatistic(description);
 	}
 	
 	protected FailureCount calculateStatistic(TestFailure data) {
-		return null;
+		return getTestStatistic(data.getTestDescription()).increment();
 	}
 }
