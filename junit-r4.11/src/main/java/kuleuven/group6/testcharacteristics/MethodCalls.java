@@ -1,13 +1,26 @@
 package kuleuven.group6.testcharacteristics;
 
-import kuleuven.group6.collectors.MethodCallTrace;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.junit.runner.Description;
 
-public class MethodCalls extends AbstractTestCharacteristic<MethodCallTrace>
-	implements ITestData<MethodCallTrace> {
+public class MethodCalls implements ITestData {
 
-	public MethodCalls(Description testDescription, MethodCallTrace methodCallTrace) {
-		super(testDescription, methodCallTrace);
+	protected final Description testDescription;
+	protected final Collection<String> methodCalls;
+	
+	public MethodCalls(Description testDescription, Collection<String> methodCalls) {
+		this.testDescription = testDescription;
+		this.methodCalls = Collections.unmodifiableCollection(methodCalls);
+	}
+
+	public Description getTestDescription() {
+		return testDescription;
+	}
+
+	public Collection<String> getMethodCalls() {
+		return methodCalls;
 	}
 	
 }

@@ -4,22 +4,22 @@ import java.util.Date;
 
 import org.junit.runner.Description;
 
-public class LastFailureDate implements ITestStatistic {
+public class LastDependencyChange implements ITestStatistic {
 
 	protected final Description testDescription;
-	protected final Date lastFailureDate;
+	protected final Date date;
 	
-	public LastFailureDate(Description testDescription, Date lastFailureDate) {
+	public LastDependencyChange(Description testDescription, Date lastDependencyChangeDate) {
 		this.testDescription = testDescription;
-		this.lastFailureDate = lastFailureDate;
+		this.date = lastDependencyChangeDate;
 	}
 
 	public Description getTestDescription() {
 		return testDescription;
 	}
 
-	public Date getLastFailureDate() {
-		return lastFailureDate;
+	public Date getDate() {
+		return date;
 	}
-	
+
 }
