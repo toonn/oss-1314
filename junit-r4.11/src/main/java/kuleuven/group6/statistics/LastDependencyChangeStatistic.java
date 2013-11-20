@@ -8,7 +8,7 @@ import kuleuven.group6.testcharacteristics.MethodCalls;
 
 import org.junit.runner.Description;
 
-public class LastDependencyChangeStatistic<TestStatisticT> extends
+public class LastDependencyChangeStatistic extends
 		Statistic<LastDependencyChange> {
 	
 	public LastDependencyChangeStatistic(IDataEnroller dataCollectorManager) {
