@@ -5,7 +5,7 @@ import java.util.Map;
 
 import kuleuven.group6.testcharacteristics.ITestStatistic;
 
-public class DefaultStatisticManager implements IStatisticManager {
+public class StatisticProvider implements IStatisticProvider {
 	
 	protected Map<Class<? extends ITestStatistic>, Statistic<? extends ITestStatistic>> statistics = new HashMap<>();
 	

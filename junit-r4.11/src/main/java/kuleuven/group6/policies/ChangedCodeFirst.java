@@ -2,7 +2,7 @@ package kuleuven.group6.policies;
 
 import java.util.Comparator;
 
-import kuleuven.group6.statistics.IStatisticManager;
+import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.LastDependencyChange;
 
@@ -12,7 +12,7 @@ public class ChangedCodeFirst extends SortingPolicy {
 	
 	protected final Statistic<LastDependencyChange> statistic;
 	
-	public ChangedCodeFirst(IStatisticManager statMan) {
+	public ChangedCodeFirst(IStatisticProvider statMan) {
 		this.statistic = statMan.getStatistic(LastDependencyChange.class);
 	}
 
