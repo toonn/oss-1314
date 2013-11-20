@@ -22,7 +22,7 @@ public class DataEnroller implements IDataEnroller {
 	protected Map<Class<? extends ITestData>, DataCollector<? extends ITestData>> collectors = new HashMap<>();
 	
 	protected DataEnroller() {
-		// TODO public of protected?
+		
 	}
 	
 	private void configure(
@@ -49,7 +49,7 @@ public class DataEnroller implements IDataEnroller {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends ITestData> DataCollector<T> findCollector(Class<T> testDataClass) {
+	protected <T extends ITestData> DataCollector<T> findCollector(Class<T> testDataClass) {
 		if (! collectors.containsKey(testDataClass))
 			throw new NoSuitableCollectorException(testDataClass);
 		
