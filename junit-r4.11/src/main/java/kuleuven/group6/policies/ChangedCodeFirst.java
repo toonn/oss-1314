@@ -18,8 +18,20 @@ public class ChangedCodeFirst extends SortingPolicy {
 
 	@Override
 	protected Comparator<Description> getComparator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Comparator<Description>() {
+			/*
+			 * Note: this comparator imposes orderings that are inconsistent
+			 * with equals.
+			 */
+			@Override
+			public int compare(Description o1, Description o2) {
+				LastDependencyChange change1 = statistic.getTestStatistic(o1);
+				LastDependencyChange change2 = statistic.getTestStatistic(o2);
+				
+				return change1.getDate().compareTo(change2.getDate());
+			}
+			
+		};
 	}
 
 }
