@@ -50,7 +50,9 @@ public class TestDependencyCollectorTest {
 		Description description = Description.createTestDescription(getClass(), "testMethodCall");
 		runNotifier.fireTestStarted(description);
 		Dummy testSubject = new Dummy();
-		testSubject.dummyMethod();
+		testSubject.dummyMethodA();
+		testSubject.dummyMethodB();
+		testSubject.nestingMethodAB();
 		runNotifier.fireTestFinished(description);
 		
 		MethodCalls methodCalls = listener.getLastCollectedMethodCalls();
@@ -58,7 +60,11 @@ public class TestDependencyCollectorTest {
 		String dummyClass = Dummy.class.getName().replace('.', '/');
 		String[] expectedMethods = {
 			dummyClass + ".<init>()V",
-			dummyClass + ".dummyMethod()V",
+			dummyClass + ".dummyMethodA()V",
+			dummyClass + ".dummyMethodB()V",
+			dummyClass + ".nestingMethodAB()V",
+			dummyClass + ".dummyMethodA()V",
+			dummyClass + ".dummyMethodB()V"
 		};
 		Collection<String> temp = new ArrayList<String>();
 		for (String method : actualMethods) {
