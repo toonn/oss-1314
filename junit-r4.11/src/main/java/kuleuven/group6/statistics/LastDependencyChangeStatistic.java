@@ -1,7 +1,7 @@
 package kuleuven.group6.statistics;
 
 import kuleuven.group6.collectors.DataCollectedListener;
-import kuleuven.group6.collectors.IDataCollectorManager;
+import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.CodeChange;
 import kuleuven.group6.testcharacteristics.LastDependencyChange;
 import kuleuven.group6.testcharacteristics.MethodCalls;
@@ -11,7 +11,7 @@ import org.junit.runner.Description;
 public class LastDependencyChangeStatistic<TestStatisticT> extends
 		Statistic<LastDependencyChange> {
 	
-	public LastDependencyChangeStatistic(IDataCollectorManager dataCollectorManager) {
+	public LastDependencyChangeStatistic(IDataEnroller dataCollectorManager) {
 		dataCollectorManager.subscribe(CodeChange.class, new CodeChangeListener());
 	}
 

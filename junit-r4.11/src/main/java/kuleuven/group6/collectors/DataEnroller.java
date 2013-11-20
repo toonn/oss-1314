@@ -12,11 +12,11 @@ import kuleuven.group6.testcharacteristics.TestFailure;
  * @author Team 6
  *
  */
-public class DefaultDataCollectorManager implements IDataCollectorManager {
+public class DataEnroller implements IDataEnroller {
 
 	protected Map<Class<? extends ITestData>, DataCollector<? extends ITestData>> collectors = new HashMap<>();
 	
-	public DefaultDataCollectorManager(RunNotificationSubscriber runNotificationSubscriber) {
+	public DataEnroller(RunNotificationSubscriber runNotificationSubscriber) {
 		collectors.put(TestFailure.class, new TestFailureCollector(runNotificationSubscriber));
 		// TODO: andere default collectors toevoegen
 	}

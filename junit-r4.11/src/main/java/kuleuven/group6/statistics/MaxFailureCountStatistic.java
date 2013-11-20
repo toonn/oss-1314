@@ -1,13 +1,13 @@
 package kuleuven.group6.statistics;
 
-import kuleuven.group6.collectors.IDataCollectorManager;
+import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.FailureCount;
 
 import org.junit.runner.Description;
 
 public class MaxFailureCountStatistic extends FailureCountStatistic {
 	
-	public MaxFailureCountStatistic(IDataCollectorManager dataCollectorManager) {
+	public MaxFailureCountStatistic(IDataEnroller dataCollectorManager) {
 		super(dataCollectorManager);
 	}
 

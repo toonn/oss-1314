@@ -3,14 +3,14 @@ package kuleuven.group6.statistics;
 import java.util.Date;
 
 import kuleuven.group6.collectors.DataCollectedListener;
-import kuleuven.group6.collectors.IDataCollectorManager;
+import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.LastFailureDate;
 import kuleuven.group6.testcharacteristics.TestFailure;
 import org.junit.runner.Description;
 
 public class LastFailureStatistic<TestStatisticT> extends Statistic<LastFailureDate> {
 	
-	public LastFailureStatistic(IDataCollectorManager dataCollectorManager) {
+	public LastFailureStatistic(IDataEnroller dataCollectorManager) {
 		dataCollectorManager.subscribe(TestFailure.class, new LastFailureListener());
 	}
 
