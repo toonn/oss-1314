@@ -17,13 +17,14 @@ public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 		dataEnroller.subscribe(TestFailure.class, new FailureCountListener());
 	}
 
-	protected class FailureCountListener implements DataCollectedListener<TestFailure> {
+	protected class FailureCountListener implements
+			DataCollectedListener<TestFailure> {
 
 		@Override
 		public void dataCollected(TestFailure data) {
-			putTestStatistic(calculateStatistic(data));
+			calculateStatistic(data);
 		}
-		
+
 	}
 
 	@Override
@@ -31,8 +32,9 @@ public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 		putTestStatistic(new FailureCount(description, 0));
 		return getTestStatistic(description);
 	}
-	
-	protected FailureCount calculateStatistic(TestFailure data) {
-		return getTestStatistic(data.getTestDescription()).increment();
+
+	protected void calculateStatistic(TestFailure data) {
+		putTestStatistic(getTestStatistic(data.getTestDescription())
+				.increment());
 	}
 }
