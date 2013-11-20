@@ -18,6 +18,16 @@ import org.junit.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * A test for the TestDependencyCollector class.
+ * 
+ * IMPORTANT: The TestDependencyCollector class depends on the OSSRewriter library, which
+ * needs to be run with the following VM arguments:
+ * 		-javaagent:lib/ossrewriter-1.0.jar  
+ * 
+ * @author team 6
+ *
+ */
 public class TestDependencyCollectorTest {
 
 	protected TestCollectionInfo testCollectionInfo;
