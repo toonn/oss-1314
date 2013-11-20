@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.junit.runner.notification.RunListener;
-import org.junit.runner.notification.RunNotifier;
-
 /**
  * 
  * @author team 6
@@ -17,15 +14,15 @@ public class TestCollectionInfo {
 	
 	protected File testDirectory;
 	protected File sourceDirectory;
-	protected RunNotifier runNotifier;
+	protected RunNotificationSubscriber runNotificationSubscriber;
 	
 	protected Collection<String> testClassNames;
 	protected Collection<String> sourceClassNames;
 	
-	public TestCollectionInfo(File testDirectory, File sourceDirectory, RunNotifier runNotifier) {
+	public TestCollectionInfo(File testDirectory, File sourceDirectory, RunNotificationSubscriber runNotificationSubscriber) {
 		this.testDirectory = testDirectory;
 		this.sourceDirectory = sourceDirectory;
-		this.runNotifier = runNotifier;
+		this.runNotificationSubscriber = runNotificationSubscriber;
 		
 		this.testClassNames = findAllClassNames(testDirectory, "");
 		this.sourceClassNames = findAllClassNames(sourceDirectory, "");
@@ -64,12 +61,8 @@ public class TestCollectionInfo {
 	}
 	
 	
-	public void addTestRunListener(RunListener listener) {
-		this.runNotifier.addListener(listener);
-	}
-	
-	public void removeTestRunListener(RunListener listener) {
-		this.runNotifier.removeListener(listener);
+	public RunNotificationSubscriber getRunNotificationSubscriber() {
+		return runNotificationSubscriber;
 	}
 
 

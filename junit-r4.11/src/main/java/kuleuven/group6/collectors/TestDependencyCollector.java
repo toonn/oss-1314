@@ -11,7 +11,6 @@ import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.MethodCalls;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
-import org.junit.runner.notification.RunNotifier;
 
 /**
  * A data collector that collects all methods called by each test.

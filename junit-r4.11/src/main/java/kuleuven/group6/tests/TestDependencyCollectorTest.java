@@ -27,13 +27,14 @@ public class TestDependencyCollectorTest {
 	@Before
 	public void initializeTestEnvironment() {
 		runNotifier = new RunNotifier();
+		RunNotificationSubscriber runNotificationSubscriber = new RunNotificationSubscriber(runNotifier);
 		
 		File subjectSourceDirectory = new File(SourceLocator.getLocation());
 		File subjectTestsDirectory = new File(TestsLocator.getLocation());
 		// TODO remove the need of TestCollectionInfo
-		testCollectionInfo = new TestCollectionInfo(subjectTestsDirectory, subjectSourceDirectory, runNotifier);
+		testCollectionInfo = new TestCollectionInfo(subjectTestsDirectory, subjectSourceDirectory, runNotificationSubscriber);
 		
-		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), new RunNotificationSubscriber(runNotifier));
+		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), runNotificationSubscriber);
 		failureTraceCollector.startCollecting();
 	}
 	
