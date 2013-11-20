@@ -1,6 +1,6 @@
 package kuleuven.group6.statistics;
 
-import kuleuven.group6.testcharacteristics.ITestStatistic;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
 public interface IStatisticProvider {
 

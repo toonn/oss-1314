@@ -2,8 +2,7 @@ package kuleuven.group6.statistics;
 
 import java.util.Map;
 
-import kuleuven.group6.testcharacteristics.ITestStatistic;
-
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import org.junit.runner.Description;
 
 public abstract class Statistic<TestStatisticT extends ITestStatistic> {

@@ -4,8 +4,7 @@ import java.util.Comparator;
 
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.Statistic;
-import kuleuven.group6.testcharacteristics.FailureTrace;
-
+import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
 import org.junit.runner.Description;
 
 public class DistinctFailureFirst extends SortingPolicy {

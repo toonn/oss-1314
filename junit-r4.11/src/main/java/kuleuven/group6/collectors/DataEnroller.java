@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.testcharacteristics.CodeChange;
-import kuleuven.group6.testcharacteristics.ITestData;
-import kuleuven.group6.testcharacteristics.MethodCalls;
-import kuleuven.group6.testcharacteristics.TestFailure;
+import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import org.junit.runner.Description;
 
 /**

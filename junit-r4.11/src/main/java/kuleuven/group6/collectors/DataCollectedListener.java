@@ -1,6 +1,6 @@
 package kuleuven.group6.collectors;
 
-import kuleuven.group6.testcharacteristics.ITestData;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
 /**
  * 

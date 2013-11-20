@@ -1,7 +1,7 @@
 package kuleuven.group6.collectors;
 
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.testcharacteristics.TestFailure;
+import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 

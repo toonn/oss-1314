@@ -1,4 +1,4 @@
-package kuleuven.group6.testcharacteristics;
+package kuleuven.group6.testcharacteristics.testdatas;
 
 import java.util.Date;
 

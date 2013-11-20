@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.junit.runner.Description;
 import static java.nio.file.StandardWatchEventKinds.*;
-import kuleuven.group6.testcharacteristics.CodeChange;
+import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 
 /**
  * 

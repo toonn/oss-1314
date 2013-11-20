@@ -2,10 +2,9 @@ package kuleuven.group6.statistics;
 
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.CodeChange;
-import kuleuven.group6.testcharacteristics.LastDependencyChange;
-import kuleuven.group6.testcharacteristics.MethodCalls;
-
+import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
+import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import org.junit.runner.Description;
 
 public class LastDependencyChangeStatistic extends

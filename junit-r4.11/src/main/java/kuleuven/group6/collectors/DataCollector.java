@@ -3,7 +3,7 @@ package kuleuven.group6.collectors;
 import java.util.Collection;
 import java.util.HashSet;
 
-import kuleuven.group6.testcharacteristics.ITestData;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
 /**
  * 

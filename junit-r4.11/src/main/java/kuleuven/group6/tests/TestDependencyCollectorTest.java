@@ -10,7 +10,7 @@ import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.TestDependencyCollector;
-import kuleuven.group6.testcharacteristics.MethodCalls;
+import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.tests.testsubject.source.Dummy;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import kuleuven.group6.tests.testsubject.tests.TestsLocator;

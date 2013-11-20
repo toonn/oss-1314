@@ -8,7 +8,7 @@ import be.kuleuven.cs.ossrewriter.MonitorEntrypoint;
 import be.kuleuven.cs.ossrewriter.OSSRewriter;
 import be.kuleuven.cs.ossrewriter.Predicate;
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.testcharacteristics.MethodCalls;
+import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 

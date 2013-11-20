@@ -1,4 +1,4 @@
-package kuleuven.group6.testcharacteristics;
+package kuleuven.group6.testcharacteristics.teststatistics;
 
 import java.util.Arrays;
 import java.util.Collections;

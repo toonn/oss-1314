@@ -4,8 +4,8 @@ import java.util.Date;
 
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.LastFailureDate;
-import kuleuven.group6.testcharacteristics.TestFailure;
+import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
 public class LastFailureStatistic extends Statistic<LastFailureDate> {

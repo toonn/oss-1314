@@ -2,9 +2,8 @@ package kuleuven.group6.statistics;
 
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.FailureTrace;
-import kuleuven.group6.testcharacteristics.TestFailure;
-
+import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
 import org.junit.runner.Description;
 
 public class FailureTraceStatistic extends

@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.FailureCount;
-import kuleuven.group6.testcharacteristics.FailureTrace;
-import kuleuven.group6.testcharacteristics.ITestStatistic;
-import kuleuven.group6.testcharacteristics.LastDependencyChange;
-import kuleuven.group6.testcharacteristics.LastFailureDate;
+import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
+import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
+import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 
 public class StatisticProvider implements IStatisticProvider {
 	

@@ -1,13 +1,13 @@
-package kuleuven.group6.testcharacteristics;
+package kuleuven.group6.testcharacteristics.teststatistics;
 
 import org.junit.runner.Description;
 
 /**
  * 
  * @author Team 6
- *
+ * 
  */
-public interface ITestCharacteristic {
+public interface ITestStatistic {
 	
 	public Description getTestDescription();
 	
