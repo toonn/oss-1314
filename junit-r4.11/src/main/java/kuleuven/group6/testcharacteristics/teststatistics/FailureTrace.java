@@ -1,8 +1,8 @@
 package kuleuven.group6.testcharacteristics.teststatistics;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.runner.Description;
 
@@ -14,11 +14,18 @@ import org.junit.runner.Description;
 public class FailureTrace implements ITestStatistic {
 
 	protected Description testDescription;
-	protected List<StackTraceElement> stackTrace;
+	protected Collection<StackTraceElement> pointsOfFailure;
 	
-	public FailureTrace(Description testDescription, StackTraceElement[] stackTrace) {
+	public FailureTrace(Description testDescription, StackTraceElement pointOfFailure) {
 		this.testDescription = testDescription;
-		this.stackTrace = Arrays.asList(stackTrace);
+		Collection<StackTraceElement> pointsOfFailure = new ArrayList<>();
+		pointsOfFailure.add(pointOfFailure);
+		this.pointsOfFailure = pointsOfFailure;
+	}
+	
+	public FailureTrace(Description testDescription, Collection<StackTraceElement> pointsOfFailure) {
+		this.testDescription = testDescription;
+		this.pointsOfFailure = Collections.unmodifiableCollection(pointsOfFailure);
 	}
 	
 	@Override
@@ -26,8 +33,8 @@ public class FailureTrace implements ITestStatistic {
 		return testDescription;
 	}
 
-	public List<StackTraceElement> getStackTrace() {
-		return Collections.unmodifiableList(stackTrace);
+	public Collection<StackTraceElement> getPointsOfFailure() {
+		return pointsOfFailure;
 	}
 	
 }
