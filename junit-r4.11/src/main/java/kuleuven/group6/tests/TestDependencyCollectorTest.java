@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.TestDependencyCollector;
@@ -32,7 +33,7 @@ public class TestDependencyCollectorTest {
 		// TODO remove the need of TestCollectionInfo
 		testCollectionInfo = new TestCollectionInfo(subjectTestsDirectory, subjectSourceDirectory, runNotifier);
 		
-		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), runNotifier);
+		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), new RunNotificationSubscriber(runNotifier));
 		failureTraceCollector.startCollecting();
 	}
 	

@@ -7,6 +7,7 @@ import be.kuleuven.cs.ossrewriter.Monitor;
 import be.kuleuven.cs.ossrewriter.MonitorEntrypoint;
 import be.kuleuven.cs.ossrewriter.OSSRewriter;
 import be.kuleuven.cs.ossrewriter.Predicate;
+import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.MethodCalls;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
@@ -23,7 +24,7 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
-	protected RunNotifier runNotifier;
+	protected RunNotificationSubscriber runNotificationSubscriber;
 	protected RunListener testListener;
 	protected Collection<String> currentMethodCalls = null;
 	protected MethodCallMonitor methodCallMonitor = null;
@@ -32,11 +33,11 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	 * Construct a new data collector that will collect all methods called by each test.
 	 * 
 	 * @param sourceClassNames The fully qualified names of all the classes of which method calls are to be included.
-	 * @param runNotifier The notifier on which this collector can subscribe itself. 
+	 * @param runNotificationSubscriber The notifier on which this collector can subscribe itself. 
 	 */
-	public TestDependencyCollector(Collection<String> sourceClassNames, RunNotifier runNotifier) {
+	public TestDependencyCollector(Collection<String> sourceClassNames, RunNotificationSubscriber runNotificationSubscriber) {
 		setupOssRewriter(sourceClassNames);
-		this.runNotifier = runNotifier;
+		this.runNotificationSubscriber = runNotificationSubscriber;
 		this.testListener = new TestListener();
 	}
 	
@@ -63,7 +64,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	public void startCollecting() {
 		methodCallMonitor = new MethodCallMonitor();
 		MonitorEntrypoint.register(methodCallMonitor);
-		runNotifier.addListener(testListener);
+		runNotificationSubscriber.addListener(testListener);
 	}
 	
 	@Override
@@ -71,7 +72,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 		OSSRewriter.disable();
 		OSSRewriter.resetUserExclusionFilter();
 		MonitorEntrypoint.unregister(methodCallMonitor);
-		runNotifier.removeListener(testListener);
+		runNotificationSubscriber.removeListener(testListener);
 		
 		methodCallMonitor = null;
 		testListener = null;
