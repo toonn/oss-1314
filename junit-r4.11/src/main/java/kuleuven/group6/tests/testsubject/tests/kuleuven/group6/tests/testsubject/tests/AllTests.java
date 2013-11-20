@@ -5,7 +5,10 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ BasicTest.class, FailingDummyTest.class })
-public class TestSuite {
+@SuiteClasses({ 
+	BasicTest.class, 
+	FailingDummyTest.class
+})
+public class AllTests {
 
 }

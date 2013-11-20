@@ -5,6 +5,11 @@ import org.junit.Test;
 
 public class BasicTest {
 
+	public static int getNbTests() {
+		return 6;
+	}
+	
+	
 	@Test
 	public void passingTestA() {
 	}

@@ -6,6 +6,11 @@ import static org.junit.Assert.*;
 
 public class FailingDummyTest {
 	
+	public static int getNbTests() {
+		return 2;
+	}
+	
+	
 	@Test
 	public void testTrueButActuallyFalse() {
 		FailingDummy instance = new FailingDummy();
