@@ -32,7 +32,7 @@ public class FailureTraceStatistic extends
 
 		@Override
 		public void dataCollected(TestFailure data) {
-			putTestStatistic(calculateStatistic(data));
+			calculateStatistic(data);
 		}
 		
 	}
@@ -55,9 +55,10 @@ public class FailureTraceStatistic extends
 		return null;
 	}
 	
-	protected FailureTrace calculateStatistic(TestFailure data) {
+	protected void calculateStatistic(TestFailure data) {
 		StackTraceElement pointOfFailure = data.getFailure().getException().getStackTrace()[0];
-		return new FailureTrace(data.getTestDescription(), pointOfFailure);
+		FailureTrace failureTrace = new FailureTrace(data.getTestDescription(), pointOfFailure);
+		putTestStatistic(failureTrace);
 	}
 	
 	
