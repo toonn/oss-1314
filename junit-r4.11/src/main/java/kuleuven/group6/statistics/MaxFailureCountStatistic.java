@@ -7,8 +7,8 @@ import org.junit.runner.Description;
 
 public class MaxFailureCountStatistic extends FailureCountStatistic {
 	
-	public MaxFailureCountStatistic(IDataEnroller dataCollectorManager) {
-		super(dataCollectorManager);
+	public MaxFailureCountStatistic(IDataEnroller dataEnroller) {
+		super(dataEnroller);
 	}
 
 	@Override

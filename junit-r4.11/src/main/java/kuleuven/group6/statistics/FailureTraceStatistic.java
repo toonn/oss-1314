@@ -10,8 +10,8 @@ import org.junit.runner.Description;
 public class FailureTraceStatistic extends
 		Statistic<FailureTrace> {
 	
-	public FailureTraceStatistic(IDataEnroller dataCollectorManager) {
-		dataCollectorManager.subscribe(TestFailure.class, new FailureTraceListener());
+	public FailureTraceStatistic(IDataEnroller dataEnroller) {
+		dataEnroller.subscribe(TestFailure.class, new FailureTraceListener());
 	}
 
 	protected class FailureTraceListener implements DataCollectedListener<TestFailure> {

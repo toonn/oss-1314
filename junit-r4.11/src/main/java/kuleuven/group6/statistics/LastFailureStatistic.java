@@ -10,8 +10,8 @@ import org.junit.runner.Description;
 
 public class LastFailureStatistic extends Statistic<LastFailureDate> {
 	
-	public LastFailureStatistic(IDataEnroller dataCollectorManager) {
-		dataCollectorManager.subscribe(TestFailure.class, new LastFailureListener());
+	public LastFailureStatistic(IDataEnroller dataEnroller) {
+		dataEnroller.subscribe(TestFailure.class, new LastFailureListener());
 	}
 
 	protected class LastFailureListener implements DataCollectedListener<TestFailure> {

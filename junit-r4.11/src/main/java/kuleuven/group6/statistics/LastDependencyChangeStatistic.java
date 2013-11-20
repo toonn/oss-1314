@@ -11,8 +11,8 @@ import org.junit.runner.Description;
 public class LastDependencyChangeStatistic extends
 		Statistic<LastDependencyChange> {
 	
-	public LastDependencyChangeStatistic(IDataEnroller dataCollectorManager) {
-		dataCollectorManager.subscribe(CodeChange.class, new CodeChangeListener());
+	public LastDependencyChangeStatistic(IDataEnroller dataEnroller) {
+		dataEnroller.subscribe(CodeChange.class, new CodeChangeListener());
 	}
 
 	protected class CodeChangeListener implements DataCollectedListener<CodeChange> {

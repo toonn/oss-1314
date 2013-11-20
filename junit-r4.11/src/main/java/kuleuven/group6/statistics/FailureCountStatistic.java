@@ -9,8 +9,8 @@ import kuleuven.group6.testcharacteristics.TestFailure;
 
 public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 
-	public FailureCountStatistic(IDataEnroller dataCollectorManager) {
-		dataCollectorManager.subscribe(TestFailure.class, new FailureCountListener());
+	public FailureCountStatistic(IDataEnroller dataEnroller) {
+		dataEnroller.subscribe(TestFailure.class, new FailureCountListener());
 	}
 
 	protected class FailureCountListener implements DataCollectedListener<TestFailure> {
