@@ -7,6 +7,14 @@ import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
 import org.junit.runner.Description;
 
+/**
+ * The DistinctFailureFirst will order a statistic by his policy. The policy is 
+ * Distinct failure first. By comparisation of the stacktraces, it can see which
+ * change in code will cause more test to fail.
+ *   
+ * @author Team 6
+ *
+ */
 public class DistinctFailureFirst extends SortingPolicy {
 	protected final Statistic<FailureTrace> statistic;
 	

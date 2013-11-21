@@ -5,6 +5,12 @@ import java.util.Map;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ * @param <TestStatisticT>
+ */
 public abstract class Statistic<TestStatisticT extends ITestStatistic> {
 	
 	protected Map<Description, TestStatisticT> statistics;

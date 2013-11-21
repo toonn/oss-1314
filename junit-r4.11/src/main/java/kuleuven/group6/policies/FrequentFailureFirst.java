@@ -7,6 +7,11 @@ import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class FrequentFailureFirst extends SortingPolicy {
 
 	protected final Statistic<FailureCount> statistic;

@@ -7,6 +7,11 @@ import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class LastDependencyChangeStatistic extends
 		Statistic<LastDependencyChange> {
 	

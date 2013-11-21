@@ -7,6 +7,11 @@ import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class LastFailureFirst extends SortingPolicy {
 	
 	protected final Statistic<LastFailureDate> statistic;

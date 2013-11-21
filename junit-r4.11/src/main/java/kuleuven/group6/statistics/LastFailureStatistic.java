@@ -8,6 +8,11 @@ import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class LastFailureStatistic extends Statistic<LastFailureDate> {
 	
 	public LastFailureStatistic(IDataEnroller dataEnroller) {

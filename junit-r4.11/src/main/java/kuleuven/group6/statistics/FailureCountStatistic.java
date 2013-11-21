@@ -6,6 +6,11 @@ import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 
 	public FailureCountStatistic(IDataEnroller dataEnroller) {
