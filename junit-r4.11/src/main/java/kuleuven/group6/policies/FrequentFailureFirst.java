@@ -33,7 +33,8 @@ public class FrequentFailureFirst extends SortingPolicy {
 						.getFailureCount();
 				int failureCount2 = statistic.getTestStatistic(o2)
 						.getFailureCount();
-				return Integer.compare(failureCount1, failureCount2);
+				int orderingByLeastFailures = Integer.compare(failureCount1, failureCount2);
+				return -1 * orderingByLeastFailures;
 			}
 		};
 	}
