@@ -66,7 +66,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 				int index1 = fullyOrderedDescriptions.indexOf(o1);
 				int index2 = fullyOrderedDescriptions.indexOf(o2);
 				boolean o1HasOrder = index1 != -1;
-				boolean o2HasOrder = index2 != -2;
+				boolean o2HasOrder = index2 != -1;
 
 				if (!o1HasOrder && !o2HasOrder)
 					return 0;

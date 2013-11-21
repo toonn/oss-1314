@@ -20,18 +20,18 @@
 \DeclareOption{i1}{%
   \def\thetitle{Verslag: iteratie 1}%
   \def\thepagelimit{100}}
-\DeclareOption{tt2}{%
-  \def\thetitle{verslag: iteratie 2}%
+\DeclareOption{i2}{%
+  \def\thetitle{Report: iteration 2}%
   \def\thepagelimit{100}}
-\DeclareOption{tt3}{%
-  \def\thetitle{Verslag: iteratie 3}%
+\DeclareOption{i3}{%
+  \def\thetitle{Report: iteration 3}%
   \def\thepagelimit{100}}
 \DeclareOption{eind}{%
   \def\thetitle{ Eindverslag}%
   \def\thepagelimit{100}}
 \ProcessOptions
 \LoadClass[10pt,a4paper]{article}
-\RequirePackage[dutch]{babel}
+\RequirePackage[english]{babel}
 \RequirePackage{color}
 \RequirePackage{everypage}
 \RequirePackage{geometry}
