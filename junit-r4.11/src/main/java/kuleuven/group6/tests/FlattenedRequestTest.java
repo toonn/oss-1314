@@ -22,9 +22,7 @@ public class FlattenedRequestTest {
 		
 		assertTrue(runnerDescription.isSuite());
 		for (Description child : runnerDescription.getChildren()) {
-			assertTrue(child.isSuite());
-			assertEquals(1, child.getChildren().size());
-			assertTrue(child.getChildren().get(0).isTest());
+			assertTrue(child.isTest());
 		}
 		
 		assertEquals(BasicAndFailingDummySuite.getNbTests(), runnerDescription.getChildren().size());
