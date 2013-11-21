@@ -180,9 +180,32 @@ public class ConsoleView {
 				output("[ OK ] ");
 			}
 			
-			outputln(description.getDisplayName());
+			if (description.isTest()) {
+				printTestDescription(description);
+			} else {
+				printSuiteDescription(description);
+			}
 			outputln();
 		}
+		
+		protected void printTestDescription(Description testDescription) {
+			String fullClassName = testDescription.getClassName();
+			int indexOfClassSeparator = fullClassName.lastIndexOf('.');
+			String className = fullClassName.substring(indexOfClassSeparator + 1);
+			String packageName = fullClassName.substring(0, indexOfClassSeparator);
+			outputln(testDescription.getMethodName() + " - in " + className);
+			outputln("           (in package " + packageName + ")");
+		}
+		
+		protected void printSuiteDescription(Description suiteDescription) {
+			String fullClassName = suiteDescription.getClassName();
+			int indexOfClassSeparator = fullClassName.lastIndexOf('.');
+			String className = fullClassName.substring(indexOfClassSeparator + 1);
+			String packageName = fullClassName.substring(0, indexOfClassSeparator);
+			outputln(className);
+			outputln("           (in package " + packageName + ")");
+		}
+		
 
 		@Override
 		public void testFailure(Failure failure) throws Exception {
