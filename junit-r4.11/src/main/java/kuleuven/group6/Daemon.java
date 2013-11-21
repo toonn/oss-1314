@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +14,8 @@ import kuleuven.group6.policies.*;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.StatisticProvider;
 import org.junit.runner.Request;
+import org.junit.runner.Result;
+import org.junit.runner.Runner;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
@@ -113,32 +113,43 @@ public class Daemon {
 	protected void startCore() {
 		boolean keepRunning = true;
 		while (keepRunning) {
-			if (Thread.currentThread().isInterrupted())
-				keepRunning = false;
-
 			try {
 				doTestRun();
 			} catch (Exception e) {
 				e.printStackTrace();
 				keepRunning = false;
 			}
+			
+			if (Thread.currentThread().isInterrupted())
+				keepRunning = false;
 		}
 	}
 
 	protected void doTestRun() throws ClassNotFoundException, IOException {
-		URL[] paths = { codeDirectory.toURI().toURL(), testDirectory.toURI().toURL() };
+		URL[] paths = { 
+			codeDirectory.toURI().toURL(), 
+			testDirectory.toURI().toURL()
+		};
 		URLClassLoader classLoader = URLClassLoader.newInstance(paths);
 		try {
-			Class<?> rootSuite = classLoader.loadClass(rootSuiteClassName);
-			Request request = createNewRequest(rootSuite);
-			request.getRunner().run(runNotifier);
+			Class<?> rootSuiteClass = Class.forName(rootSuiteClassName, true, classLoader);
+			Request request = createNewRequest(rootSuiteClass);
+			Runner runner = request.getRunner();
+			
+			runNotifier.fireTestRunStarted(runner.getDescription());
+			Result result = new Result();
+			RunListener resultListener = result.createListener();
+			runNotifier.addFirstListener(resultListener);
+			runner.run(runNotifier);
+			runNotifier.removeListener(resultListener);
+			runNotifier.fireTestRunFinished(result);
 		} finally {
 			classLoader.close();
 		}
 	}
 	
-	protected Request createNewRequest(Class<?> rootSuite) {
-		Request request = Request.aClass(rootSuite);
+	public Request createNewRequest(Class<?> rootSuiteClass) {
+		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
 		return getActivePolicy().apply(flattenedRequest);
 	}
@@ -153,16 +164,19 @@ public class Daemon {
 		}
 		
 		File codeDirectory = new File(args[1]);
-		if (!codeDirectory.exists() || !codeDirectory.isDirectory())
+		if (!codeDirectory.exists() || !codeDirectory.isDirectory()) {
 			System.err.println("Not a valid code directory.");
+			return;
+		}
 		
 		File testDirectory = new File(args[2]);
-		if (!testDirectory.exists() || !testDirectory.isDirectory())
+		if (!testDirectory.exists() || !testDirectory.isDirectory()) {
 			System.err.println("Not a valid test directory.");
+			return;
+		}
 		
 		Daemon daemon = Daemon.createConfiguredDaemon(args[0], codeDirectory, testDirectory);
 		new ConsoleView(daemon).start();
 	}
-	
 	
 }
