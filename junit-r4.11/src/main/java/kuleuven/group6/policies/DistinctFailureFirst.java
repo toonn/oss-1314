@@ -63,8 +63,10 @@ public class DistinctFailureFirst extends SortingPolicy {
 		return new Comparator<Description>() {
 			@Override
 			public int compare(Description o1, Description o2) {
-				boolean o1HasOrder = fullyOrderedDescriptions.contains(o1);
-				boolean o2HasOrder = fullyOrderedDescriptions.contains(o2);
+				int index1 = fullyOrderedDescriptions.indexOf(o1);
+				int index2 = fullyOrderedDescriptions.indexOf(o2);
+				boolean o1HasOrder = index1 != -1;
+				boolean o2HasOrder = index2 != -2;
 
 				if (!o1HasOrder && !o2HasOrder)
 					return 0;
@@ -73,9 +75,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 				else if (!o2HasOrder)
 					return -1;
 				else
-					return Integer.compare(
-							fullyOrderedDescriptions.indexOf(o1),
-							fullyOrderedDescriptions.indexOf(o2));
+					return Integer.compare(index1, index2);
 			}
 		};
 	}
