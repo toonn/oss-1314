@@ -1,7 +1,6 @@
 package kuleuven.group6.collectors;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,19 +25,19 @@ public class DataEnroller implements IDataEnroller {
 	}
 	
 	private void configure(
-			RunNotificationSubscriber runNotificationSubscriber, Collection<String> sourceClassNames, 
+			RunNotificationSubscriber runNotificationSubscriber, 
 			Description topLevelDescription, File testDirectory, File codeDirectory) {
 		collectors.put(TestFailure.class, new TestFailureCollector(runNotificationSubscriber));
-		collectors.put(MethodCalls.class, new TestDependencyCollector(sourceClassNames, runNotificationSubscriber));
+		collectors.put(MethodCalls.class, new TestDependencyCollector(codeDirectory, runNotificationSubscriber));
 		collectors.put(CodeChange.class, new CodeChangeCollector(topLevelDescription, testDirectory, codeDirectory));
 	}
 	
 	public static DataEnroller createConfiguredDataEnroller(
-			RunNotificationSubscriber runNotificationSubscriber, Collection<String> sourceClassNames, 
+			RunNotificationSubscriber runNotificationSubscriber, 
 			Description topLevelDescription, File testDirectory, File codeDirectory) {
 		// TODO put all these arguments inside a value object (i.e. TestCollectionInfo)
 		DataEnroller dataEnroller = new DataEnroller();
-		dataEnroller.configure(runNotificationSubscriber, sourceClassNames, topLevelDescription, testDirectory, codeDirectory);
+		dataEnroller.configure(runNotificationSubscriber, topLevelDescription, testDirectory, codeDirectory);
 		return dataEnroller;
 	}
 
