@@ -14,16 +14,16 @@ import org.junit.runner.Description;
 public class FailureTrace implements ITestStatistic {
 
 	protected Description testDescription;
-	protected Collection<StackTraceElement> pointsOfFailure;
+	protected Collection<String> pointsOfFailure;
 	
-	public FailureTrace(Description testDescription, StackTraceElement pointOfFailure) {
+	public FailureTrace(Description testDescription, String pointOfFailure) {
 		this.testDescription = testDescription;
-		Collection<StackTraceElement> pointsOfFailure = new ArrayList<>();
+		Collection<String> pointsOfFailure = new ArrayList<>();
 		pointsOfFailure.add(pointOfFailure);
 		this.pointsOfFailure = pointsOfFailure;
 	}
 	
-	public FailureTrace(Description testDescription, Collection<StackTraceElement> pointsOfFailure) {
+	public FailureTrace(Description testDescription, Collection<String> pointsOfFailure) {
 		this.testDescription = testDescription;
 		this.pointsOfFailure = Collections.unmodifiableCollection(pointsOfFailure);
 	}
@@ -33,7 +33,11 @@ public class FailureTrace implements ITestStatistic {
 		return testDescription;
 	}
 
-	public Collection<StackTraceElement> getPointsOfFailure() {
+	/*
+	 * The pointOfFailure string is (fully qualified className).methodName
+	 * So this does not comply to the JVM spec 4.3.3
+	 */
+	public Collection<String> getPointsOfFailure() {
 		return pointsOfFailure;
 	}
 	

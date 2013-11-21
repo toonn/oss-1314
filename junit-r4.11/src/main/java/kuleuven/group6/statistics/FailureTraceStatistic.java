@@ -12,35 +12,35 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 
 /**
- * A FailureTraceStatistic stores FailureTrace instances for each test it has data for.
- * When a new test run starts, all stored FailureTrace instances are removed, since 
- * they don't have a use anymore. This is in contrast to other statistics which summarize
- * data over time.  
+ * A FailureTraceStatistic stores FailureTrace instances for each test it has
+ * data for. When a new test run starts, all stored FailureTrace instances are
+ * removed, since they don't have a use anymore. This is in contrast to other
+ * statistics which summarize data over time.
  * 
  * @author team 6
- *
+ * 
  */
-public class FailureTraceStatistic extends
-		Statistic<FailureTrace> {
-	
-	public FailureTraceStatistic(IDataEnroller dataEnroller, RunNotificationSubscriber runNotificationSubscriber) {
+public class FailureTraceStatistic extends Statistic<FailureTrace> {
+
+	public FailureTraceStatistic(IDataEnroller dataEnroller,
+			RunNotificationSubscriber runNotificationSubscriber) {
 		dataEnroller.subscribe(TestFailure.class, new FailureTraceListener());
 		runNotificationSubscriber.addListener(new TestRunStartedListener());
 	}
 
-	protected class FailureTraceListener implements DataCollectedListener<TestFailure> {
+	protected class FailureTraceListener implements
+			DataCollectedListener<TestFailure> {
 
 		@Override
 		public void dataCollected(TestFailure data) {
 			calculateStatistic(data);
 		}
-		
-	}
 
+	}
 
 	@Override
 	protected FailureTrace composeTestStatistic(Description description) {
-		Collection<StackTraceElement> pointsOfFailure = new ArrayList<>();
+		Collection<String> pointsOfFailure = new ArrayList<>();
 		for (Description childDescription : description.getChildren()) {
 			FailureTrace childTrace = getTestStatistic(childDescription);
 			if (childTrace != null) {
@@ -54,26 +54,28 @@ public class FailureTraceStatistic extends
 	protected FailureTrace getDefaultTestStatistic(Description description) {
 		return null;
 	}
-	
+
 	protected void calculateStatistic(TestFailure data) {
-		StackTraceElement pointOfFailure = data.getFailure().getException().getStackTrace()[0];
-		FailureTrace failureTrace = new FailureTrace(data.getTestDescription(), pointOfFailure);
+		StackTraceElement trace = data.getFailure().getException()
+				.getStackTrace()[0];
+		String pointOfFailure = trace.getClassName() + '.'
+				+ trace.getMethodName();
+		FailureTrace failureTrace = new FailureTrace(data.getTestDescription(),
+				pointOfFailure);
 		putTestStatistic(failureTrace);
 	}
-	
-	
+
 	private void clearStatistics() {
 		statistics.clear();
 	}
-	
-	
+
 	protected class TestRunStartedListener extends RunListener {
 
 		@Override
 		public void testRunStarted(Description description) throws Exception {
 			clearStatistics();
 		}
-		
+
 	}
 
 }
