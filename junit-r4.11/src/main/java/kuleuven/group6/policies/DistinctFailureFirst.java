@@ -61,7 +61,6 @@ public class DistinctFailureFirst extends SortingPolicy {
 	@Override
 	protected Comparator<Description> getComparator() {
 		return new Comparator<Description>() {
-
 			@Override
 			public int compare(Description o1, Description o2) {
 				boolean o1HasOrder = fullyOrderedDescriptions.contains(o1);
@@ -85,6 +84,8 @@ public class DistinctFailureFirst extends SortingPolicy {
 		// TODO: More efficient to first create buckets for leafs (istest()) and
 		// then add parents to the buckets of their children.
 		FailureTrace ft = statistic.getTestStatistic(description);
+		if (ft == null)
+			return;
 		for (String POF : ft.getPointsOfFailure()) {
 			if (fBuckets.containsKey(POF))
 				fBuckets.get(POF).add(description);

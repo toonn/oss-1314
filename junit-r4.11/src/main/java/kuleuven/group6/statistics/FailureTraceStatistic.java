@@ -48,7 +48,10 @@ public class FailureTraceStatistic extends Statistic<FailureTrace> {
 				pointsOfFailure.addAll(childTrace.getPointsOfFailure());
 			}
 		}
-		return new FailureTrace(description, pointsOfFailure);
+		if (pointsOfFailure.size() > 0)
+			return new FailureTrace(description, pointsOfFailure);
+		else
+			return null;
 	}
 
 	@Override
