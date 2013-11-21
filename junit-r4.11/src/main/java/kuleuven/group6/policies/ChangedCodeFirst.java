@@ -35,6 +35,11 @@ public class ChangedCodeFirst extends SortingPolicy {
 				LastDependencyChange change1 = statistic.getTestStatistic(o1);
 				LastDependencyChange change2 = statistic.getTestStatistic(o2);
 				
+				if (change1 == null)
+					return 1;
+				if (change2 == null)
+					return -1;
+					
 				return change1.getDate().compareTo(change2.getDate());
 			}
 			
