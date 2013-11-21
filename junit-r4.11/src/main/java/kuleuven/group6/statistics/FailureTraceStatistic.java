@@ -40,6 +40,7 @@ public class FailureTraceStatistic extends Statistic<FailureTrace> {
 
 	@Override
 	protected FailureTrace composeTestStatistic(Description description) {
+		// TODO calculate directly from all leafs instead of own children
 		Collection<String> pointsOfFailure = new ArrayList<>();
 		for (Description childDescription : description.getChildren()) {
 			FailureTrace childTrace = getTestStatistic(childDescription);
