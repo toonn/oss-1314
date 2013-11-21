@@ -22,13 +22,13 @@ import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
  */
 public class CodeChangeCollector extends DataCollector<CodeChange> {
 	protected WatchService watchService;
-	protected Description suiteDescription;
+	protected Description rootDescription;
 	private File codeDir;
 	private File testDir;
 	private CodeChangeWatchThread ccwt;
 
-	public CodeChangeCollector(Description suiteDescription, File testDir, File codeDir){
-		this.suiteDescription = suiteDescription;
+	public CodeChangeCollector(Description rootDescription, File testDir, File codeDir){
+		this.rootDescription = rootDescription;
 		this.testDir = testDir;
 		this.codeDir = codeDir;
 	}
@@ -45,11 +45,10 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			registerPath(codeDir);
 			//Start watching directories
 			ccwt = new CodeChangeWatchThread(this,watchService);
-			ccwt.run();
+			ccwt.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private class CodeChangeWatchThread extends Thread {
@@ -69,14 +68,18 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 					List<Path> paths = new ArrayList<Path>();
 					//We know the WatchEvent<T>s will be WatchEvent<Path>s because of the 
 					//kinds of events that we registered
-					for(@SuppressWarnings("rawtypes") WatchEvent event : key.pollEvents()){
+					for(WatchEvent<?> event : key.pollEvents()){
 						if(event.kind().type().equals(Path.class)){
 							paths.add((Path)event.context());
 						}
 					}
 					parent.reportEventPaths(paths);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (Exception e) {
+					try {
+						watchService.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 		}
@@ -86,7 +89,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		for(Path path : paths){
 			//TODO TEST THIS!
 			String className = FileSystems.getDefault().getPath(codeDir.getAbsolutePath()).relativize(path).toString().replace('/', '.');
-			CodeChange data = new CodeChange(suiteDescription,className,new Date());
+			CodeChange data = new CodeChange(rootDescription,className,new Date());
 			onDataCollected(data);
 		}
 	}

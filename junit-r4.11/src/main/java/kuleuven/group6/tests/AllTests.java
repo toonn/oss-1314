@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 	TestDependencyCollectorTest.class,
-	FlattenedRequestTest.class
+	FlattenedRequestTest.class,
+	CodeChangeCollectorTest.class
 })
 public class AllTests {
 
