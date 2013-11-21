@@ -29,12 +29,10 @@ public class ConsoleView {
 	protected void suspendOutput() {
 		this.isOutputSuspended = true;
 		outputln();
-		outputln("SUSPENDING OUTPUT");
 	}
 	
 	protected void resumeOutput() {
 		this.isOutputSuspended = false;
-		outputln("RESUMING OUTPUT");
 	}
 	
 	
