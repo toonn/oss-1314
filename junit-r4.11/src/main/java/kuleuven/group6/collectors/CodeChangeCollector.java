@@ -63,8 +63,9 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			this.parent = parent;
 		}
 
+		@Override
 		public void run() {
-			while(true){
+			while(true) {
 				WatchKey key;
 				try {
 					key = watchService.take();
@@ -83,6 +84,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
+					break;
 				}
 			}
 		}

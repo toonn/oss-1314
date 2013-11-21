@@ -108,6 +108,7 @@ public class Daemon {
 			return;
 
 		runThread.interrupt();
+		dataEnroller.close();
 	}
 
 	protected void startCore() {

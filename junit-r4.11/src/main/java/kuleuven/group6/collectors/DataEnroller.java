@@ -56,4 +56,13 @@ public class DataEnroller implements IDataEnroller {
 		return (DataCollector<T>) collectors.get(testDataClass);
 	}
 	
+	
+	@Override
+	public void close() {
+		for (DataCollector<?> collector : collectors.values()) {
+			if (collector.isCollecting())
+				collector.stopCollecting();
+		}
+	}
+	
 }
