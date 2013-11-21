@@ -9,7 +9,6 @@ import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
-import org.junit.runner.Description;
 
 /**
  * 
@@ -26,18 +25,18 @@ public class DataEnroller implements IDataEnroller {
 	
 	private void configure(
 			RunNotificationSubscriber runNotificationSubscriber, 
-			Description topLevelDescription, File testDirectory, File codeDirectory) {
+			String rootSuiteClassName, File testDirectory, File codeDirectory) {
 		collectors.put(TestFailure.class, new TestFailureCollector(runNotificationSubscriber));
 		collectors.put(MethodCalls.class, new TestDependencyCollector(codeDirectory, runNotificationSubscriber));
-		collectors.put(CodeChange.class, new CodeChangeCollector(topLevelDescription, testDirectory, codeDirectory));
+		collectors.put(CodeChange.class, new CodeChangeCollector(rootSuiteClassName, testDirectory, codeDirectory));
 	}
 	
 	public static DataEnroller createConfiguredDataEnroller(
 			RunNotificationSubscriber runNotificationSubscriber, 
-			Description topLevelDescription, File testDirectory, File codeDirectory) {
+			String rootSuiteClassName, File testDirectory, File codeDirectory) {
 		// TODO put all these arguments inside a value object (i.e. TestCollectionInfo)
 		DataEnroller dataEnroller = new DataEnroller();
-		dataEnroller.configure(runNotificationSubscriber, topLevelDescription, testDirectory, codeDirectory);
+		dataEnroller.configure(runNotificationSubscriber, rootSuiteClassName, testDirectory, codeDirectory);
 		return dataEnroller;
 	}
 

@@ -29,8 +29,8 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	private File testDir;
 	private CodeChangeWatchThread ccwt;
 
-	public CodeChangeCollector(Description suiteDescription, File testDir, File codeDir){
-		this.suiteDescription = suiteDescription;
+	public CodeChangeCollector(String rootSuiteClassName, File testDir, File codeDir){
+		this.suiteDescription = Description.createSuiteDescription(rootSuiteClassName);
 		this.testDir = testDir;
 		this.codeDir = codeDir;
 	}
