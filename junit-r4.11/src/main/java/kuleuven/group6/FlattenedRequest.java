@@ -22,7 +22,6 @@ public class FlattenedRequest extends Request {
 
 	protected final Runner runner;
 	
-	
 	protected FlattenedRequest(Runner runner) {
 		this.runner = runner;
 	}
@@ -38,8 +37,8 @@ public class FlattenedRequest extends Request {
 	private static Runner createRunnerForLeafDescriptions(List<Description> leafDescriptions) {
 		List<Runner> leafRunners = new ArrayList<>();
 		for (Description leaf : leafDescriptions) {
-			Request leafRequest = Request.method(leaf.getTestClass(), leaf.getMethodName());
-			leafRunners.add(leafRequest.getRunner());
+			Runner runner = new MethodRunner(leaf.getTestClass(), leaf.getMethodName());
+			leafRunners.add(runner);
 		}
 		
 		try {
