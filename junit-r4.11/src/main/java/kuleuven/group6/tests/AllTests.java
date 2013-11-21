@@ -4,18 +4,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-	TestDependencyCollectorTest.class,
-	FlattenedRequestTest.class,
-	CodeChangeCollectorTest.class
-})
-
 /**
  * 
  * @author Team 6
  *
  */
+@RunWith(Suite.class)
+@SuiteClasses({
+	TestDependencyCollectorTest.class,
+	FlattenedRequestTest.class,
+//	CodeChangeCollectorTest.class
+})
 public class AllTests {
 
 }

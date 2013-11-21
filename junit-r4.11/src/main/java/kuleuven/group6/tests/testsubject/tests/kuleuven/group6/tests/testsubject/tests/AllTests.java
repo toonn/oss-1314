@@ -7,7 +7,10 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ 
 	BasicTest.class, 
-	FailingDummyTest.class
+	FailingDummyTest.class,
+	MostlyHighPctFailingTest.class,
+	MostlyLowPctFailingTest.class,
+	DistinctFailingTest.class
 })
 public class AllTests {
 
