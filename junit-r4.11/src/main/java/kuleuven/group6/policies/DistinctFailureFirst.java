@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 
 import kuleuven.group6.statistics.IStatisticProvider;
@@ -43,10 +41,14 @@ public class DistinctFailureFirst extends SortingPolicy {
 		fBuckets = new HashMap<>();
 		dBuckets = new HashMap<>();
 		createBuckets(rootDescription);
-		final Queue<Bucket> buckets = new PriorityQueue<>(fBuckets.values());
+		final List<Bucket> buckets = new ArrayList<>(fBuckets.values());
 		fullyOrderedDescriptions = new ArrayList<>();
 		while (!buckets.isEmpty()) {
-			Description nextDescription = buckets.peek().getFirst();
+			Bucket nextBucket = buckets.get(0);
+			for (Bucket b : buckets)
+				if (b.compareTo(nextBucket) < 0)
+					nextBucket = b;
+			Description nextDescription = nextBucket.getFirst();
 			for (Bucket buck : dBuckets.get(nextDescription)) {
 				buck.remove(nextDescription);
 				if (buck.getSize() == 0)
@@ -124,6 +126,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 		}
 
 		public Description getFirst() {
+			executionCount++;
 			return bucketList.pollFirst();
 		}
 
@@ -135,6 +138,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 		}
 
 		public void remove(Description description) {
+			executionCount++;
 			bucketList.remove(description);
 		}
 
@@ -153,7 +157,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 			else if (getCount() > o.getCount())
 				return 1;
 			else
-				return Integer.compare(getSize(), o.getSize());
+				return Integer.compare(o.getSize(), getSize());
 		}
 	}
 
