@@ -22,11 +22,13 @@ public class TestFailureCollector extends DataCollector<TestFailure> {
 
 	@Override
 	public void startCollecting() {
+		super.startCollecting();
 		runNotificationSubscriber.addListener(runListener);
 	}
 	
 	@Override
 	public void stopCollecting() {
+		super.startCollecting();
 		runNotificationSubscriber.removeListener(runListener);
 	}
 	

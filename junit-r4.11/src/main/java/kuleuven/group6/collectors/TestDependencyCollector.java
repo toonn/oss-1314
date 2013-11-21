@@ -63,6 +63,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	
 	@Override
 	public void startCollecting() {
+		super.startCollecting();
 		methodCallMonitor = new MethodCallMonitor();
 		MonitorEntrypoint.register(methodCallMonitor);
 		runNotificationSubscriber.addListener(testListener);
@@ -70,6 +71,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	
 	@Override
 	public void stopCollecting() {
+		super.stopCollecting();
 		OSSRewriter.disable();
 		OSSRewriter.resetUserExclusionFilter();
 		MonitorEntrypoint.unregister(methodCallMonitor);

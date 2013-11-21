@@ -14,7 +14,7 @@ import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 public abstract class DataCollector<TestDataT extends ITestData> {
 
 	protected Collection<DataCollectedListener<? super TestDataT>> listeners = new HashSet<>();
-	
+	protected boolean isCollecting = false;
 
 	public void addListener(DataCollectedListener<? super TestDataT> listener) {
 		this.listeners.add(listener);
@@ -31,9 +31,16 @@ public abstract class DataCollector<TestDataT extends ITestData> {
 		}
 	}
 	
+	public boolean isCollecting() {
+		return isCollecting;
+	}
 	
-	public abstract void startCollecting();
+	public void startCollecting() {
+		isCollecting = true;
+	}
 	
-	public abstract void stopCollecting();
+	public void stopCollecting() {
+		isCollecting = false;
+	}
 	
 }

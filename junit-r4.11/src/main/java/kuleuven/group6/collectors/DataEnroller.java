@@ -43,6 +43,8 @@ public class DataEnroller implements IDataEnroller {
 	@Override
 	public <T extends ITestData> void subscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
 		DataCollector<T> collector = findCollector(testDataClass);
+		if (!collector.isCollecting())
+			collector.startCollecting();
 		collector.addListener(listener);
 	}
 	

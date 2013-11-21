@@ -41,6 +41,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	 */
 	@Override
 	public void startCollecting() {
+		super.startCollecting();
 		try {
 			//Initiate the WatchService and WatchKeys by registering the test and code paths
 			registerPath(testDir);
@@ -105,6 +106,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 
 	@Override
 	public void stopCollecting() {
+		super.stopCollecting();
 		ccwt.interrupt();
 	}
 
