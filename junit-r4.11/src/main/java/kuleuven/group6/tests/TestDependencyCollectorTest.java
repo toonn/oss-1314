@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.TestCollectionInfo;
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.TestDependencyCollector;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.tests.testsubject.source.Dummy;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
-import kuleuven.group6.tests.testsubject.tests.TestsLocator;
 import org.junit.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
@@ -30,7 +28,6 @@ import org.junit.runner.notification.RunNotifier;
  */
 public class TestDependencyCollectorTest {
 
-	protected TestCollectionInfo testCollectionInfo;
 	protected RunNotifier runNotifier;
 	protected TestDependencyCollector failureTraceCollector;
 	
@@ -40,11 +37,7 @@ public class TestDependencyCollectorTest {
 		RunNotificationSubscriber runNotificationSubscriber = new RunNotificationSubscriber(runNotifier);
 		
 		File subjectSourceDirectory = new File(SourceLocator.getLocation());
-		File subjectTestsDirectory = new File(TestsLocator.getLocation());
-		// TODO remove the need of TestCollectionInfo
-		testCollectionInfo = new TestCollectionInfo(subjectTestsDirectory, subjectSourceDirectory, runNotificationSubscriber);
-		
-		failureTraceCollector = new TestDependencyCollector(testCollectionInfo.getSourceClassNames(), runNotificationSubscriber);
+		failureTraceCollector = new TestDependencyCollector(subjectSourceDirectory, runNotificationSubscriber);
 		failureTraceCollector.startCollecting();
 	}
 	

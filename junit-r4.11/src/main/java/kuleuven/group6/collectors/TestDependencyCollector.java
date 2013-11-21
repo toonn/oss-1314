@@ -1,5 +1,6 @@
 package kuleuven.group6.collectors;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -31,11 +32,12 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 	/**
 	 * Construct a new data collector that will collect all methods called by each test.
 	 * 
-	 * @param sourceClassNames The fully qualified names of all the classes of which method calls are to be included.
+	 * @param sourceDirectory The root directory in which all class files reside from which calls to
+	 * their methods must be collected. This directory must correspond to the empty package. 
 	 * @param runNotificationSubscriber The notifier on which this collector can subscribe itself. 
 	 */
-	public TestDependencyCollector(Collection<String> sourceClassNames, RunNotificationSubscriber runNotificationSubscriber) {
-		setupOssRewriter(sourceClassNames);
+	public TestDependencyCollector(File sourceDirectory, RunNotificationSubscriber runNotificationSubscriber) {
+		setupOssRewriter(findAllClassNames(sourceDirectory, ""));
 		this.runNotificationSubscriber = runNotificationSubscriber;
 		this.testListener = new TestListener();
 	}
@@ -75,6 +77,37 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 		
 		methodCallMonitor = null;
 		testListener = null;
+	}
+	
+	
+	protected Collection<String> findAllClassNames(File directory, String parentPackage) {
+		Collection<String> files = new ArrayList<String>();
+		for (File file : directory.listFiles()) {
+			if (file.isDirectory()) {
+				files.addAll(getClassNamesFromDirectory(file, parentPackage));		
+			} else if (file.isFile() && file.getName().endsWith(".class")) {
+				files.add(getClassNameFromFile(file, parentPackage));
+			}
+		}
+		return files;
+	}
+
+	protected Collection<String> getClassNamesFromDirectory(File directory, String currentPackage) {
+		String subPackage;
+		if (currentPackage.isEmpty()) {
+			subPackage = directory.getName();
+		} else {
+			subPackage = currentPackage + "." + directory.getName();
+		}
+		
+		return findAllClassNames(directory, subPackage);
+	}
+	
+	protected String getClassNameFromFile(File file, String currentPackage) {
+		String fileName = file.getName();
+		String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+		String className = currentPackage + "." + fileNameWithoutExtension;
+		return className;
 	}
 	
 

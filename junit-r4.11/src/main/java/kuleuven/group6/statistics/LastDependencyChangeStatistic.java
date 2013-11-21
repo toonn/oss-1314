@@ -1,53 +1,108 @@
 package kuleuven.group6.statistics;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
+
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class LastDependencyChangeStatistic extends
 		Statistic<LastDependencyChange> {
-	
+	protected Map<String, Set<Description>> dependencies = new HashMap<>();
+
 	public LastDependencyChangeStatistic(IDataEnroller dataEnroller) {
 		dataEnroller.subscribe(CodeChange.class, new CodeChangeListener());
 	}
 
-	protected class CodeChangeListener implements DataCollectedListener<CodeChange> {
+	protected class CodeChangeListener implements
+			DataCollectedListener<CodeChange> {
 
 		@Override
 		public void dataCollected(CodeChange data) {
-			putTestStatistic(calculateStatistic(data));
+			calculateStatistic(data);
 		}
-		
+
 	}
-	
-	protected class TestDependencyListener implements DataCollectedListener<MethodCalls> {
+
+	protected class TestDependencyListener implements
+			DataCollectedListener<MethodCalls> {
 
 		@Override
 		public void dataCollected(MethodCalls data) {
-			// TODO Auto-generated method stub
-			
+			addDependencies(data);
 		}
-		
+
 	}
 
 	@Override
 	protected LastDependencyChange composeTestStatistic(Description description) {
-		// TODO Auto-generated method stub
-		return null;
+		boolean hasLastFailureDate = false;
+		Date lastDependencyChangeDate = null;
+
+		for (Description childDescription : description.getChildren()) {
+			LastDependencyChange childData = getTestStatistic(childDescription);
+			if (childData == null)
+				continue;
+
+			Date childLastDependencyChangeDate = childData.getDate();
+			if (!hasLastFailureDate
+					|| childLastDependencyChangeDate
+							.after(lastDependencyChangeDate)) {
+				lastDependencyChangeDate = childLastDependencyChangeDate;
+				hasLastFailureDate = true;
+			}
+		}
+
+		if (!hasLastFailureDate)
+			return null;
+
+		return new LastDependencyChange(description, lastDependencyChangeDate);
 	}
 
 	@Override
 	protected LastDependencyChange getDefaultTestStatistic(
 			Description description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	protected LastDependencyChange calculateStatistic(CodeChange data) {
 		return null;
 	}
 
+	protected void addDependencies(MethodCalls methodCalls) {
+		for (String methodName : methodCalls.getMethodNames()) {
+			String containingClass;
+			int dollarIndex = methodName.indexOf('$');
+			int dotIndex = methodName.indexOf('.');
+			if (dollarIndex != -1 && dollarIndex < dotIndex)
+				containingClass = methodName.substring(0, dollarIndex);
+			else
+				// A dot always occurs in a fully qualified (JVM spec 4.3.3)
+				// method name (descriptor)
+				containingClass = methodName.substring(0, dotIndex);
+
+			Set<Description> dependencySet = dependencies.get(containingClass);
+			if (dependencySet == null) {
+				dependencySet = new HashSet<>();
+				dependencySet.add(methodCalls.getTestDescription());
+			} else
+				dependencySet.add(methodCalls.getTestDescription());
+		}
+	}
+
+	protected void calculateStatistic(CodeChange data) {
+		for (Description description : dependencies.get(data.getClassName())) {
+			putTestStatistic(new LastDependencyChange(description,
+					data.getDate()));
+		}
+	}
 }

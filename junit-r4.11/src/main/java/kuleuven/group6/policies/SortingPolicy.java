@@ -5,6 +5,11 @@ import java.util.Comparator;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public abstract class SortingPolicy implements IPolicy {
 
 	@Override

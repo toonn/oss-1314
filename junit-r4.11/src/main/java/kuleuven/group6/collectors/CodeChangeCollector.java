@@ -17,6 +17,8 @@ import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 
 /**
  * 
+ * CodeChangeCollector is a data collector that will collect the tests that execute modified code
+ * 
  * @author Team 6
  *
  */
@@ -27,8 +29,8 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	private File testDir;
 	private CodeChangeWatchThread ccwt;
 
-	public CodeChangeCollector(Description rootDescription, File testDir, File codeDir){
-		this.rootDescription = rootDescription;
+	public CodeChangeCollector(String rootSuiteClassName, File testDir, File codeDir){
+		this.suiteDescription = Description.createSuiteDescription(rootSuiteClassName);
 		this.testDir = testDir;
 		this.codeDir = codeDir;
 	}

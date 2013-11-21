@@ -7,6 +7,7 @@ import org.junit.runner.notification.RunListener;
 
 /**
  * 
+ * TestFailureCollector is a dataCollector that collects all test that will fail.
  * @author Team 6
  *
  */

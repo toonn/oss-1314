@@ -11,6 +11,11 @@ import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class StatisticProvider implements IStatisticProvider {
 	
 	protected Map<Class<? extends ITestStatistic>, Statistic<? extends ITestStatistic>> statistics = new HashMap<>();

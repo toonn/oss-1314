@@ -7,6 +7,11 @@ import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class LastFailureFirst extends SortingPolicy {
 	
 	protected final Statistic<LastFailureDate> statistic;
@@ -25,7 +30,12 @@ public class LastFailureFirst extends SortingPolicy {
 			@Override
 			public int compare(Description o1, Description o2) {
 				LastFailureDate date1 = statistic.getTestStatistic(o1);
-				LastFailureDate date2 = statistic.getTestStatistic(o1);
+				LastFailureDate date2 = statistic.getTestStatistic(o2);
+				
+				if (date1 == null)
+					return 1;
+				if (date2 == null)
+					return -1;
 				
 				return date1.getLastFailureDate().compareTo(date2.getLastFailureDate());
 			}

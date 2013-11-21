@@ -3,6 +3,11 @@ package kuleuven.group6;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class RunNotificationSubscriber {
 
 	protected RunNotifier runNotifier;

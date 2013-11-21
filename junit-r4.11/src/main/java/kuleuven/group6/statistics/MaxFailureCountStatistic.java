@@ -4,6 +4,11 @@ import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class MaxFailureCountStatistic extends FailureCountStatistic {
 	
 	public MaxFailureCountStatistic(IDataEnroller dataEnroller) {

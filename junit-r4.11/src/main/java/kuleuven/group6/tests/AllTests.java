@@ -10,6 +10,12 @@ import org.junit.runners.Suite.SuiteClasses;
 	FlattenedRequestTest.class,
 	CodeChangeCollectorTest.class
 })
+
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class AllTests {
 
 }

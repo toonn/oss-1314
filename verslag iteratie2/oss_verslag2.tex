@@ -57,6 +57,27 @@ In de tweede sectie worden de interactiediagrammas besproken die
 \subsection{Klassendiagramma}
 \label{ssec:Klassendiagramma}
 
+Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
+
+\begin{description}
+
+\item \textit{Deamon}: \textit{Deamon} is verantwoordelijk voor het opstarten van de TestRuns. Het is alleen maar vanop de hoogte van de active policies.
+
+\item \textit{SortingPolicy}:\textit{SortingPolicy} is verantwoordelijk voor het ordenen van de testen volgens een bepaalde policy en voor het filteren van de testen.
+
+\item \textit{Statistic}: \textit{Statistic} is verantwoordelijk voor het berekenen van de statistieken.
+
+\item \textit{StatisticManager}:
+
+\item \textit{DataCollector}: \textit{DAtaCollector} heeft de verantwoordelijkheid om gegenereerde data te laten horen bij een description van een testcase in plaats van testklassen en suites. 
+
+\item \textit{DataCollectorManager}:
+
+\item \textit{AbstractTestCharacteristic}:
+
+
+
+\end{description}
 
 
 %figuur oud klassendiagram
@@ -79,16 +100,56 @@ In de tweede sectie worden de interactiediagrammas besproken die
 \end{center}
 \end{figure}
 
+
+
+
+%figuur nieuw klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{klassendiagram3}
+    \caption{Grafische User Interface}
+	\label{fig:gui}
+\end{center}
+\end{figure}
+
+
 %-------------Interactie Diagrammas-------------------------------
 \subsection{Interactie diagrammas}
 \label{ssec:Interactiedia}
+
+
+
+
+
 
 
 %-------------Ontwerpbeslissingen-------------------------------
 \subsection{Ontwerpbeslissingen en patronen}
 \label{ssec:Ontwerpbeslissingen}
 
+Helemaal in het begin werd er geopteerd voor het Model-View-Controller Pattern. Hierbij zou de view de \textit{GUI}, \textit{CLI} zijn. De Controller zou een input besturingsview zijn die input en output handelde en als laatste de Model zouden de verschillende klassen zijn: \textit{Daemon, Policy, TestInfomation, DataCollector, Statistic, TestRun}. \\
 
+Hiervan werd er toch afgestapt om het ontwerp anders te implementeren. \\
+%TODO waarom?
+
+
+\begin{description}
+\item Statistieken verzamelen. (Het verwerpen van de statistic pool)
+In het begin was er in het ontwerp een \textit{Statistic Pool}. Deze pool zou de statistieken bijhouden. Hier wordt dan aan opgevraagd of er een specifiek statistiek in zit. Is dit niet zo dan wordt deze geregistreerd. Deze werd uiteindelijk toch verworpen want er zou teveel afhangen van deze klasse. Er worden nog steeds statistieken bijgehouden maar dit wordt gedaan in \textit{StatisticManager}.
+%TODO is dit correct?
+
+\item Policies
+Samengestelde filters en sorting policies
+We hebben een Policy die een apply, die op een request werkt en een request teruggeeft. Daarnaast hebben we dat elke Policy een child Policy heeft. Als de apply aangeroepen wordt, wordt eerst de apply van de child opgeroepen en daarna zijn eigen apply op het resulterende request. Hiervoor kunnen we niet garanderen dat het resultaat correct volgens meerdere sorteringen gedaan wordt. SortingRequest kan dit niet over meerdere niveaus heen (stel dat er een filterRequest tussenzit). Naar buiten toe is de aanname dus is dat de nieuwe sortering de vorige sortering teniet kan doen ipv samenstellen.
+%TODO dit was veranderd naar een ander ontwerp
+
+\item Collectors
+Voor FailureTraceColelctor zijn de parallelle testen niet ondersteund. Dit wordt gedaan omdat het op dit moment teveel werk is om te onderscheiden welke methode-oproepen van welke test komen.
+\end{description}
+
+
+
+%
 
 %----------------------------------------------------------------------------------------
 %	TESTEN

@@ -1,13 +1,20 @@
 package kuleuven.group6.statistics;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import org.junit.runner.Description;
 
+/**
+ * 
+ * @author Team 6
+ *
+ * @param <TestStatisticT>
+ */
 public abstract class Statistic<TestStatisticT extends ITestStatistic> {
 	
-	protected Map<Description, TestStatisticT> statistics;
+	protected Map<Description, TestStatisticT> statistics = new HashMap<>();
 
 	public TestStatisticT getTestStatistic(Description description) {
 		TestStatisticT stat;
