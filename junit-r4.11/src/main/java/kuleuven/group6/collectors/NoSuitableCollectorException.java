@@ -3,6 +3,7 @@ package kuleuven.group6.collectors;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
 /**
+ * This class will give an exception if there was no collector found that can collect data for a description 
  * 
  * @author Team 6
  *

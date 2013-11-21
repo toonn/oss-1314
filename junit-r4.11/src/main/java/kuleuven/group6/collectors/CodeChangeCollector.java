@@ -17,6 +17,8 @@ import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 
 /**
  * 
+ * CodeChangeCollector is a data collector that will collect the tests that execute modified code
+ * 
  * @author Team 6
  *
  */

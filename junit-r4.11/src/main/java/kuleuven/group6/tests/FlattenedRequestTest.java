@@ -7,6 +7,11 @@ import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class FlattenedRequestTest {
 	
 	@Test

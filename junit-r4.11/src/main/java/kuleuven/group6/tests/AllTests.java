@@ -9,6 +9,12 @@ import org.junit.runners.Suite.SuiteClasses;
 	TestDependencyCollectorTest.class,
 	FlattenedRequestTest.class
 })
+
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class AllTests {
 
 }
