@@ -8,6 +8,7 @@ import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 
@@ -67,6 +68,11 @@ public class FailureTraceStatistic extends Statistic<FailureTrace> {
 		FailureTrace failureTrace = new FailureTrace(data.getTestDescription(),
 				pointOfFailure);
 		putTestStatistic(failureTrace);
+	}
+	
+	@Override
+	public <T extends ITestStatistic> boolean canSummarize(Class<T> testStatisticClass) {
+		return testStatisticClass.isAssignableFrom(FailureTrace.class);
 	}
 
 	private void clearStatistics() {

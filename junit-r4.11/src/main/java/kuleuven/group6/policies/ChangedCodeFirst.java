@@ -17,7 +17,7 @@ import org.junit.runner.Description;
 
 public class ChangedCodeFirst extends SortingPolicy {
 	
-	protected final Statistic<LastDependencyChange> statistic;
+	protected final Statistic<? extends LastDependencyChange> statistic;
 	
 	public ChangedCodeFirst(IStatisticProvider statMan) {
 		this.statistic = statMan.getStatistic(LastDependencyChange.class);

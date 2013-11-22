@@ -30,7 +30,7 @@ import org.junit.runner.Request;
  * 
  */
 public class DistinctFailureFirst extends SortingPolicy {
-	protected final Statistic<FailureTrace> statistic;
+	protected final Statistic<? extends FailureTrace> statistic;
 
 	private Map<String, Bucket> fBuckets;
 	private Map<Description, Set<Bucket>> dBuckets;

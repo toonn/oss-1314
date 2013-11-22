@@ -14,7 +14,7 @@ import org.junit.runner.Description;
  */
 public class FrequentFailureFirst extends SortingPolicy {
 
-	protected final Statistic<FailureCount> statistic;
+	protected final Statistic<? extends FailureCount> statistic;
 
 	public FrequentFailureFirst(IStatisticProvider statMan) {
 		this.statistic = statMan.getStatistic(FailureCount.class);

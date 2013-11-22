@@ -35,4 +35,6 @@ public abstract class Statistic<TestStatisticT extends ITestStatistic> {
 	protected abstract TestStatisticT composeTestStatistic(Description description);
 	
 	protected abstract TestStatisticT getDefaultTestStatistic(Description description);
+	
+	public abstract <T extends ITestStatistic> boolean canSummarize(Class<T> testStatisticClass);
 }

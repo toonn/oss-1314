@@ -9,6 +9,6 @@ import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
  */
 public interface IStatisticProvider {
 
-	public <T extends ITestStatistic> Statistic<T> getStatistic(Class<T> testStatisticClass);
+	public <T extends ITestStatistic> Statistic<? extends T> getStatistic(Class<T> testStatisticClass);
 
 }

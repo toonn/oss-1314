@@ -10,8 +10,8 @@ import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
-
 import org.junit.runner.Description;
 
 /**
@@ -26,6 +26,13 @@ public class LastDependencyChangeStatistic extends
 	public LastDependencyChangeStatistic(IDataEnroller dataEnroller) {
 		dataEnroller.subscribe(CodeChange.class, new CodeChangeListener());
 	}
+	
+	
+	@Override
+	public <T extends ITestStatistic> boolean canSummarize(Class<T> testStatisticClass) {
+		return testStatisticClass.isAssignableFrom(LastDependencyChange.class);
+	}
+	
 
 	protected class CodeChangeListener implements
 			DataCollectedListener<CodeChange> {
