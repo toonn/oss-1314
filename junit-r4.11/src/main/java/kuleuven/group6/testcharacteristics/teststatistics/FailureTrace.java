@@ -7,9 +7,7 @@ import java.util.Collections;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * Contains the top of the stacktrace of the failure of a test.
  */
 public class FailureTrace implements ITestStatistic {
 

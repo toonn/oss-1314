@@ -3,9 +3,8 @@ package kuleuven.group6.statistics;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
 /**
- * 
- * @author Team 6
- *
+ * This interface provides a way to get a Statistic that collects a specific
+ * kind of ITestStatistic.
  */
 public interface IStatisticProvider {
 

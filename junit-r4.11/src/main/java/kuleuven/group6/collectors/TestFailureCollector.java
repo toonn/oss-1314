@@ -8,8 +8,7 @@ import org.junit.runner.notification.RunListener;
 
 /**
  * 
- * TestFailureCollector is a dataCollector that collects all test that will fail.
- * @author Team 6
+ * TestFailureCollector collects every failure for every test that is run.
  *
  */
 public class TestFailureCollector extends DataCollector<TestFailure> {

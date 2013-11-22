@@ -3,9 +3,7 @@ package kuleuven.group6.testcharacteristics.teststatistics;
 import org.junit.runner.Description;
 
 /**
- * This class will count how many times a test has failed
- * @author Team 6
- *
+ * Contains the failurCount for a test.
  */
 public class FailureCount implements ITestStatistic {
 

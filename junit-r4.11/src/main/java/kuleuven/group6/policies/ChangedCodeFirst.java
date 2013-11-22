@@ -8,15 +8,11 @@ import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import org.junit.runner.Description;
 
 /**
- * The ChangedCodeFirst will order a statistic by his policy. The policy is 
- * Changed Code First. It will order the tests that executes modified code first
- * 
- * @author Team 6
- *
+ * This policy will order tests on the date of the last change to the code they
+ * test.
  */
 
 public class ChangedCodeFirst extends SortingPolicy {
-	
 	protected final Statistic<? extends LastDependencyChange> statistic;
 	
 	public ChangedCodeFirst(IStatisticProvider statMan) {
@@ -28,21 +24,22 @@ public class ChangedCodeFirst extends SortingPolicy {
 		return new Comparator<Description>() {
 			/*
 			 * Note: this comparator imposes orderings that are inconsistent
-			 * with equals.
+			 * with equals. (Different descriptions can have the same
+			 * LastDepencyChange, this will cause the comparator to return 0.)
 			 */
 			@Override
 			public int compare(Description o1, Description o2) {
 				LastDependencyChange change1 = statistic.getTestStatistic(o1);
 				LastDependencyChange change2 = statistic.getTestStatistic(o2);
-				
+
 				if (change1 == null)
 					return 1;
 				if (change2 == null)
 					return -1;
-					
+
 				return change1.getDate().compareTo(change2.getDate());
 			}
-			
+
 		};
 	}
 

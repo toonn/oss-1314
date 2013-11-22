@@ -22,11 +22,9 @@ import org.junit.runner.Request;
  * during a testrun.
  * 
  * Failures that originate in the org.junit.Assert class are actually distinct,
- * since these failures are not caused by the method in the Assert class, but 
- * due by the calling code. As such, these failures are handled as distinct by 
- * this policy.
- * 
- * @author Team 6
+ * since these failures are not caused by the method in the Assert class, but by
+ * the calling code. As such, these failures are handled as distinct by this
+ * policy.
  * 
  */
 public class DistinctFailureFirst extends SortingPolicy {
@@ -35,7 +33,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 	private Map<String, Bucket> fBuckets;
 	private Map<Description, Set<Bucket>> dBuckets;
 	private int currentAssertFailureCount = 0;
-	
+
 	private List<Description> fullyOrderedDescriptions;
 
 	public DistinctFailureFirst(IStatisticProvider statisticProvider) {
@@ -44,23 +42,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 
 	@Override
 	public Request apply(Request request) {
-		Description rootDescription = request.getRunner().getDescription();
-		createNewBuckets(rootDescription);
-		final List<Bucket> buckets = new ArrayList<>(fBuckets.values());
-		fullyOrderedDescriptions = new ArrayList<>();
-		while (!buckets.isEmpty()) {
-			Bucket nextBucket = buckets.get(0);
-			for (Bucket b : buckets)
-				if (b.compareTo(nextBucket) < 0)
-					nextBucket = b;
-			Description nextDescription = nextBucket.getFirst();
-			for (Bucket buck : dBuckets.get(nextDescription)) {
-				buck.remove(nextDescription);
-				if (buck.getSize() == 0)
-					buckets.remove(buck);
-			}
-			fullyOrderedDescriptions.add(nextDescription);
-		}
+		fullyOrderedDescriptions = createTotalOrder(request);
 
 		return super.apply(request);
 	}
@@ -87,13 +69,35 @@ public class DistinctFailureFirst extends SortingPolicy {
 		};
 	}
 
+	private List<Description> createTotalOrder(Request request) {
+		final List<Description> totalOrder = new ArrayList<>();
+		Description rootDescription = request.getRunner().getDescription();
+		createNewBuckets(rootDescription);
+		final List<Bucket> buckets = new ArrayList<>(fBuckets.values());
+		while (!buckets.isEmpty()) {
+			Bucket nextBucket = buckets.get(0);
+			for (Bucket b : buckets)
+				if (b.compareTo(nextBucket) < 0)
+					nextBucket = b;
+			Description nextDescription = nextBucket.getFirst();
+			for (Bucket buck : dBuckets.get(nextDescription)) {
+				buck.remove(nextDescription);
+				if (buck.getSize() == 0)
+					buckets.remove(buck);
+			}
+			totalOrder.add(nextDescription);
+		}
+
+		return totalOrder;
+	}
+
 	private void createNewBuckets(Description rootDescription) {
 		fBuckets = new HashMap<>();
 		dBuckets = new HashMap<>();
 		currentAssertFailureCount = 0;
 		createBuckets(rootDescription);
 	}
-	
+
 	private void createBuckets(Description description) {
 		// TODO: More efficient to first create buckets for leafs (istest()) and
 		// then add parents to the buckets of their children.
@@ -105,7 +109,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 				POF += "#" + currentAssertFailureCount;
 				currentAssertFailureCount++;
 			}
-			
+
 			if (fBuckets.containsKey(POF))
 				fBuckets.get(POF).add(description);
 			else
@@ -134,6 +138,9 @@ public class DistinctFailureFirst extends SortingPolicy {
 			add(description);
 		}
 
+		/*
+		 * Returns the number of items that have been removed from this Bucket.
+		 */
 		public int getCount() {
 			return executionCount;
 		}
@@ -147,6 +154,15 @@ public class DistinctFailureFirst extends SortingPolicy {
 			return bucketList.pollFirst();
 		}
 
+		/*
+		 * Atomic tests (methods annotated with @Test) are added at the start of
+		 * this Bucket while Suite's are added at the end. This because every
+		 * 
+		 * @Test in a method has certainly failed (there is only one), while
+		 * Suite's may contain contain @Test's that have never failed and you
+		 * want to avoid running tests that haven't failed before tests that
+		 * have.
+		 */
 		public void add(Description description) {
 			if (description.isTest())
 				bucketList.offerFirst(description);
@@ -161,7 +177,9 @@ public class DistinctFailureFirst extends SortingPolicy {
 
 		/*
 		 * Note: this comparator imposes orderings that are inconsistent with
-		 * equals.
+		 * equals. (Two Bucket's are considered "equal"(ly important) when they
+		 * have the same executionCount and they contain the same number of
+		 * Description's)
 		 * 
 		 * (non-Javadoc)
 		 * 

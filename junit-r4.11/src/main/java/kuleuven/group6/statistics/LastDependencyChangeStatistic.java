@@ -15,9 +15,10 @@ import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * This Statistic makes use of two DataCollector's to create
+ * LastDependencyChange's. (A collector that collects dependencies for tests and
+ * one that collects which files have changed.) This Statistic will then combine
+ * that information to create LastDependencyChange's.
  */
 public class LastDependencyChangeStatistic extends
 		Statistic<LastDependencyChange> {

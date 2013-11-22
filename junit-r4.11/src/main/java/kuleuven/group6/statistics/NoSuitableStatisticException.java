@@ -3,9 +3,8 @@ package kuleuven.group6.statistics;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
 /**
- * 
- * @author Team 6
- *
+ * IStatisticProvider's should throw this exception when they can't find a
+ * Statistic for a requested ITestStatistic type.
  */
 public class NoSuitableStatisticException extends RuntimeException {
 

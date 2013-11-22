@@ -5,9 +5,7 @@ import java.util.Date;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * Contains the date of the last change to a dependency for a test.
  */
 public class LastDependencyChange implements ITestStatistic {
 

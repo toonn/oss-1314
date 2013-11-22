@@ -8,9 +8,7 @@ import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
 /**
- * 
- * @author Team 6
- *
+ * This statistic collects the number of times a certain test has failed.
  */
 public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 
@@ -28,6 +26,11 @@ public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 
 	}
 
+	/*
+	 * A Description without a failureCount has a failureCount equal to 0, but
+	 * this description would not be known to this Statistic because it only
+	 * receives messages when a test fails.
+	 */
 	@Override
 	protected FailureCount getDefaultTestStatistic(Description description) {
 		putTestStatistic(new FailureCount(description, 0));

@@ -14,12 +14,9 @@ import org.junit.runner.notification.RunListener;
 
 /**
  * A FailureTraceStatistic stores FailureTrace instances for each test it has
- * data for. When a new test run starts, all stored FailureTrace instances are
+ * data for. When a new testrun starts, all stored FailureTrace instances are
  * removed, since they don't have a use anymore. This is in contrast to other
  * statistics which summarize data over time.
- * 
- * @author team 6
- * 
  */
 public class FailureTraceStatistic extends Statistic<FailureTrace> {
 

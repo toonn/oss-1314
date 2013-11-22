@@ -5,12 +5,11 @@ import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * MaxFailureCountStatistic returns the maximum FailureCount over all children
+ * of a description, unless a description already has a FailureCount.
  */
 public class MaxFailureCountStatistic extends FailureCountStatistic {
-	
+
 	public MaxFailureCountStatistic(IDataEnroller dataEnroller) {
 		super(dataEnroller);
 	}
@@ -23,7 +22,7 @@ public class MaxFailureCountStatistic extends FailureCountStatistic {
 			if (failureCount < count)
 				failureCount = count;
 		}
-		
+
 		return new FailureCount(description, failureCount);
 	}
 
