@@ -6,9 +6,9 @@ import org.junit.runner.Description;
 import org.junit.runner.Request;
 
 /**
- * 
- * @author Team 6
- *
+ * A SortingPolicy determines an order for tests and suites. Examples of
+ * possible criteria for ordering: most frequent failures, shortest execution
+ * time.
  */
 public abstract class SortingPolicy implements IPolicy {
 
@@ -16,7 +16,7 @@ public abstract class SortingPolicy implements IPolicy {
 	public Request apply(Request request) {
 		return request.sortWith(getComparator());
 	}
-	
+
 	abstract protected Comparator<Description> getComparator();
 
 }
