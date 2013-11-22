@@ -43,6 +43,7 @@ public class ConsoleView {
 	
 	public void start() {
 		console = new Scanner(System.in);
+		showInfo();
 		askForPolicy();
 		
 		daemon.start();
@@ -59,6 +60,12 @@ public class ConsoleView {
 		isStopped = true;
 	}
 	
+	
+	private void showInfo() {
+		System.out.println();
+		System.out.println("IMPORTANT:");
+		System.out.println("Press enter during testing to access the menu.");
+	}
 	
 	private void askForCommand() {
 		suspendOutput();
