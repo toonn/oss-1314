@@ -1,6 +1,7 @@
 package kuleuven.group6.tests;
 
 import kuleuven.group6.tests.collectors.AllCollectorTests;
+import kuleuven.group6.tests.statistics.AllStatisticTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -13,7 +14,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 	FlattenedRequestTest.class,
-	AllCollectorTests.class
+	AllCollectorTests.class,
+	AllStatisticTests.class
 })
 public class AllTests {
 
