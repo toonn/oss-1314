@@ -6,10 +6,13 @@ import java.util.HashSet;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
 /**
+ * All DataCollector's extend this "interface."
+ * These are subjects observed by DataCollectedListener's.
  * 
- * @author Team 6
- *
  * @param <TestDataT>
+ * 		This "interface" is generic in the type of data it collects,
+ * 		concrete DataCollector subclasses are parameterized with a specific
+ * 		type of ITestData and are no longer generic.
  */
 public abstract class DataCollector<TestDataT extends ITestData> {
 
