@@ -10,9 +10,7 @@ import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * This Statistic collects the dates of the last failure of tests.
  */
 public class LastFailureStatistic extends Statistic<LastFailureDate> {
 
@@ -65,7 +63,6 @@ public class LastFailureStatistic extends Statistic<LastFailureDate> {
 	}
 
 	protected void calculateStatistic(TestFailure data) {
-		// TODO : new Date in ITestData (TestFailure)
 		putTestStatistic(new LastFailureDate(data.getTestDescription(),
 				new Date()));
 	}

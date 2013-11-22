@@ -7,13 +7,13 @@ import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import org.junit.runner.Description;
 
 /**
+ * A Statistic listens to ITestData for tests and creates ITestStatistics for
+ * those tests.
  * 
- * @author Team 6
- *
  * @param <TestStatisticT>
  */
 public abstract class Statistic<TestStatisticT extends ITestStatistic> {
-	
+
 	protected Map<Description, TestStatisticT> statistics = new HashMap<>();
 
 	public TestStatisticT getTestStatistic(Description description) {
@@ -24,10 +24,10 @@ public abstract class Statistic<TestStatisticT extends ITestStatistic> {
 			stat = composeTestStatistic(description);
 		else
 			stat = getDefaultTestStatistic(description);
-		
+
 		return stat;
 	}
-	
+
 	protected void putTestStatistic(TestStatisticT testStatistic) {
 		statistics.put(testStatistic.getTestDescription(), testStatistic);
 	}
