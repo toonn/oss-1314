@@ -3,9 +3,7 @@ package kuleuven.group6.testcharacteristics.testdatas;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * Contains data for a test.
  */
 public interface ITestData {
 

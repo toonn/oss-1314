@@ -6,9 +6,8 @@ import java.util.List;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * Contains the fully qualified method name (JVM spec 4.3.3) for every method
+ * called by a test.
  */
 public class MethodCalls implements ITestData {
 

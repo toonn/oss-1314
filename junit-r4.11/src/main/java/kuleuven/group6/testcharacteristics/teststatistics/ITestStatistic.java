@@ -3,9 +3,7 @@ package kuleuven.group6.testcharacteristics.teststatistics;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- * 
+ * Contains a Statistic calculated for a test.
  */
 public interface ITestStatistic {
 	

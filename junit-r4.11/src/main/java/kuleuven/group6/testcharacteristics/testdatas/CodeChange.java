@@ -5,9 +5,7 @@ import java.util.Date;
 import org.junit.runner.Description;
 
 /**
- * 
- * @author Team 6
- *
+ * Contains the name of a class that changed and the date of the change.
  */
 public class CodeChange implements ITestData {
 

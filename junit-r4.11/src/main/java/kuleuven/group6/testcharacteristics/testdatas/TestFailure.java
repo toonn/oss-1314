@@ -4,10 +4,7 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
 /**
- * This class is the Test Failure Class and will see when a test has failed
- * 
- * @author Team 6
- *
+ * Contains Failure's for tests.
  */
 public class TestFailure implements ITestData {
 
