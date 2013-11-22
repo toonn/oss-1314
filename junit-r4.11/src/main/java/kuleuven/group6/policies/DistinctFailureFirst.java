@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.Statistic;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
@@ -20,6 +21,11 @@ import org.junit.runner.Request;
  * FailureTrace's. This makes sure every distinct failure is tested early on
  * during a testrun.
  * 
+ * Failures that originate in the org.junit.Assert class are actually distinct,
+ * since these failures are not caused by the method in the Assert class, but 
+ * due by the calling code. As such, these failures are handled as distinct by 
+ * this policy.
+ * 
  * @author Team 6
  * 
  */
@@ -28,7 +34,8 @@ public class DistinctFailureFirst extends SortingPolicy {
 
 	private Map<String, Bucket> fBuckets;
 	private Map<Description, Set<Bucket>> dBuckets;
-
+	private int currentAssertFailureCount = 0;
+	
 	private List<Description> fullyOrderedDescriptions;
 
 	public DistinctFailureFirst(IStatisticProvider statisticProvider) {
@@ -38,9 +45,7 @@ public class DistinctFailureFirst extends SortingPolicy {
 	@Override
 	public Request apply(Request request) {
 		Description rootDescription = request.getRunner().getDescription();
-		fBuckets = new HashMap<>();
-		dBuckets = new HashMap<>();
-		createBuckets(rootDescription);
+		createNewBuckets(rootDescription);
 		final List<Bucket> buckets = new ArrayList<>(fBuckets.values());
 		fullyOrderedDescriptions = new ArrayList<>();
 		while (!buckets.isEmpty()) {
@@ -82,6 +87,13 @@ public class DistinctFailureFirst extends SortingPolicy {
 		};
 	}
 
+	private void createNewBuckets(Description rootDescription) {
+		fBuckets = new HashMap<>();
+		dBuckets = new HashMap<>();
+		currentAssertFailureCount = 0;
+		createBuckets(rootDescription);
+	}
+	
 	private void createBuckets(Description description) {
 		// TODO: More efficient to first create buckets for leafs (istest()) and
 		// then add parents to the buckets of their children.
@@ -89,6 +101,11 @@ public class DistinctFailureFirst extends SortingPolicy {
 		if (ft == null)
 			return;
 		for (String POF : ft.getPointsOfFailure()) {
+			if (POF.startsWith(Assert.class.getName() + '.')) {
+				POF += "#" + currentAssertFailureCount;
+				currentAssertFailureCount++;
+			}
+			
 			if (fBuckets.containsKey(POF))
 				fBuckets.get(POF).add(description);
 			else
