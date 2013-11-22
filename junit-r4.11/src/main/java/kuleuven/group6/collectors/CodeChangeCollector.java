@@ -21,10 +21,14 @@ import org.junit.runner.Description;
 
 /**
  * 
- * CodeChangeCollector is a data collector that will collect the tests that execute modified code
+ * CodeChangeCollector collects data on changes to files in the directory
+ * of tests and in the directory of code being tested.
+ * This data can be used to decide which tests to run first under the
+ * "Changed code first" policy or to decide when to run a testrun, if you only
+ * want to start a testrun when you expect the results may have changed.
  * 
  * @author Team 6
- *
+ * 
  */
 public class CodeChangeCollector extends DataCollector<CodeChange> {
 	protected WatchService watchService;
@@ -39,10 +43,6 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		this.codeDir = codeDir;
 	}
 
-	/**
-	 * Calling this method will start the collection of code changes.
-	 * Every time it is called all test classes' dependencies are checked again.
-	 */
 	@Override
 	public void startCollecting() {
 		super.startCollecting();
@@ -63,6 +63,11 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		return testDataClass.isAssignableFrom(CodeChange.class);
 	}
 
+	/**
+	 * The CodeChangeWatchThread makes use of a watchservice to monitor
+	 * filechanges in the testDir and codeDir directories.
+	 *
+	 */
 	private class CodeChangeWatchThread extends Thread {
 		private WatchService watchService;
 		private CodeChangeCollector parent;
@@ -99,7 +104,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		}
 	}
 
-	public void reportEventPaths(List<Path> paths) {
+	private void reportEventPaths(List<Path> paths) {
 		for(Path path : paths){
 			//TODO TEST THIS!
 			String className = FileSystems.getDefault().getPath(codeDir.getAbsolutePath()).relativize(path).toString().replace('/', '.');
@@ -108,7 +113,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		}
 	}
 
-	protected WatchKey registerPath(File file)
+	private WatchKey registerPath(File file)
 			throws IOException {
 		watchService = FileSystems.getDefault().newWatchService();
 		Path path = FileSystems.getDefault().getPath(file.getPath());
