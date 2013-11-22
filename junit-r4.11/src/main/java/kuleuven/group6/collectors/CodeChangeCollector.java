@@ -8,10 +8,12 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.runner.Description;
+
 import static java.nio.file.StandardWatchEventKinds.*;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 
@@ -42,16 +44,12 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	@Override
 	public void startCollecting() {
 		super.startCollecting();
-		try {
-			//Initiate the WatchService and WatchKeys by registering the test and code paths
-			registerPath(testDir);
-			registerPath(codeDir);
-			//Start watching directories
-			ccwt = new CodeChangeWatchThread(this,watchService);
-			ccwt.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//Initiate the WatchService and WatchKeys by registering the test and code paths
+		registerPathRecursive(testDir);
+		registerPathRecursive(codeDir);
+		//Start watching directories
+		ccwt = new CodeChangeWatchThread(this,watchService);
+		ccwt.start();
 	}
 
 	private class CodeChangeWatchThread extends Thread {
@@ -68,17 +66,24 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			while(true) {
 				WatchKey key;
 				try {
-					key = watchService.take();
+					List<WatchEvent<?>> events;
+					do{
+						key = watchService.take();
+						events = key.pollEvents();
+					} while(events.isEmpty());
+					System.out.println("A key has been taken! "+events.get(0).kind().name());
 					List<Path> paths = new ArrayList<Path>();
 					//We know the WatchEvent<T>s will be WatchEvent<Path>s because of the 
 					//kinds of events that we registered
-					for(WatchEvent<?> event : key.pollEvents()){
-						if(event.kind().type().equals(Path.class)){
-							paths.add((Path)event.context());
-						}
+					for(WatchEvent<?> event : events){
+						Path context = (Path)event.context();
+						System.out.println(context);
+						paths.add(((Path)key.watchable()).resolve(context));
 					}
 					parent.reportEventPaths(paths);
+					System.out.println("Paths have been reported");
 				} catch (Exception e) {
+					System.out.println("Exception! "+e.getMessage());
 					try {
 						watchService.close();
 					} catch (IOException e1) {
@@ -91,10 +96,13 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	}
 
 	public void reportEventPaths(List<Path> paths) {
+		System.out.println("reportEventPaths: Paths="+paths.toString());
 		for(Path path : paths){
-			//TODO TEST THIS!
-			String className = FileSystems.getDefault().getPath(codeDir.getAbsolutePath()).relativize(path).toString().replace('/', '.');
+			System.out.println("Path: "+path.toString());
+			System.out.println("Code: "+codeDir.toString());
+			String className = FileSystems.getDefault().getPath(codeDir.getPath()).relativize(path).toString().replace(".class", "");
 			CodeChange data = new CodeChange(rootDescription,className,new Date());
+			System.out.println("New CodeChange! "+data.toString());
 			onDataCollected(data);
 		}
 	}
@@ -104,6 +112,20 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		watchService = FileSystems.getDefault().newWatchService();
 		Path path = FileSystems.getDefault().getPath(file.getPath());
 		return path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+	}
+	
+	private void registerPathRecursive(File file){
+		List<File> tempList = new ArrayList<File>(Arrays.asList(file.listFiles()));
+		for(File f : tempList){
+			if(f.isDirectory()){
+				try {
+					registerPath(f);
+					registerPathRecursive(f);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override
