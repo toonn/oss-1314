@@ -14,7 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
 	FlattenedRequestTest.class,
 	AllCollectorTests.class
-//	CodeChangeCollectorTest.class
 })
 public class AllTests {
 

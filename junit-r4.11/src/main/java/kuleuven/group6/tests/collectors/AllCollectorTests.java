@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 	TestFailureCollectorTest.class,
-	TestDependencyCollectorTest.class
+	TestDependencyCollectorTest.class,
+	CodeChangeCollectorTest.class
 })
 public class AllCollectorTests {
 	

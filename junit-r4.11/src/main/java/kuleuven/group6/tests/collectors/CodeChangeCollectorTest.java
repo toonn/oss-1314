@@ -1,4 +1,4 @@
-package kuleuven.group6.tests;
+package kuleuven.group6.tests.collectors;
 
 import static org.junit.Assert.*;
 
@@ -75,7 +75,6 @@ public class CodeChangeCollectorTest {
 		
 		//Test reporting the creation of files
 		Path newFilePath = Paths.get(classFileDir.getPath().concat("/newfile.class"));
-		System.out.println(newFilePath);
 		try {
 			if(!Files.exists(newFilePath)){
 				Files.createFile(newFilePath);
@@ -89,7 +88,6 @@ public class CodeChangeCollectorTest {
 				createFileChange = ccl.getLastCollectedCodeChange();
 			}
 			assertFalse(createFileChange==null);
-			System.out.println(createFileChange.getClassName());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
