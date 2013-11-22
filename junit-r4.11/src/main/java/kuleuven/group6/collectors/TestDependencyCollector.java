@@ -27,7 +27,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
 	protected RunNotificationSubscriber runNotificationSubscriber;
 	protected RunListener testListener;
-	protected List<String> currentMethodCalls = null;
+	protected List<String> currentMethodCalls = new ArrayList<>();
 	protected MethodCallMonitor methodCallMonitor = null;
 	
 	/**
