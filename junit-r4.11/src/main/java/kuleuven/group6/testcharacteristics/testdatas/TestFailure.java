@@ -28,4 +28,28 @@ public class TestFailure implements ITestData {
 		return failure;
 	}
 	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (! (obj instanceof TestFailure))
+			 return false;
+		TestFailure other = (TestFailure)obj;
+		if (! getTestDescription().equals(other.getTestDescription())) 
+			return false;
+		if (! getFailure().equals(other.getFailure()))
+			return false;
+		
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 17 + testDescription.hashCode();
+		hash = hash * 31 + failure.hashCode();
+		return hash;
+	}
+	
 }

@@ -28,4 +28,28 @@ public class LastFailureDate implements ITestStatistic {
 		return lastFailureDate;
 	}
 	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (! (obj instanceof LastFailureDate))
+			 return false;
+		LastFailureDate other = (LastFailureDate)obj;
+		if (! getTestDescription().equals(other.getTestDescription())) 
+			return false;
+		if (! getLastFailureDate().equals(other.getLastFailureDate()))
+			return false;
+		
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 17 + testDescription.hashCode();
+		hash = hash * 31 + lastFailureDate.hashCode();
+		return hash;
+	}
+	
 }

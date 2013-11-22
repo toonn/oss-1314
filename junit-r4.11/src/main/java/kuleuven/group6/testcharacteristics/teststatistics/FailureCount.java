@@ -31,4 +31,27 @@ public class FailureCount implements ITestStatistic {
 		return new FailureCount(getTestDescription(), incrementedFailureCount); 
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (! (obj instanceof FailureCount))
+			 return false;
+		FailureCount other = (FailureCount)obj;
+		if (! getTestDescription().equals(other.getTestDescription())) 
+			return false;
+		if (getFailureCount() != other.getFailureCount())
+			return false;
+		
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 17 + testDescription.hashCode();
+		hash = hash * 31 + failureCount;
+		return hash;
+	}
+
 }

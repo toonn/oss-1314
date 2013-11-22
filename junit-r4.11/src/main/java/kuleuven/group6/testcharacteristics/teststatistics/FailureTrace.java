@@ -38,7 +38,30 @@ public class FailureTrace implements ITestStatistic {
 	 * So this does not comply to the JVM spec 4.3.3
 	 */
 	public Collection<String> getPointsOfFailure() {
-		return pointsOfFailure;
+		return Collections.unmodifiableCollection(pointsOfFailure);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (! (obj instanceof FailureTrace))
+			 return false;
+		FailureTrace other = (FailureTrace)obj;
+		if (! getTestDescription().equals(other.getTestDescription())) 
+			return false;
+		if (! pointsOfFailure.equals(other.pointsOfFailure))
+			return false;
+		
+		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 17 + testDescription.hashCode();
+		hash = hash * 31 + pointsOfFailure.hashCode();
+		return hash;
 	}
 	
 }
