@@ -77,19 +77,16 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 						key = watchService.take();
 						events = key.pollEvents();
 					} while(events.isEmpty());
-					System.out.println("A key has been taken! "+events.get(0).kind().name());
 					List<Path> paths = new ArrayList<Path>();
 					//We know the WatchEvent<T>s will be WatchEvent<Path>s because of the 
 					//kinds of events that we registered
 					for(WatchEvent<?> event : events){
 						Path context = (Path)event.context();
-						System.out.println(context);
+
 						paths.add(((Path)key.watchable()).resolve(context));
 					}
 					parent.reportEventPaths(paths);
-					System.out.println("Paths have been reported");
 				} catch (Exception e) {
-					System.out.println("Exception! "+e.getMessage());
 					try {
 						watchService.close();
 					} catch (IOException e1) {
@@ -103,11 +100,8 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 
 	public void reportEventPaths(List<Path> paths) {
 		for(Path path : paths){
-			System.out.println("Path: "+path.toString());
-			System.out.println("Code: "+codeDir.toString());
 			String className = FileSystems.getDefault().getPath(codeDir.getPath()).relativize(path).toString().replace(".class", "");
 			CodeChange data = new CodeChange(rootDescription,className,new Date());
-			System.out.println("New CodeChange! "+data.toString());
 			onDataCollected(data);
 		}
 	}
