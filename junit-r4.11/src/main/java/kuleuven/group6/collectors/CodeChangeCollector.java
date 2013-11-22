@@ -1,5 +1,9 @@
 package kuleuven.group6.collectors;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -11,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.runner.Description;
-import static java.nio.file.StandardWatchEventKinds.*;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import org.junit.runner.Description;
 
 /**
  * 
@@ -52,6 +56,11 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public <T extends ITestData> boolean canProduce(Class<T> testDataClass) {
+		return testDataClass.isAssignableFrom(CodeChange.class);
 	}
 
 	private class CodeChangeWatchThread extends Thread {
