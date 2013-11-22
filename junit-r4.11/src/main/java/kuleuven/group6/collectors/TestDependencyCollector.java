@@ -3,15 +3,17 @@ package kuleuven.group6.collectors;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import kuleuven.group6.RunNotificationSubscriber;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import org.junit.runner.Description;
+import org.junit.runner.notification.RunListener;
 import be.kuleuven.cs.ossrewriter.Monitor;
 import be.kuleuven.cs.ossrewriter.MonitorEntrypoint;
 import be.kuleuven.cs.ossrewriter.OSSRewriter;
 import be.kuleuven.cs.ossrewriter.Predicate;
-import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunListener;
 
 /**
  * A data collector that collects all methods called by each test.
@@ -26,7 +28,7 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 
 	protected RunNotificationSubscriber runNotificationSubscriber;
 	protected RunListener testListener;
-	protected Collection<String> currentMethodCalls = null;
+	protected List<String> currentMethodCalls = new ArrayList<>();
 	protected MethodCallMonitor methodCallMonitor = null;
 	
 	/**
@@ -81,7 +83,11 @@ public class TestDependencyCollector extends DataCollector<MethodCalls> {
 		testListener = null;
 	}
 	
-	
+	@Override
+	public <T extends ITestData> boolean canProduce(Class<T> testDataClass) {
+		return testDataClass.isAssignableFrom(MethodCalls.class);
+	}
+
 	protected Collection<String> findAllClassNames(File directory, String parentPackage) {
 		Collection<String> files = new ArrayList<String>();
 		for (File file : directory.listFiles()) {

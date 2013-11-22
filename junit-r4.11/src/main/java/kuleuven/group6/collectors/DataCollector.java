@@ -43,4 +43,13 @@ public abstract class DataCollector<TestDataT extends ITestData> {
 		isCollecting = false;
 	}
 	
+	/**
+	 * Check whether this data collector can produce data of the given class. A
+	 * DataCollector<T> can produce data for type T and it's super types. 
+	 * 
+	 * @param testDataClass
+	 * @return
+	 */
+	public abstract <T extends ITestData> boolean canProduce(Class<T> testDataClass);
+	
 }

@@ -1,6 +1,7 @@
 package kuleuven.group6.collectors;
 
 import kuleuven.group6.RunNotificationSubscriber;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
@@ -32,6 +33,10 @@ public class TestFailureCollector extends DataCollector<TestFailure> {
 		runNotificationSubscriber.removeListener(runListener);
 	}
 	
+	@Override
+	public <T extends ITestData> boolean canProduce(Class<T> testDataClass) {
+		return testDataClass.isAssignableFrom(TestFailure.class);
+	}
 	
 	protected class FailureListener extends RunListener {
 		@Override

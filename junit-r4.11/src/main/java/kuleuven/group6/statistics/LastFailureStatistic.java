@@ -5,6 +5,7 @@ import java.util.Date;
 import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.runner.Description;
 
@@ -17,6 +18,11 @@ public class LastFailureStatistic extends Statistic<LastFailureDate> {
 
 	public LastFailureStatistic(IDataEnroller dataEnroller) {
 		dataEnroller.subscribe(TestFailure.class, new LastFailureListener());
+	}
+	
+	@Override
+	public <T extends ITestStatistic> boolean canSummarize(Class<T> testStatisticClass) {
+		return testStatisticClass.isAssignableFrom(LastFailureDate.class);
 	}
 
 	protected class LastFailureListener implements

@@ -5,6 +5,7 @@ import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
 /**
  * 
@@ -36,5 +37,10 @@ public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 	protected void calculateStatistic(TestFailure data) {
 		putTestStatistic(getTestStatistic(data.getTestDescription())
 				.increment());
+	}
+	
+	@Override
+	public <T extends ITestStatistic> boolean canSummarize(Class<T> testStatisticClass) {
+		return testStatisticClass.isAssignableFrom(FailureCount.class);
 	}
 }

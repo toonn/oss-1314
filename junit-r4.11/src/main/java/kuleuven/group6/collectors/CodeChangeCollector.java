@@ -12,10 +12,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.runner.Description;
-
 import static java.nio.file.StandardWatchEventKinds.*;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
+import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import org.junit.runner.Description;
 
 /**
  * 
@@ -50,6 +50,11 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		//Start watching directories
 		ccwt = new CodeChangeWatchThread(this,watchService);
 		ccwt.start();
+	}
+	
+	@Override
+	public <T extends ITestData> boolean canProduce(Class<T> testDataClass) {
+		return testDataClass.isAssignableFrom(CodeChange.class);
 	}
 
 	private class CodeChangeWatchThread extends Thread {
