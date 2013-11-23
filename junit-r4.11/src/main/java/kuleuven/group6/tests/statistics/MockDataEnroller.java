@@ -16,15 +16,25 @@ public class MockDataEnroller implements IDataEnroller {
 	
 	@Override
 	public <T extends ITestData> void subscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+		DataCollector<? extends T> collector = findCollector(testDataClass);
+		collector.addListener(listener);
+		if (! collector.isCollecting())
+			collector.startCollecting();
+	}
+	
+	@Override
+	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+		DataCollector<? extends T> collector = findCollector(testDataClass);
+		collector.removeListener(listener);
+	}
+	
+	protected <T extends ITestData> DataCollector<? extends T> findCollector(Class<T> testDataClass) {
 		for (DataCollector<?> collector : collectors) {
 			if (collector.canProduce(testDataClass)) {
 				@SuppressWarnings("unchecked")
 				DataCollector<? extends T> typedCollector = 
 						(DataCollector<? extends T>) collector;
-				typedCollector.addListener(listener);
-				if (! typedCollector.isCollecting())
-					typedCollector.startCollecting();
-				return;
+				return typedCollector;
 			}
 		}
 		

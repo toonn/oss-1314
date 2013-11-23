@@ -10,6 +10,8 @@ public interface IDataEnroller {
 
 	public <T extends ITestData> void subscribe(Class<T> testDataClass,
 			DataCollectedListener<? super T> listener);
+	public <T extends ITestData> void unsubscribe(Class<T> testDataClass,
+			DataCollectedListener<? super T> listener);
 
 	public void close();
 

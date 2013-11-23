@@ -66,6 +66,12 @@ public class DataEnroller implements IDataEnroller {
 			collector.startCollecting();
 		collector.addListener(listener);
 	}
+	
+	@Override
+	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+		DataCollector<? extends T> collector = findCollector(testDataClass);
+		collector.removeListener(listener);
+	}
 
 	@SuppressWarnings("unchecked")
 	protected <T extends ITestData> DataCollector<? extends T> findCollector(Class<T> testDataClass) {
