@@ -4,6 +4,11 @@ import kuleuven.group6.collectors.DataCollector;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class MockTestFailureCollector extends DataCollector<TestFailure> {
 
 	@Override

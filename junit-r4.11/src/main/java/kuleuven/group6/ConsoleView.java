@@ -9,6 +9,11 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class ConsoleView {
 
 	protected Daemon daemon;

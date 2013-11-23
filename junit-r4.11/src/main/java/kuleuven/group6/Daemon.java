@@ -22,6 +22,11 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class Daemon {
 
 	protected String rootSuiteClassName;

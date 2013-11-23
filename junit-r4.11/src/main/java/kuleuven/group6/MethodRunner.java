@@ -5,6 +5,11 @@ import org.junit.runner.Request;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class MethodRunner extends Runner {
 
 	protected Runner wrappedRunner;

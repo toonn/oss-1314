@@ -6,6 +6,12 @@ import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.collectors.NoSuitableCollectorException;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
+/**
+ * 
+ * @author Team 6
+ * 
+ *
+ */
 public class MockDataEnroller implements IDataEnroller {
 
 	protected DataCollector<?>[] collectors;

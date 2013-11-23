@@ -18,11 +18,13 @@ import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 import org.junit.runner.Description;
 
 /**
- * CodeChangeCollector collects data on changes to files in the directory
+ * CodeChangeCollector collects data from files that have been modified in the directory
  * of tests and in the directory of code being tested.
  * This data can be used to decide which tests to run first under the
- * "Changed code first" policy or to decide when to run a testrun, if you only
+ * "Changed code first" policy or to decide to run a testrun if you only
  * want to start a testrun when you expect the results may have changed.
+ * 
+ * 
  */
 public class CodeChangeCollector extends DataCollector<CodeChange> {
 	protected WatchService watchService;

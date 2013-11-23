@@ -13,6 +13,12 @@ import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
+/**
+ * 
+ * @author Team 6
+ *
+ *
+ */
 public class MaxFailureCountStatisticTest {
 
 	protected final long SLEEP_MS = 1;

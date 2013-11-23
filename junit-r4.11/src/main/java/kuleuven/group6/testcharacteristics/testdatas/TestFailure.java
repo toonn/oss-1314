@@ -4,7 +4,7 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
 /**
- * Contains Failure's for tests.
+ * This class contains Failure's for tests.
  */
 public class TestFailure implements ITestData {
 

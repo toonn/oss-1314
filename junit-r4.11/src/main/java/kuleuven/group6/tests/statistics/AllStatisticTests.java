@@ -8,6 +8,12 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
 	LastFailureStatisticTest.class
 })
+
+/**
+ * 
+ * @author Team 6
+ *
+ */
 public class AllStatisticTests {
 
 }
