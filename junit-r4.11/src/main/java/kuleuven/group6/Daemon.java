@@ -1,7 +1,6 @@
 package kuleuven.group6;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
@@ -179,14 +178,17 @@ public class Daemon {
 				doTestRun();
 			} catch (InterruptedException e) {
 				keepRunning = false;
-			} catch (Exception e) {
-				e.printStackTrace();
-				keepRunning = false;
+			} catch (Throwable e) {
+				// Catch all throwables, since half written class files can 
+				// cause all different kinds of faults. 
+				System.err.println("[ERROR] A problem occured while starting a testrun.");
+				System.err.println("        Make sure all class files are available.");
+				keepRunning = true;
 			}
 		}
 	}
 
-	protected void doTestRun() throws ClassNotFoundException, IOException {
+	protected void doTestRun() throws Exception {
 		URL[] paths = { 
 			codeDirectory.toURI().toURL(), 
 			testDirectory.toURI().toURL()
