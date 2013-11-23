@@ -88,7 +88,8 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 						paths.add(((Path)key.watchable()).resolve(context));
 					}
 					parent.reportEventPaths(paths);
-				} catch (Exception e) {
+					key.reset();
+				} catch (InterruptedException e) {
 					try {
 						watchService.close();
 					} catch (IOException e1) {
