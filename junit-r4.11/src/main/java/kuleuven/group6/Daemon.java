@@ -93,7 +93,14 @@ public class Daemon {
 	}
 	
 
+	public boolean isRunning() {
+		return runThread != null;
+	}
+	
 	public void start() {
+		if (isRunning())
+			return;
+		
 		runThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -104,10 +111,13 @@ public class Daemon {
 	}
 
 	public void stop() {
-		if (runThread == null)
+		if (!isRunning())
 			return;
 
 		runThread.interrupt();
+		runThread = null;
+		
+		// TODO this line will cause failing of a start() after a stop()
 		dataEnroller.close();
 	}
 
