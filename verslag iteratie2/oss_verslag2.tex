@@ -49,7 +49,7 @@ language.
 Currently running the tests is either done manually by developers or
 automatically by a continuous integration tool on a central server.
 A disadvantage of these approaches is that tests only run when a 
-developer decides to or when a developer commit's work to the central 
+developer decides to or when a developer commits work to the central 
 repository.
 This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
 takes away the burden of manually starting tests.
@@ -133,18 +133,17 @@ Supported
 
 
 \begin{description}
-\item Statistieken verzamelen. (Het verwerpen van de statistic pool)
-In het begin was er in het ontwerp een \textit{Statistic Pool}. Deze pool zou de statistieken bijhouden. Hier wordt dan aan opgevraagd of er een specifiek statistiek in zit. Is dit niet zo dan wordt deze geregistreerd. Deze werd uiteindelijk toch verworpen want er zou teveel afhangen van deze klasse. Er worden nog steeds statistieken bijgehouden maar dit wordt gedaan in \textit{StatisticManager}.
+\item Collecting Statistics.( rejecting of the statistic pool)
+At the beginning of the brainstorm of the design we included a class {Statistic Pool}. This class would have kept all the statistics. By a request there will be checked if it owns a specific statistic. If the requested statistic is not owned by the \emph{StatisticPool} then the statistic will be registered. This was eventually rejected because there would be too much dependently on this class. Statistics are still being kept but this is now done in the \emph{StatisticManager}.
 %TODO is dit correct?
 
 \item Policies
 Composite filters and sorting policies.
-A \emph{Policy} has an apply. This apply will work with a request and it will return a request.
-We hebben een Policy die een apply, die op een request werkt en een request teruggeeft. Daarnaast hebben we dat elke Policy een child Policy heeft. Als de apply aangeroepen wordt, wordt eerst de apply van de child opgeroepen en daarna zijn eigen apply op het resulterende request. Hiervoor kunnen we niet garanderen dat het resultaat correct volgens meerdere sorteringen gedaan wordt. SortingRequest kan dit niet over meerdere niveaus heen (stel dat er een filterRequest tussenzit). Naar buiten toe is de aanname dus is dat de nieuwe sortering de vorige sortering teniet kan doen ipv samenstellen.
+A \emph{Policy} has an apply. This apply will operates on a request and it will return a request. In addition, every policy has a child as Policy. If an apply is called, then it will first call the apply of the child and after that it will call its own apply on the resulting request. We can not guarantee that the result is correct according to the multiple sorting policies that are done. SortingRequest can not be applied over multiple levels (if there is a filterRequest in between). The assumption we are making here is that the new sorting will wipe out the older sorting instead of putting it together.
 %TODO dit was veranderd naar een ander ontwerp
 
 \item Collectors
-For \emph{FailureTraceCollector} are the parallel tests not suported. This is not supported because it will take a lot of time to implement it and there are other priorities.
+For \emph{FailureTraceCollector} are the parallel tests not supported. This is not supported because it will take a lot of time to implement it and there are other priorities.
 \end{description}
 
 %-------------KLASSENDIAGRAMMA------------------------------------------
@@ -167,9 +166,9 @@ files.
 \item \emph{DataEnroller}: The \emph{DataEnroller} provides the service
 of subscribing //TODO
 
-\item \emph{Policy}:\emph{SortingPolicy} is responsible for the ordening of tests by a certain policy and it can also implement a filter for a \emph{FilterPolicy} so it can also filter certain tests.
+\item \emph{Policy}:\emph{SortingPolicy} is responsible for the ordering of tests by a certain policy and it can also implement a filter for a \emph{FilterPolicy} so it can also filter certain tests.
 
-\item \emph{Statistic}: \emph{Statistic} is responsible for the calculations of statistics based on de data that is collected througt the \emph{Data}class
+\item \emph{Statistic}: \emph{Statistic} is responsible for the calculations of statistics based on the data that is collected through the \emph{Data}class
 
 \item \emph{StatisticProvider}: 
 
