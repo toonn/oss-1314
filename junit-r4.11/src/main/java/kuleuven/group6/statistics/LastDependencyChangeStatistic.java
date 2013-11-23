@@ -108,7 +108,11 @@ public class LastDependencyChangeStatistic extends
 	}
 
 	protected void calculateStatistic(CodeChange data) {
-		for (Description description : dependencies.get(data.getClassName())) {
+		Set<Description> changedClassDependencies = dependencies.get(data.getClassName());
+		if (changedClassDependencies == null)
+			return;
+		
+		for (Description description : changedClassDependencies) {
 			putTestStatistic(new LastDependencyChange(description,
 					data.getDate()));
 		}
