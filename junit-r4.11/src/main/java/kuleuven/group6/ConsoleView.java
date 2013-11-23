@@ -74,6 +74,7 @@ public class ConsoleView {
 		System.out.println("Available commands:");
 		System.out.println("\tP : change policy");
 		System.out.println("\tC : continue");
+		System.out.println("\tN : queue new testrun");
 		System.out.println("\tQ : quit");
 		System.out.println();
 			
@@ -90,6 +91,9 @@ public class ConsoleView {
 					break;
 				case 'c':
 					break;
+				case 'n':
+					daemon.queueNewTestRun();
+					break;
 				case 'q':
 					stop();
 					break;
@@ -99,6 +103,8 @@ public class ConsoleView {
 			
 			isCommandProcessed = true;
 		}
+		
+		System.out.println();
 		
 		if (!isStopped())
 			resumeOutput();
@@ -127,6 +133,8 @@ public class ConsoleView {
 				// Ask again
 			}
 		}
+		
+		System.out.println();
 	}
 	
 	protected void outputln() {

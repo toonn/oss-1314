@@ -7,12 +7,15 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
+import kuleuven.group6.collectors.DataCollectedListener;
 import kuleuven.group6.collectors.DataEnroller;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.policies.*;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.StatisticProvider;
+import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import org.junit.runner.Request;
 import org.junit.runner.Result;
 import org.junit.runner.Runner;
@@ -31,6 +34,8 @@ public class Daemon {
 
 	protected String activePolicyName = null;
 	protected Thread runThread = null;
+	protected Semaphore mayRunSemaphore = null;
+	protected DataCollectedListener<CodeChange> fileChangedListener;
 
 	protected Daemon(String rootSuiteClassName, File codeDirectory, File testDirectory) {
 		if (! codeDirectory.exists() || ! codeDirectory.isDirectory() ||
@@ -49,6 +54,13 @@ public class Daemon {
 				runNotificationSubscriber, rootSuiteClassName, testDirectory, codeDirectory);
 		this.statisticProvider = StatisticProvider.createConfiguredStatisticProvider(
 				dataEnroller, runNotificationSubscriber);
+		
+		this.fileChangedListener = new DataCollectedListener<CodeChange>() {
+			@Override
+			public void dataCollected(CodeChange data) {
+				onFileChanged();
+			}
+		};
 	}
 
 	public static Daemon createConfiguredDaemon(
@@ -81,6 +93,8 @@ public class Daemon {
 			throw new IllegalArgumentException("A policy with the given name does not exist.");
 
 		activePolicyName = policyName;
+		
+		queueNewTestRun();
 	}
 	
 	
@@ -101,6 +115,9 @@ public class Daemon {
 		if (isRunning())
 			return;
 		
+		dataEnroller.subscribe(CodeChange.class, this.fileChangedListener);
+		mayRunSemaphore = new Semaphore(1);
+		
 		runThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -116,23 +133,51 @@ public class Daemon {
 
 		runThread.interrupt();
 		runThread = null;
+		mayRunSemaphore = null;
+		dataEnroller.unsubscribe(CodeChange.class, this.fileChangedListener);
 		
 		// TODO this line will cause failing of a start() after a stop()
 		dataEnroller.close();
 	}
-
+	
+	private void onFileChanged() {
+		ensureQueuedTestRun();
+	}
+	
+	/**
+	 * Ensure that a testrun is queued, by queuing one if no testrun is currently running.
+	 */
+	public void ensureQueuedTestRun() {
+		if (!isRunning())
+			return;
+		if (mayRunSemaphore.availablePermits() != 0)
+			return;
+		
+		mayRunSemaphore.release();
+	}
+	
+	/**
+	 * Queue a new testrun.
+	 */
+	public void queueNewTestRun() {
+		if (!isRunning())
+			return;
+		
+		mayRunSemaphore.release();
+	}
+	
 	protected void startCore() {
 		boolean keepRunning = true;
-		while (keepRunning) {
+		while (keepRunning) {			
 			try {
+				mayRunSemaphore.acquire();
 				doTestRun();
+			} catch (InterruptedException e) {
+				keepRunning = false;
 			} catch (Exception e) {
 				e.printStackTrace();
 				keepRunning = false;
 			}
-			
-			if (Thread.currentThread().isInterrupted())
-				keepRunning = false;
 		}
 	}
 
