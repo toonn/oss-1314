@@ -1,18 +1,23 @@
-\documentclass[i1]{oss}
+\documentclass[i2]{oss}
 \setlength{\topmargin}{-.5in}
 \setlength{\textheight}{9in}
 \setlength{\oddsidemargin}{.100in}
 \setlength{\textwidth}{6.25in}
-\usepackage [dutch] {babel}
+\usepackage[english]{babel}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{fullpage}
 \usepackage{color}
 \usepackage{soul}
-\usepackage{gensymb}
+%\usepackage{gensymb}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+
+\newcommand{\class}[1]{\emph{#1}}
+\newcommand{\method}[1]{\emph{#1}}
+\newcommand{\junit}{\emph{JUnit }}
+\newcommand{\comment}[1]{{\huge \textcolor{green}{#1}}}
 
 \begin{document}
 
@@ -30,50 +35,145 @@
 
 
 
-%----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------
 %	INLEIDING
-%----------------------------------------------------------------------------------------
-\section*{Inleiding}
-\label{ssec:Inleiding}
+%-----------------------------------------------------------------------
+\section*{Introduction}
+\label{ssec:introduction}
 %introductie en de belangrijkste elementen van ons ontwerp
+%test
+Unit Tests are important because today's software systems are very 
+complex.
+\emph{junit} is the most popular framework for unit testing in the Java 
+language.
+Currently running the tests is either done manually by developers or
+automatically by a continuous integration tool on a central server.
+A disadvantage of these approaches is that tests only run when a 
+developer decides to or when a developer commit's work to the central 
+repository.
+This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
+takes away the burden of manually starting tests.
 
-Het \emph{JUnit} systeem wordt uitgebreid om een automatische test deamon te maken. Deze uitbreiding wordt uitgevoerd op de achtergrond en moet code van een bepaald project in de gaten houden. Wanneer er code gewijzigt wordt in het project dan zal deamon tests uitvoeren en de ontwikkelaar van deze testen op de hoogte brengen.\\
+
+%TODO Design strategy/... summary?
 
 
-Voor het ontwerp streven we naar lage coupling. Deamon weet alleen maar af van de actieve policies en de policies waarvoor hem op dat moment de statistieken gaat berekenen. Daemon weet wat hij moet weten en niet te veel. Andere belangrijke klassen zijn \textit{Policy}, \textit{Statistic}, \textit{DataCollector}, \textit{AbstractTestCharacteristics}.
-
-
-%----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------
 %	ONTWERP
-%----------------------------------------------------------------------------------------
-\section{Ontwerp}
-\label{ssec:Ontwerp}
+%-----------------------------------------------------------------------
+\section{Design}
+\label{ssec:design}
 %Klassendiagram en interactie diagrammen
 
-In deze sectie bespreken we het algemene ontwerp en de ontwerpbeslissingen. In de eerste subsectie wordt het klassendiagram besproken samen met een aantal verschillen met het vorige klassendiagram.
-In de tweede sectie worden de interactiediagrammas besproken die 
+In this section we describe how our design followed from an analysis
+of responsibilities and we go through the start-up and execution of 
+our application.
 
-%-------------KLASSENDIAGRAMMA-------------------------------
+\subsection{Design and responsibilities}
+
+The guiding principle for our design is a clear separation of 
+responsibilities. The first step is an analysis of necessary actions:
+
+\begin{itemize}
+	\item Run tests
+    \item Collect information on tests
+    \item Summarize the available information for a test
+    \item Order tests according to a user-specified policy
+    \item Output of results
+\end{itemize}
+
+Each of these is different enough to merit an entire entity responsible 
+for that action. Those entities were implemented as \emph{Daemon},
+\emph{DataCollector}, \class{Statistic}, \class{Policy} and
+\class{ConsoleView}. Our daemon makes as much use of the existing \junit
+infrastructure as possible. We only needed to extend three existing
+classes: \class{FlattenedRequest} is a request that contains only tests
+(no suites) as children (this was basically copied from \class{MaxCore} 
+in the experimental package), \class{MethodRunner} was necessary because
+when sorting a \class{FlattenedRequest} the description of the children
+was actually the description of the testclass containing the method and
+not the method itself, \class{RunNotificationSubscriber} does not extend
+anything from \junit but is used as a protection proxy so \class{Daemon}
+does not have to pass an actual \class{RunNotifier} which could be used
+to fire events (testRunStarted, testFailed...).
+
+The \class{Daemon} is responsible for running tests.
+It can make use of different \class{Policy}'s to order the tests that 
+need to be run.
+
+A \class{Policy} could do many different things, we use them only for
+ordering tests but they could also filter requests or (? nog iets).
+% (this filtering is not implemented in the current state of the application but is a possible extension).
+A \class{SortingPolicy} makes use of \class{Statistic}'s to determine
+an order for tests
+At the moment the following policies are supported: last failure first, 
+frequent failure first, distinct failure first and changed code 
+first.
+Each of these determines a different order that can be useful for
+developers.
+For example, tests that consistently order first under the frequent
+failure first policy might indicate brittle/(badly written) code.
+
+\class{Statistic}'s calculate any necessary information for the ordering
+of tests from data collected by dedicated \class{DataCollector}'s.
+Examples of data that has to be collected: every failure of a test,
+which code a test depends on and what code changes.
+
+% Deze subsecties mogen er wel bij vindt ik, miss nog een paar meer.
+\subsubsection{Collecting statistics}
+To enable handling tests in different ways according to different events 
+that can occur during testing (like failures, changes to class files) 
+a number of different statistics need to be gathered.
+Supported
+
+\subsubsection{Collecting data for statistics}
+
+
+
+
+
+\begin{description}
+\item Statistieken verzamelen. (Het verwerpen van de statistic pool)
+In het begin was er in het ontwerp een \textit{Statistic Pool}. Deze pool zou de statistieken bijhouden. Hier wordt dan aan opgevraagd of er een specifiek statistiek in zit. Is dit niet zo dan wordt deze geregistreerd. Deze werd uiteindelijk toch verworpen want er zou teveel afhangen van deze klasse. Er worden nog steeds statistieken bijgehouden maar dit wordt gedaan in \textit{StatisticManager}.
+%TODO is dit correct?
+
+\item Policies
+Composite filters and sorting policies.
+A \emph{Policy} has an apply. This apply will work with a request and it will return a request.
+We hebben een Policy die een apply, die op een request werkt en een request teruggeeft. Daarnaast hebben we dat elke Policy een child Policy heeft. Als de apply aangeroepen wordt, wordt eerst de apply van de child opgeroepen en daarna zijn eigen apply op het resulterende request. Hiervoor kunnen we niet garanderen dat het resultaat correct volgens meerdere sorteringen gedaan wordt. SortingRequest kan dit niet over meerdere niveaus heen (stel dat er een filterRequest tussenzit). Naar buiten toe is de aanname dus is dat de nieuwe sortering de vorige sortering teniet kan doen ipv samenstellen.
+%TODO dit was veranderd naar een ander ontwerp
+
+\item Collectors
+For \emph{FailureTraceCollector} are the parallel tests not suported. This is not supported because it will take a lot of time to implement it and there are other priorities.
+\end{description}
+
+%-------------KLASSENDIAGRAMMA------------------------------------------
 \subsection{Klassendiagramma}
 \label{ssec:Klassendiagramma}
 
-Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
+Each class has its own well-defined set of responsibilities.
 
 \begin{description}
 
-\item \textit{Deamon}: \textit{Deamon} is verantwoordelijk voor het opstarten van de TestRuns. Het is alleen maar vanop de hoogte van de active policies.
+\item \emph{Daemon}: \emph{Daemon} is responsible for initializing the 
+application. It provides an interface to set a policy for presenting 
+test results according to statistics gathered during test runs.
 
-\item \textit{SortingPolicy}:\textit{SortingPolicy} is verantwoordelijk voor het ordenen van de testen volgens een bepaalde policy en voor het filteren van de testen.
+\item \emph{DataCollector}: A \emph{DataCollector} is responsible for
+collecting specific kinds of data. These data can be related to test
+execution or changes that occur to the test environment such as changed
+files.
 
-\item \textit{Statistic}: \textit{Statistic} is verantwoordelijk voor het berekenen van de statistieken.
+\item \emph{DataEnroller}: The \emph{DataEnroller} provides the service
+of subscribing //TODO
 
-\item \textit{StatisticManager}:
+\item \emph{Policy}:\emph{SortingPolicy} is responsible for the ordening of tests by a certain policy and it can also implement a filter for a \emph{FilterPolicy} so it can also filter certain tests.
 
-\item \textit{DataCollector}: \textit{DAtaCollector} heeft de verantwoordelijkheid om gegenereerde data te laten horen bij een description van een testcase in plaats van testklassen en suites. 
+\item \emph{Statistic}: \emph{Statistic} is responsible for the calculations of statistics based on de data that is collected througt the \emph{Data}class
 
-\item \textit{DataCollectorManager}:
+\item \emph{StatisticProvider}: 
 
-\item \textit{AbstractTestCharacteristic}:
+\item \emph{DataEnroller}: 
 
 
 
@@ -84,8 +184,8 @@ Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
 \begin{figure}[tbp]
 \begin{center}
     \includegraphics[width=0.8\textwidth]{klassendiagramOud}
-    \caption{Grafische User Interface}
-	\label{fig:gui}
+    \caption{The old classdiagram}
+	\label{fig:kd-oud}
 \end{center}
 \end{figure}
 
@@ -95,8 +195,8 @@ Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
 \begin{figure}[tbp]
 \begin{center}
     \includegraphics[width=0.8\textwidth]{klassendiagram}
-    \caption{Grafische User Interface}
-	\label{fig:gui}
+    \caption{The intermediate classdiagram}
+	\label{fig:kd-tt}
 \end{center}
 \end{figure}
 
@@ -107,14 +207,14 @@ Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
 \begin{figure}[tbp]
 \begin{center}
     \includegraphics[width=0.8\textwidth]{klassendiagram3}
-    \caption{Grafische User Interface}
-	\label{fig:gui}
+    \caption{Current classdiagram}
+	\label{fig:kd-h}
 \end{center}
 \end{figure}
 
 
-%-------------Interactie Diagrammas-------------------------------
-\subsection{Interactie diagrammas}
+%-------------Interactie Diagrammas-------------------------------------
+\subsection{Interactie diagrammen}
 \label{ssec:Interactiedia}
 
 
@@ -123,39 +223,14 @@ Elke klassen heeft zijn eigen specifieke verantwoordelijkheid:
 
 
 
-%-------------Ontwerpbeslissingen-------------------------------
-\subsection{Ontwerpbeslissingen en patronen}
-\label{ssec:Ontwerpbeslissingen}
-
-Helemaal in het begin werd er geopteerd voor het Model-View-Controller Pattern. Hierbij zou de view de \textit{GUI}, \textit{CLI} zijn. De Controller zou een input besturingsview zijn die input en output handelde en als laatste de Model zouden de verschillende klassen zijn: \textit{Daemon, Policy, TestInfomation, DataCollector, Statistic, TestRun}. \\
-
-Hiervan werd er toch afgestapt om het ontwerp anders te implementeren. \\
-%TODO waarom?
-
-
-\begin{description}
-\item Statistieken verzamelen. (Het verwerpen van de statistic pool)
-In het begin was er in het ontwerp een \textit{Statistic Pool}. Deze pool zou de statistieken bijhouden. Hier wordt dan aan opgevraagd of er een specifiek statistiek in zit. Is dit niet zo dan wordt deze geregistreerd. Deze werd uiteindelijk toch verworpen want er zou teveel afhangen van deze klasse. Er worden nog steeds statistieken bijgehouden maar dit wordt gedaan in \textit{StatisticManager}.
-%TODO is dit correct?
-
-\item Policies
-Samengestelde filters en sorting policies
-We hebben een Policy die een apply, die op een request werkt en een request teruggeeft. Daarnaast hebben we dat elke Policy een child Policy heeft. Als de apply aangeroepen wordt, wordt eerst de apply van de child opgeroepen en daarna zijn eigen apply op het resulterende request. Hiervoor kunnen we niet garanderen dat het resultaat correct volgens meerdere sorteringen gedaan wordt. SortingRequest kan dit niet over meerdere niveaus heen (stel dat er een filterRequest tussenzit). Naar buiten toe is de aanname dus is dat de nieuwe sortering de vorige sortering teniet kan doen ipv samenstellen.
-%TODO dit was veranderd naar een ander ontwerp
-
-\item Collectors
-Voor FailureTraceColelctor zijn de parallelle testen niet ondersteund. Dit wordt gedaan omdat het op dit moment teveel werk is om te onderscheiden welke methode-oproepen van welke test komen.
-\end{description}
-
-
 
 %
 
-%----------------------------------------------------------------------------------------
+%-----------------------------------------------------------------------
 %	TESTEN
-%----------------------------------------------------------------------------------------
-\section{Testen}
-\label{ssec:testen}
+%-----------------------------------------------------------------------
+\section{Tests}
+\label{ssec:tests}
 %Een hoofdstuk rond testen dat de procedure beschrijft die gevolgd werd bij het testen: wat
 %werd getest en hoe?
 
