@@ -42,9 +42,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	@Override
 	public void startCollecting() {
 		super.startCollecting();
-		//Initiate the WatchService and WatchKeys by registering the test and code paths
-		registerPathRecursive(testDir);
-		registerPathRecursive(codeDir);
+		startWatching();
 		//Start watching directories
 		ccwt = new CodeChangeWatchThread(this,watchService);
 		ccwt.start();
@@ -109,23 +107,29 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		}
 	}
 
+	private void startWatching() {
+		//Initiate the WatchService and WatchKeys by registering the test and code paths
+		try {
+			watchService = FileSystems.getDefault().newWatchService();
+			registerPathRecursive(testDir);
+			registerPathRecursive(codeDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private WatchKey registerPath(File file)
 			throws IOException {
-		watchService = FileSystems.getDefault().newWatchService();
 		Path path = FileSystems.getDefault().getPath(file.getPath());
 		return path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 	}
 	
-	private void registerPathRecursive(File file){
+	private void registerPathRecursive(File file) throws IOException {
 		List<File> tempList = new ArrayList<File>(Arrays.asList(file.listFiles()));
 		for(File f : tempList){
 			if(f.isDirectory()){
-				try {
-					registerPath(f);
-					registerPathRecursive(f);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				registerPath(f);
+				registerPathRecursive(f);
 			}
 		}
 	}
