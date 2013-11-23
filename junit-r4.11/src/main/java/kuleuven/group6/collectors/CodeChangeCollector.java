@@ -125,8 +125,7 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	}
 	
 	private void registerPathRecursive(File file) throws IOException {
-		List<File> tempList = new ArrayList<File>(Arrays.asList(file.listFiles()));
-		for(File f : tempList){
+		for(File f : file.listFiles()){
 			if(f.isDirectory()){
 				registerPath(f);
 				registerPathRecursive(f);
