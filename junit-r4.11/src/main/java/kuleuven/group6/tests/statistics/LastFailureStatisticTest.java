@@ -6,6 +6,9 @@ import java.util.Date;
 
 import kuleuven.group6.statistics.LastFailureStatistic;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
+import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
 import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,6 +139,14 @@ public class LastFailureStatisticTest {
 		
 		LastFailureDate suiteDate = statistic.getTestStatistic(suiteDescription);
 		assertNull(suiteDate);
+	}
+	
+	@Test
+	public void testCanSummarize() {
+		assertTrue(statistic.canSummarize(LastFailureDate.class));
+		assertTrue(statistic.canSummarize(ITestStatistic.class));
+		assertFalse(statistic.canSummarize(LastDependencyChange.class));
+		assertFalse(statistic.canSummarize(FailureCount.class));
 	}
 	
 	private void sleep() {
