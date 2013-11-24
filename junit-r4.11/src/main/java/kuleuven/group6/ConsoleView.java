@@ -1,6 +1,8 @@
 package kuleuven.group6;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -182,26 +184,45 @@ public class ConsoleView {
 		
 		@Override
 		public void testRunStarted(Description description) throws Exception {
+			String now = DateFormat.getDateTimeInstance().format(new Date());
+			String line = "*                                       *";
+			String nowLine = replaceStringAt(line, "at " + now, 6);
+			
 			outputln();
 			outputln("*****************************************");
 			outputln("* New testrun started                   *");
+			outputln(nowLine);
 			outputln("*****************************************");
 			outputln();
 		}
 
 		@Override
 		public void testRunFinished(Result result) throws Exception {
-			String results = result.getFailureCount() + "/" + result.getRunCount() + " tests failed";
 			String line = "*                                       *";
-			String resultsLine = 
-					line.substring(0, 6) + results + line.substring(6 + results.length());
+			
+			String results = result.getFailureCount() + "/" + result.getRunCount() + " tests failed";
+			String resultsLine = replaceStringAt(line, results, 6);
+			
+			String now = DateFormat.getDateTimeInstance().format(new Date());
+			String nowLine = replaceStringAt(line, "at " + now, 6);
 			
 			outputln();
 			outputln("*****************************************");
 			outputln("* Testrun finished                      *");
+			outputln(nowLine);
 			outputln(resultsLine);
 			outputln("*****************************************");
 			outputln();
+		}
+		
+		private String replaceStringAt(String original, String replace, int index) {
+			if (index + replace.length() > original.length())
+				throw new IllegalArgumentException();
+			
+			return 
+					original.substring(0, index) + 
+					replace + 
+					original.substring(index + replace.length());
 		}
 
 		@Override

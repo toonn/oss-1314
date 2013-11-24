@@ -71,7 +71,6 @@ public class CodeChangeCollectorTest {
 			}
 		}
 		File classFileDir = lsList.get(0);
-		File[] classFiles = classFileDir.listFiles();
 		
 		//Test reporting the creation of files
 		Path newFilePath = Paths.get(classFileDir.getPath().concat("/newfile.class"));
