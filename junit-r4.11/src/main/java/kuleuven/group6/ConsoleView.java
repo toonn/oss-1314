@@ -50,7 +50,7 @@ public class ConsoleView {
 	
 	
 	/**
-	 * Method that will be called once the deamon is made. 
+	 * Method that will be called once the Deamon is made. It will also stop the Deamon when the program is done.
 	 */
 	public void start() {
 		console = new Scanner(System.in);
@@ -126,7 +126,7 @@ public class ConsoleView {
 	
 	/**
 	 * This will return the policies that are registered. Then the user had to choose a valid policy and 
-	 * this will be the active policy.
+	 * this will be the active policy of the deamon.
 	 * 
 	 */
 	private void askForPolicy() {
