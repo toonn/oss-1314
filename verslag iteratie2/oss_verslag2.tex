@@ -18,7 +18,9 @@
 \newcommand{\class}[1]{\emph{#1}}
 \newcommand{\method}[1]{\emph{#1}}
 \newcommand{\junit}{\emph{JUnit }}
+\newcommand{\gloss}[1]{\textbf{#1}}
 \newcommand{\comment}[1]{{\huge \textcolor{green}{#1}}\\}
+
 
 \begin{document}
 
@@ -53,7 +55,12 @@ A disadvantage of these approaches is that tests only run when a
 developer decides to or when a developer commits work to the central 
 repository.\\
 This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
-takes away the burden of manually starting tests.
+takes away the burden of manually starting tests.\\
+
+The task of this iteration was to make a deamon that improves \junit.
+\comment{belangrijkste elementen van ons ontwerp nog toevoegen}
+
+In the first section the general decisions regarding this design are described. In de next section describes how the design is implemented with the help of the classdiagram and sequence diagrams.
 
 %-----------------------------------------------------------------------
 %	ALGEMENE BESLISSINGEN
@@ -62,13 +69,13 @@ takes away the burden of manually starting tests.
 \label{ssec:general-decisions}
 
 A new testrun should be executed when source code changes, either in tests or in classes that are being tested. 
-%-- Misschien hier ook zeggen dat ge dan uw testen niet echt test, daarvoor zou ge continu testruns moeten herhalen, als uw testen niet deterministisch zijn bvb. 
+%-- Misschien hier ook zeggen dat ge dan uw testen niet echt test, daarvoor zou ge continu testruns moeten herhalen, als uw testen niet deterministisch zijn bvb. En ook zeggen dat als ge dat doet, dat ge met het probleem zit dat failurecount's niet meer echt kloppen enzo...
 A granularity of picked up changes has to be chosen.
 A distinction between code changes in different classes should obviously be made.
 It is however not immediately clear at which granularity changes inside a class should be detected.
 Changes in methods could be detected separately.
 Even a distinction between different execution paths inside a method could be made.
-However, we argue that a class should be coherent and as such, a change of the code of a method would have a high possibility of impacting the behaviour of the whole class.
+However, we argue that a class should be coherent and as such, a change of the code of a method would have a high possibility of impacting the behavior of the whole class.
 Therefore, code changes will be looked at only at the level of classes and a finer distinction will not be made.\\
 
 Changes to the classes will be detected by monitoring their *.class files.
@@ -126,6 +133,7 @@ for that action. Those entities were implemented as \class{Daemon},
 existing \junit infrastructure as possible. \\
 
 %Stef: Misschien eerder eerst de belangrijke zaken uitleggen en deze details pas later vermelden?
+%-- Ik vond dat we dit heel vroeg konden vermelden omdat dat een sterk punt is van ons ontwerp, eigenlijk hebben we maar twee klassen moeten 'veranderen'. Maar er staan inderdaad misschien teveel details in.
 We only needed to extend three existing classes: \class{FlattenedRequest}
 is a request that flattens all tests in an existing Request, so that it only contains test methods (no suites) as children. 
 This class is mostly based on \class{MaxCore} in the \junit experimental package. \
@@ -175,21 +183,25 @@ changes on disk during execution.\\
 %# Verzoek voor goedkeuring volgend deel
 The original design included a kind of data storage class where collected
 data or statistics could be kept, but this generated too much coupling
+%-- Ik zou niet zeggen generated, maar entailed/caused ofzo
 and placed too much responsibility on this single class.
 The structure was altered and in the current design a \class{Statistic}
-only keeps the data that it needs.\\
+only keeps (--holds on to?) the data that it needs.\\
+%-- http://www.youtube.com/watch?v=HgAZ5uyZUDg
 
 %# idem
 A \class{Policy} gains access to one or more \class{Statistic}'s through
 the \class{StatisticProvider}.
 A \class{Policy} sends the kind of statistic it needs to the 
+%-- miss hier zeggen type ofzo, want het klinkt alsof de policy een statistic krijgt door er een te geven.
 \class{StatisticProvider}, which then responds with a \class{Statistic}
 that can provide it if it knows about such a \class{Statistic}, otherwise
 an exception is thrown.\\
 This way a layer of indirection is created between \class{Policy}'s and
 \class{Statistic}'s so another class that produces the same kind of 
 statistic data as an existing \class{Statistic} but in a different way 
-can easily substituted for that existing \class{Statistic}. 
+can easily be substituted for that existing \class{Statistic}. 
+%-- by changing/implementing a/extending statisticprovider ? Misschien ook zeggen hoe?
 It also enables sharing of different \class{Statistic}'s between 
 \class{Policy}'s. \\
 %# Zouden we hier ook iets bij zetten over dat alternatief design met de chain of responsibility van factories voor het aanmaken van Statistics?
@@ -233,17 +245,18 @@ experimental feature.
 \label{subssec:Data collectors}
 
 A \class{DataCollector} is responsible for collecting a certain type of information on tests.
-It has to link this information to a certain \junit \class{Description}, which corresponds with a \junit test. 
+It has to link this information to a certain \junit \class{Description}, which corresponds with a \junit test. %-- Ik zou het nooit hebben over een junit test, maar unit test of gewoon test.
 When it has collected such a data item for a \class{Description}, it has to notify all interested parties of this event.
 Therefore, it also has to keep track of its interested parties.
 %# Tof, maar zou ge dit niet beter bij het deel hier boven bij schrijven of de tekst van daar naar hier verplaatsen of iets dergelijks?
 %Stef: ja het zou kunnen dat daar iets bij moet of van daar naar hier, maar ik denk dat in deze "detailsectie" alles wel volledig moet zijn, niet? Dus dan moet het wel een klein beetje dubbele info zijn, hiervoor is het tenslotte een samenvatting van wat in deze sectie allemaal komt
 %# Bwa we hoeven onszelf toch sowieso niet te herhalen? Maar inderdaad er zou wel wat van boven naar hier opgeschoven kunnen worden.
+%-- Zou ge hier wel spreken over "it has to link this to ... description", dat is niet echt de responsibility van de collectors toch? Het is eerder ze verzamelen events en soms hangt aan zo'n event inderdaad een description vast.
 
 %Stef: TODO waarom generic + exact uitleggen hoe
 \class{DataCollector}s are generic in the type of data they collect.
 
-No assumptions should be made about who these interested parties are. The only thing a \class{DataCollector} should  know, is that it is a party that is interested in the event that is has collected a data item. This notification problem is a typical problem that can be solved by the Observer pattern.\\
+No assumptions should be made about who these interested parties are. The only thing a \class{DataCollector} should  know, is that it is a party that is interested in the events that it collects (a data item). This notification problem is a typical problem that can be solved by the Observer pattern.\\
 
 %Stef: TODO Modifications to the Observer pattern: 
 %- in the original observer pattern: interested parties are only notified of the change event, after which they themselves will look for the new state
@@ -252,16 +265,21 @@ No assumptions should be made about who these interested parties are. The only t
 %Stef: TODO werking van elke collectors
 
 \subsection{Daemon}
+\label{subssec: deamon}
 
-\class{Daemon} is de core of the program. It is responsible for running the testruns. The flow is as follows: first it will execute the main method. Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
+\class{Daemon} is the core of the program. % daemon start alles maar is het daarom ook de core?
+It is responsible for running the tests. The flow is as follows: first it will execute the main method. % Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
+Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
 %TODO klopt dit?
 Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
 
 \subsection{Policies}
+\label{subssec: Policies}
 
 
 
 \subsection{Statistics}
+\label{subssec: statistics}
 
 The implemented \class{Statistic}'s will be discussed here in greater 
 detail.
@@ -287,14 +305,27 @@ test runs.
 For each failing test in a test run a stack trace is collected. 
 The last element in this stack trace is then the point of failure for 
 this test.
-
-\item \class{LastDependencyChangeStatistic}
+A \class{String} that represents this point of failure is then wrapped
+in a \class{FailureTrace} object.
+\item \class{LastDependencyChangeStatistic}: This \class{Statistic} uses
+two different \class{DataCollector}'s to gather its statistics.
+The first is a \class{TestDependencyCollector} which finds out which 
+tests use which other classes by tracking the methods called by each
+test.
+The second is a \class{CodeChangeCollector} which reports changes to
+class files in the project.
+The \class{Statistic} then combines these data into 
+\class{LastDependencyChange} objects.
+These objects wrap the most recent date at which a dependency of the 
+test it's associated with changed.
 \end{description}
 
 %-------------KLASSENDIAGRAMMA------------------------------------------
-\subsection{Class diagrams} % Hier maken we geen aparte sectie van, en een volledig klassediagram zou veel groter moeten.
+%\subsection{Class diagrams} %-- Hier maken we geen aparte sectie van, en een volledig klassediagram zou veel groter moeten.
 %# Akkoord wat het groter maken betreft. Het is misschien wel interessant om er een hoofding bij te zetten voor de duidelijkheid (eigenlijk vooral voor de index) maar het is niet de bedoeling dat er tekst bij staat. Of zie ik dat verkeerd.
-\label{ssec:Klassendiagramma}
+%-- Ik zag het eerder als volgt. Mogelijks een volledig klassediagram in een appendix en voor de rest, waar nodig een gedetailleerd deeldiagram bij/in de tekst waar het bij hoort.
+%# Mij goed, dan mag de subsectie weg.
+%\label{ssec:Klassendiagramma}
 
 
 %figuur oud klassendiagram
@@ -352,6 +383,8 @@ this test.
 For testing the application a two-fold approach was used: unit tests for
 important classes and a dummy project to use the application on.
 %# Voor zo ver ik gezien heb gebruiken we niet echt mocks, mocks verzamelen intern ook gegevens over de tests (zo kan een methode bijhouden hoe veel keer die is opgeroepen en zo'n dingen) en bestaan uit meer dan alleen maar stubs van methoden die opgeroepen worden in de tests.
+%-- application vind ik eigenlijk niet zo'n goed woord voor wat we maken. En de two-fold is niet heel erg two-fold, we hebben geen twee manieren van testen, we hebben een nepproject om onze unit tests mee te kunnen doen.
+%# Ah ik dacht dat het dummy project ook diende om de daemon zelf op te testen?
 This dummy project includes some stub classes which contain methods that
 exhibit behaviour that is interesting to test on.
 For example there are classes that only include methods that throw 
@@ -370,12 +403,13 @@ to a test's failure rate happens correctly.
 %taakverdeling elk lid en welke taak
 %uren
 
-We spended a lot of hours on group descussions about the design of deamon and how we could implement everything. We did not always agree on everything and a lot of discussions followed. The first 3 weeks we spend a lot of time thinking about a good design for our program.\\ 
+We spent a lot of time on group discussions about the design of deamon and how we could implement everything. We did not always agree on everything and a lot of discussions followed. The first three weeks we spent a lot of time thinking about a good design for our program.\\ 
+%-- Moet dit echt op deze manier? Het ligt toch nogal voor de hand dat we veel gediscussieerd/overlegd hebben als we er veel tijd in gestoken hebben. %% ja we zijn over de 40uur gegaan dat ze hadden gezegd en in verhouding hebben we veel meer gediscussieerd dan dat we geimplementeerd hebben
 
-In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and had not much time to help with the implementation. \\
+In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and did not have much time to help with the implementation. \\
 %TODO tekst
 
-The division of task was for everybody about the same. We did almost everything in group. 
+The division of tasks was about the same for everybody. We worked in group most of the time. 
 
 %TODO laatste week aanvullen!!
 \begin{table}[h!]
@@ -444,11 +478,13 @@ The division of task was for everybody about the same. We did almost everything 
 
 
 In the beginning of the design there were a lot of discussions about the overall implementation. We started with the Model-View-Controller pattern but it turned out that it was not that good. \\
+%-- Ik snap niet waarom iedereen ineens zegt dat MVC niet goed is, we hebben dat gewoon niet gedaan omdat het niet nodig was, dat is iets heel anders.
 
-In our first implementation we putted every statistic and data in a big StatisticPool class. But after we spoke with the assistant we realized that it was a bad designing because of the multiple dependencies with other classes and it was kind of a godclass in our design. \\
+In our first implementation we put every statistic and data in a big \class{StatisticPool} class. But after we spoke with the assistant we realized that it was a bad design because of the multiple dependencies with other classes and it was kind of god class in our design. \\
 
-We spend a lot of time discussion the design of Deamon. Sometimes we got stuck on a problem and we tried to find a solution but every solution had its own flaws. So we had to chose the solution with the least flaws. Not for every problem there is a pattern or strategy. 
+We spent a lot of time discussing the design of the \class{Daemon}. Sometimes we got stuck on a problem and we tried to find a solution but every solution had its own flaws. So we had to choose the solution with the least flaws. Not for every problem there is a pattern or design strategy. 
 \\
+%-- Ik zou liever niet zeggen dat er niet voor elk probleem een strategy is, strategies zijn normaal altijd toe te passen (scheiding van verantwoordelijkheden, low coupling, high cohesion, godclasses vermijden). Ik denk dat ge het hier hebt over onze oplossing met de "managers" enzo, en eigenlijk hebben we met die chain-of-responsibility daar wel een goede oplossing voor.
 
 
 
@@ -463,12 +499,60 @@ We spend a lot of time discussion the design of Deamon. Sometimes we got stuck o
 \section{Glossary}
 \label{ssec:glossary}
 
+
 \begin{description}
-\item 
+\item \gloss{Collector}
+
+\item \gloss{Comparator}
+
+\item \gloss{ConsoleView}
+
+\item \gloss{DataCollector}
+
+\item \gloss{Deamon}
+
+\item \gloss{Description}
+
+\item \gloss{FlattenedRequest}
+
+\item \gloss{filtering}
+
+\item \gloss{MaxCore}
+
+\item \gloss{MethodRunner}
+
+\item \gloss{Policy}
+
+\item \gloss{Request}
+
+\item \gloss{RunNotificationSubscriber}
+
+\item \gloss{RunNotifier}
+
+\item \gloss{SortingPolicy}
+
+\item \gloss{Statistic}
+
+\item \gloss{StatisticPool}
+
+\item \gloss{StatisticProvider}
+
+\item \gloss{Testclass}
+
+\item \gloss{TestFailed}
+
+\item \gloss{Testrun}
+
+\item \gloss{TestRunStarted}
+
+\item \gloss{Unit Tests}
+
+ 
 \end{description}
 
 %TODO hier kunnen we de patterns en strategies in vermelden
 \newpage
+\comment{Dit mogen we zeker niet vergeten aan te passen.}
 \begin{flushleft}
 \begin{thebibliography}{9}
 
@@ -531,7 +615,6 @@ We streven voor low-coupling.
 Verslag: beginnen met de analyse van wat we nodig hebben en daarna uitleggen hoe we dit oplossen en analyseren en bediscussi\"eren.
 
  
-
 
 \end{document}
 
