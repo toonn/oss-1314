@@ -51,7 +51,7 @@ Currently running the tests is either done manually by developers or
 automatically by a continuous integration tool on a central server.
 A disadvantage of these approaches is that tests only run when a 
 developer decides to or when a developer commits work to the central 
-repository.
+repository.\\
 This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
 takes away the burden of manually starting tests.
 
@@ -62,34 +62,35 @@ takes away the burden of manually starting tests.
 \label{ssec:general-decisions}
 
 A new testrun should be executed when source code changes, either in tests or in classes that are being tested. 
+%-- Misschien hier ook zeggen dat ge dan uw testen niet echt test, daarvoor zou ge continu testruns moeten herhalen, als uw testen niet deterministisch zijn bvb. 
 A granularity of picked up changes has to be chosen.
 A distinction between code changes in different classes should obviously be made.
 It is however not immediately clear at which granularity changes inside a class should be detected.
 Changes in methods could be detected separately.
 Even a distinction between different execution paths inside a method could be made.
 However, we argue that a class should be coherent and as such, a change of the code of a method would have a high possibility of impacting the behaviour of the whole class.
-Therefore, code changes will be looked at only at the level of classes and a finer distinction will not be made.
+Therefore, code changes will be looked at only at the level of classes and a finer distinction will not be made.\\
 
 Changes to the classes will be detected by monitoring their *.class files.
 An alternative would be to monitor the actual *.java source files, but most integrated development environments already offer automatic building functionality.
 Moreover, the test daemon would have to know the specifics of how to compile the entire project. 
 Therefore, it will be required that users of the automatic test daemon use the automatic building feature of their IDE.
-The test daemon will pick up changes in the compiled *.class files and as a result, it will queue a new testrun.
+The test daemon will pick up changes in the compiled *.class files and as a result, it will queue a new testrun.\\
 
 Testruns should always always be executed completely.
 Otherwise, when a developer is constantly making changes to the code, some tests would only be executed after a very long time.
 Only when the developer would eventually take a break longer than the duration of a testrun, these tests would be executed.
-While it could be argued that this is acceptable for some tests that are scheduled by a policy to run at the very end of a testrun, there are significant drawbacks to this approach.
+While it could be argued that this is acceptable for some tests that are scheduled by a policy to run at the very end of a testrun, there are significant drawbacks to this approach.\\
 
 An important drawback is starvation. Some policies can only change the execution order based on new information of runs of the tests.
 This would mean that for tests that are initially scheduled at the very end, it would be very hard to raise their priority, even though some code changes could significantly affect their test result.
-Even though techniques as aging could partially solve this starvation problem, the root of this problem would still be the same: new information on these tests is simply not available. Another solution would be to discard new information on all tests when the testrun has not completed entirely. However, this would undermine the purpose of the policy, since it could take very long until a policy would take new information into account.
+Even though techniques as aging could partially solve this starvation problem, the root of this problem would still be the same: new information on these tests is simply not available. Another solution would be to discard new information on all tests when the testrun has not completed entirely. However, this would undermine the purpose of the policy, since it could take very long until a policy would take new information into account.\\
 
 Sometimes, a comparison between tests that are run more often and tests that starve at the end of the testrun, wouldn't even make sense.
 Consider the priority of tests under the frequent failure first policy.
-It is not clear how to do a fair comparison between tests under this policy when different tests are run more often than others.
+It is not clear how to do a fair comparison between tests under this policy when different tests are run more often than others.\\
 
-Because of these reasons, when a testrun is executed, it will execute all the tests and leave no single one out.
+Because of these reasons, when a testrun is executed, it will execute all the tests and leave no single one out.\\
 
 \comment{Nog algemene beslissingen?}
 
@@ -102,12 +103,13 @@ Because of these reasons, when a testrun is executed, it will execute all the te
 
 In this section we describe how our design followed from an analysis
 of responsibilities and we go through the start-up and execution of 
-our application.
+our application.\\
 
 \subsection{Design overview and responsibilities}
+\label{subssec: Design overview}
 
 The guiding principle for our design is a clear separation of 
-responsibilities. The first step is an analysis of necessary actions:
+responsibilities. The first step is an analysis of necessary actions:\\
 
 \begin{itemize}
 	\item Run tests
@@ -121,29 +123,31 @@ Each of these is different enough to merit an entire entity responsible
 for that action. Those entities were implemented as \class{Daemon},
 \class{DataCollector}, \class{Statistic}, \class{Policy} and
 \class{ConsoleView} respectively. Our daemon makes as much use of the 
-existing \junit infrastructure as possible. 
+existing \junit infrastructure as possible. \\
+
 %Stef: Misschien eerder eerst de belangrijke zaken uitleggen en deze details pas later vermelden?
 We only needed to extend three existing classes: \class{FlattenedRequest}
 is a request that flattens all tests in an existing Request, so that it only contains test methods (no suites) as children. 
-This class is mostly based on \class{MaxCore} in the \junit experimental package. 
+This class is mostly based on \class{MaxCore} in the \junit experimental package. \
 However, it makes use of a custom runner: \class{MethodRunner}. 
 This class was necessary because when sorting a \class{FlattenedRequest}, the description of the children was actually the
 description of the testclass containing the method and not the method 
-itself.
+itself.\\
+
 \class{RunNotificationSubscriber} does not extend anything from 
 \junit but is used as a protection proxy so \class{Daemon} does not have 
 to pass an actual \class{RunNotifier} which could be used to fire events 
-(testRunStarted, testFailed...). 
+(testRunStarted, testFailed...). \\
 
 The \class{Daemon} is responsible for executing testruns.
 It can make use of different \class{Policy}'s to order the tests that 
-need to be run. 
+need to be run. \\
 
 A \class{Policy} is responsible for transforming a \class{Request} into a \class{Request} that is run according to the rules of the \class{Policy}. 
 These can be all different kinds of rules, but only policies that sort the executing tests have been implemented. 
 An example of another possible rule is the filtering of requests.
 %# Ik kon niet zo direct iets anders bedenken dat ze zouden kunnen doen maar als iemand nog ergens op komt schrijf het er bij.
-The abstract \class{SortingPolicy} class implements a policy that can sort its executing test methods. It asks of its concrete classes only a comparator that determines an order between two \class{Description}s, which correspond to a test.
+The abstract \class{SortingPolicy} class implements a policy that can sort its executing test methods. It asks of its concrete classes only a comparator that determines an order between two \class{Description}s, which correspond to a test.\\
 All implemented sorting policies make use of \class{Statistic}s to determine
 an order for tests, but this is not required.
 At the moment, the following policies are supported: last failure first, 
@@ -153,10 +157,11 @@ Each of these determines a different order that can be useful for
 developers.
 For example, tests that consistently order first under the frequent
 %failure first policy might indicate brittle/(badly written) code.
-failure first policy might indicate fragile / badly written code. 
+failure first policy might indicate fragile / badly written code. \\
 %# Ik heb nog nooit het woord brittle gebruikt zien worden voor code, het klinkt een beetje vreemd, maar als ge zeker weet dat Mario gaat weten wat ge bedoelt zet het er maar bij
 %-- Brittle betekent dat iets heel gemakkelijk breekt, iemand die engels spreekt zal dat wel begrijpen denk ik, slecht geschreven vindt ik een beetje teveel oordelend, misschien 'fragile'?
 %# Ja ik weet wat brittle betekent. Ik vind het alleen vreemd om code broos te noemen. Breekbaar misschien maar broos slaagt echt nergens op.
+%-- Hoe zegt ge dan breekbaar, iets dat broos is breekt als ge er te hard op slaagt. Maar zoals ik al zei moet het voor mij niet brittle zijn vandaar de /. Ik wil vooral duidelijk maken dat de code misschien wel werkt en ook goed geschreven kan zijn maar dat het misschien te ingewikkeld is voor mensen om te begrijpen en daardoor breekbaar, dus misschien: code that is too complicated and is often broken because of that, of iets in die trant?
 
 %# Ik heb dit stuk een beetje herschikt, het is op dit moment nog een beetje kort voor een eigen subsubsectie maar we kunnen het eventueel afsplitsen als het te groot wordt.
 To enable handling tests in different ways in response to different 
@@ -165,34 +170,38 @@ necessary information for the ordering from data collected by dedicated
 \class{DataCollector}'s. %% welke events? misschien hier dieper op ingaan
 Examples of data that has to be collected for the supported policies: 
 every failure of a test, which code a test depends on and which code 
-changes on disk during execution.
+changes on disk during execution.\\
+
 %# Verzoek voor goedkeuring volgend deel
 The original design included a kind of data storage class where collected
 data or statistics could be kept, but this generated too much coupling
 and placed too much responsibility on this single class.
 The structure was altered and in the current design a \class{Statistic}
-only keeps the data that it needs.
+only keeps the data that it needs.\\
+
 %# idem
 A \class{Policy} gains access to one or more \class{Statistic}'s through
 the \class{StatisticProvider}.
 A \class{Policy} sends the kind of statistic it needs to the 
 \class{StatisticProvider}, which then responds with a \class{Statistic}
 that can provide it if it knows about such a \class{Statistic}, otherwise
-an exception is thrown.
+an exception is thrown.\\
 This way a layer of indirection is created between \class{Policy}'s and
 \class{Statistic}'s so another class that produces the same kind of 
 statistic data as an existing \class{Statistic} but in a different way 
 can easily substituted for that existing \class{Statistic}. 
 It also enables sharing of different \class{Statistic}'s between 
-\class{Policy}'s.
+\class{Policy}'s. \\
 %# Zouden we hier ook iets bij zetten over dat alternatief design met de chain of responsibility van factories voor het aanmaken van Statistics?
+%-- Dat hoort ook bij de statistics net als de datacollectors, dus als het ergens vermeld wordt moet het op een of andere manier bij de twee, en ja ik zou het vermelden want dat verdeeld de responsibilities die wij zo belangrijk vinden beter.
 
 %# Ook niet genoeg voor een eigen subsubsectie
 %\subsubsection{Collecting data for statistics}
 \class{DataCollector}'s are responsible for collecting necessary data 
 during execution.
 Some \class{DataCollector}'s collect data about tests that have been run,
-some collect data about changes in the testing environment such as files that have been changed.
+some collect data about changes in the testing environment such as files that have been changed.\\
+
 %# Hier misschien wat meer over hoe ze werken (als in met welke delen van junit etc. ze gekoppeld zijn en zo)
 \class{DataCollector}'s are available through the \class{DataEnroller}
 that provides the service of subscribing \class{Statistic}'s to specific
@@ -221,6 +230,7 @@ experimental feature.
 %\end{description}
 
 \subsubsection{Data collectors}
+\label{subssec:Data collectors}
 
 A \class{DataCollector} is responsible for collecting a certain type of information on tests.
 It has to link this information to a certain \junit \class{Description}, which corresponds with a \junit test. 
@@ -233,23 +243,57 @@ Therefore, it also has to keep track of its interested parties.
 %Stef: TODO waarom generic + exact uitleggen hoe
 \class{DataCollector}s are generic in the type of data they collect.
 
-No assumptions should be made about who these interested parties are. The only thing a \class{DataCollector} should  know, is that it is a party that is interested in the event that is has collected a data item. This notification problem is a typical problem that can be solved by the Observer pattern.
+No assumptions should be made about who these interested parties are. The only thing a \class{DataCollector} should  know, is that it is a party that is interested in the event that is has collected a data item. This notification problem is a typical problem that can be solved by the Observer pattern.\\
 
 %Stef: TODO Modifications to the Observer pattern: 
-%- in the original observer pattern: interested parties are only notified of the change event, after which they themself will look for the new state
+%- in the original observer pattern: interested parties are only notified of the change event, after which they themselves will look for the new state
 %- afscherming van de echte datacollectors via de dataenroller
 
 %Stef: TODO werking van elke collectors
 
+\subsection{Daemon}
 
-\subsection{Deamon}
-
-Deamon is de core of the program. It is responsible for running the testruns. The flow is ass follow: First it will execute the main. Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \emph{policies} will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the Deamon by calling the method start. If the Deamon is still running nothing is done. If the deamon is not yet running then there will be created a new thread and it will subscribe itself to the DataEnroller. 
+\class{Daemon} is de core of the program. It is responsible for running the testruns. The flow is as follows: first it will execute the main method. Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
 %TODO klopt dit?
-Then the startCore() method is called. Now the real execution of the Deamon is started.
+Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
+
+\subsection{Policies}
+
+
+
+\subsection{Statistics}
+
+The implemented \class{Statistic}'s will be discussed here in greater 
+detail.
+\begin{description}
+\item \class{FailureCountStatistic}: Collects the amount of times a test 
+has failed until now.
+A test is identified by its \class{Description}.
+A \class{FailureCount} object is associated with this description,
+representing the failure count.
+When the \class{DataCollector} that this \class{Statistic} listens to
+signals that a test has failed the counter inside the 
+\class{FailureCount} is incremented.
+\item \class{MaxFailureCountStatistic}: This is a special kind of 
+\class{FailureCountStatistic} where if the \class{Description} that it's
+associated with is for multiple tests the highest failure count of its 
+children is returned.
+\item \class{LastFailureStatistic}: This \class{Statistic} keeps the 
+last time a test failed with a \class{LastFailureDate} object, which
+wraps a \class{Date} object.
+\item \class{FailureTraceStatistic}: This \class{Statistic}, in contrast
+with other \class{Statistic}'s, does not keep its state across multiple
+test runs.
+For each failing test in a test run a stack trace is collected. 
+The last element in this stack trace is then the point of failure for 
+this test.
+
+\item \class{LastDependencyChangeStatistic}
+\end{description}
 
 %-------------KLASSENDIAGRAMMA------------------------------------------
-\subsection{Class diagrams}
+\subsection{Class diagrams} % Hier maken we geen aparte sectie van, en een volledig klassediagram zou veel groter moeten.
+%# Akkoord wat het groter maken betreft. Het is misschien wel interessant om er een hoofding bij te zetten voor de duidelijkheid (eigenlijk vooral voor de index) maar het is niet de bedoeling dat er tekst bij staat. Of zie ik dat verkeerd.
 \label{ssec:Klassendiagramma}
 
 
@@ -326,17 +370,22 @@ to a test's failure rate happens correctly.
 %taakverdeling elk lid en welke taak
 %uren
 
+We spended a lot of hours on group descussions about the design of deamon and how we could implement everything. We did not always agree on everything and a lot of discussions followed. The first 3 weeks we spend a lot of time thinking about a good design for our program.\\ 
+
+In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and had not much time to help with the implementation. \\
 %TODO tekst
+
+The division of task was for everybody about the same. We did almost everything in group. 
 
 %TODO laatste week aanvullen!!
 \begin{table}[h!]
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
      & Joren & Toon & Stef & Sophie \\ \hline
-    Algemeen & 2u00 & 2u00 & 2u00 & 2u00\\
-           Tools & 8u30 & 8u30 & 8u00 & 4u30 \\
-        Analyse & 10u00 & 10u00 & 12u15 & 12u00 \\
-        Design & 00u00 & 00u00 & 00u00 & 00u00 \\
+    Algemeen & 3u35 & 4u00 & 4u00 & 4u00\\
+           Tools & 00u00 & 00u00 & 00u00 & 00u00 \\
+        Analyse & 00u00 & 00u00 & 00u00 & 00u00 \\
+        Design & 14u45 & 20u30 & 24u45 & 20u30 \\
         Implementation & 00u00 & 00u00 & 00u00 & 00u00\\
         Report & 9u00 & 9u00 & 9u00 & 9u00 \\
         Total & 29u30 & 29u30 & 31u15 & 27u30  
@@ -372,11 +421,11 @@ to a test's failure rate happens correctly.
                 \begin{subfigure}[hb]{0.20\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{legende}
-                \caption{Legende}
+                \caption{Legend}
         \end{subfigure}%
 
 
- \caption{Weergave van de werkverdeling}
+ \caption{Overview of the division of tasks}
 \label{fig:werkverdeling}
 \end{figure}
 
@@ -389,17 +438,67 @@ to a test's failure rate happens correctly.
 %-----------------------------------------------------------------------
 \section{Conclusion and discussion}
 \label{ssec:conclusion}
+
 % Een hoofdstuk met een discussie en conclusie waarin interessante ervaringen, problemen en
 %andere opmerkingen omtrent het project worden beschreven
+
+
+In the beginning of the design there were a lot of discussions about the overall implementation. We started with the Model-View-Controller pattern but it turned out that it was not that good. \\
+
+In our first implementation we putted every statistic and data in a big StatisticPool class. But after we spoke with the assistant we realized that it was a bad designing because of the multiple dependencies with other classes and it was kind of a godclass in our design. \\
+
+We spend a lot of time discussion the design of Deamon. Sometimes we got stuck on a problem and we tried to find a solution but every solution had its own flaws. So we had to chose the solution with the least flaws. Not for every problem there is a pattern or strategy. 
+\\
+
+
+
+
 
 
 
 %-----------------------------------------------------------------------
 %	GLOSSARY
 %-----------------------------------------------------------------------
+
 \section{Glossary}
 \label{ssec:glossary}
 
+\begin{description}
+\item 
+\end{description}
+
+%TODO hier kunnen we de patterns en strategies in vermelden
+\newpage
+\begin{flushleft}
+\begin{thebibliography}{9}
+
+\bibitem{TeamTreasure} 
+\textit{Team Treasure Trek}
+\begin{scriptsize}
+geraadpleegd op 7/5/2013 via: \mbox{www.nintendo-europe.com/}
+\end{scriptsize}
+
+\bibitem{RabbitMQ}
+\textit{RabbitMQ}
+\begin{scriptsize}
+geraadpleegd op 7/5/2013 via: \mbox{http://en.wikipedia.org/wiki/RabbitMQ}
+\end{scriptsize}
+
+\bibitem{mindstorms}
+\textit{Lego Mindstorms}
+\begin{scriptsize}
+geraadpleegd op 7/5/2013 via: \mbox{www.lego.com} en \mbox{http://en.wikipedia.org/wiki/Lego\textendash Mindstorms}
+\end{scriptsize}
+
+\bibitem{leJOS}
+\textit{leJOS}
+\begin{scriptsize}
+geraadpleegd op 7/5/2013 via: \mbox{http://lejos.sourceforge.net/}
+\end{scriptsize}
+
+
+\end{thebibliography}
+\end{flushleft}
 
 Daemon met een policy en een testinformation Klasse en een Statistic information 
 
