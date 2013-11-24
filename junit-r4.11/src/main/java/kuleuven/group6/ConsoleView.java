@@ -10,7 +10,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 /**
- * 
+ * This class is the console view of the deamon. It will give output to the programmer and report ... TODO
  * @author Team 6
  *
  */
@@ -20,6 +20,7 @@ public class ConsoleView {
 	protected boolean isOutputSuspended = false;
 	protected boolean isStopped = false;
 	protected Scanner console = null;
+	
 	
 	public ConsoleView(Daemon daemon) {
 		this.daemon = daemon;
@@ -46,6 +47,9 @@ public class ConsoleView {
 	}
 	
 	
+	/**
+	 * Method that will be called once the deamon is made. 
+	 */
 	public void start() {
 		console = new Scanner(System.in);
 		showInfo();
@@ -66,6 +70,9 @@ public class ConsoleView {
 	}
 	
 	
+	/**
+	 * This will give information on how to use the console view.
+	 */
 	private void showInfo() {
 		System.out.println();
 		System.out.println("IMPORTANT:");
@@ -115,7 +122,13 @@ public class ConsoleView {
 			resumeOutput();
 	}
 	
+	/**
+	 * This will return the policies that are registered. Then the user had to choose a valid policy and 
+	 * this will be the active policy.
+	 * 
+	 */
 	private void askForPolicy() {
+		// printing out the registered policies
 		System.out.println();
 		System.out.println("Available policies:");
 		List<String> policies = new ArrayList<>(daemon.getRegisteredPolicies());
@@ -123,19 +136,23 @@ public class ConsoleView {
 			System.out.println("\t" + i + " : " + policies.get(i - 1));
 		}
 		
+		// Here you can choose which policy to run.
 		boolean isCommandProcessed = false;
 		while (! isCommandProcessed) {
 			System.out.print("Enter the new policy number: ");
 			String policyNumberString = console.nextLine();
 			try {
 				int policyNumber = Integer.parseInt(policyNumberString);
-				if (policyNumber < 1 || policyNumber > policies.size())
+				if (policyNumber < 1 || policyNumber > policies.size()) {
+					System.out.println("The number has to be greater then zero or smaller then " + policies.size());
 					continue;
+				}
 				
+				// Active policy is chosen correctly and the process will continue
 				daemon.setActivePolicy(policies.get(policyNumber - 1));
 				isCommandProcessed = true;
 			} catch (NumberFormatException e) {
-				// Ask again
+				System.out.println("The number you were providing was not a number. Please give a valid number");
 			}
 		}
 		

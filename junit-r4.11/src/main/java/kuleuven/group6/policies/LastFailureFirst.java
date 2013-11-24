@@ -35,9 +35,11 @@ public class LastFailureFirst extends SortingPolicy {
 					return 1;
 				if (date2 == null)
 					return -1;
+				// Explain  ? why -1 ?
 
 				return date1.getLastFailureDate().compareTo(
 						date2.getLastFailureDate());
+			
 			}
 
 		};
