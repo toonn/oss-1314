@@ -4,11 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -29,22 +28,29 @@ import org.junit.runner.Description;
 public class CodeChangeCollector extends DataCollector<CodeChange> {
 	protected WatchService watchService;
 	protected Description rootDescription;
-	private File codeDir;
-	private File testDir;
+	private File absoluteCodeDir;
+	private File absoluteTestDir;
 	private CodeChangeWatchThread ccwt;
 
 	public CodeChangeCollector(String rootSuiteClassName, File testDir, File codeDir){
 		this.rootDescription = Description.createSuiteDescription(rootSuiteClassName);
-		this.testDir = testDir;
-		this.codeDir = codeDir;
+		this.absoluteTestDir = testDir.getAbsoluteFile();
+		this.absoluteCodeDir = codeDir.getAbsoluteFile();
 	}
 
 	@Override
 	public void startCollecting() {
 		super.startCollecting();
-		startWatching();
+		//Initiate the WatchService and WatchKeys by registering the test and code paths
+		try {
+			watchService = FileSystems.getDefault().newWatchService();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		registerPathRecursive(absoluteTestDir);
+		registerPathRecursive(absoluteCodeDir);
 		//Start watching directories
-		ccwt = new CodeChangeWatchThread(this,watchService);
+		ccwt = new CodeChangeWatchThread();
 		ccwt.start();
 	}
 	
@@ -59,12 +65,8 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 	 *
 	 */
 	private class CodeChangeWatchThread extends Thread {
-		private WatchService watchService;
-		private CodeChangeCollector parent;
 
-		public CodeChangeWatchThread(CodeChangeCollector parent, WatchService watchService) {
-			this.watchService = watchService;
-			this.parent = parent;
+		public CodeChangeWatchThread() {
 		}
 
 		@Override
@@ -77,15 +79,16 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 						key = watchService.take();
 						events = key.pollEvents();
 					} while(events.isEmpty());
-					List<Path> paths = new ArrayList<Path>();
 					//We know the WatchEvent<T>s will be WatchEvent<Path>s because of the 
 					//kinds of events that we registered
-					for(WatchEvent<?> event : events){
-						Path context = (Path)event.context();
-
-						paths.add(((Path)key.watchable()).resolve(context));
+					for(WatchEvent<?> event : events) {
+						if (event.kind() == StandardWatchEventKinds.OVERFLOW)
+							continue;
+						
+						@SuppressWarnings("unchecked")
+						WatchEvent<Path> typedEvent = (WatchEvent<Path>)event; 
+						processWatchEvent(typedEvent, key);
 					}
-					parent.reportEventPaths(paths);
 					key.reset();
 				} catch (InterruptedException e) {
 					try {
@@ -99,37 +102,65 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 		}
 	}
 
-	public void reportEventPaths(List<Path> paths) {
-		for(Path path : paths){
-			String className = FileSystems.getDefault().getPath(codeDir.getPath()).relativize(path).toString().replace(".class", "");
-			CodeChange data = new CodeChange(rootDescription,className,new Date());
-			onDataCollected(data);
+	protected void processWatchEvent(WatchEvent<Path> event, WatchKey key) {
+		Path relativePath = event.context();
+		Path watchedDirectory = (Path)key.watchable();
+		Path absolutePath = watchedDirectory.resolve(relativePath);
+		File absoluteFile = absolutePath.toFile();
+		
+		// Removed files need to be handled as a real file since events for them
+		// are important! There's no way to distinguish between a removed file or 
+		// directory, so handle them all as a file.
+		if (absoluteFile.isFile() || (event.kind() == ENTRY_DELETE)) {
+			processFileEvent(absolutePath);
+		} else if (absoluteFile.isDirectory()) {
+			registerPathRecursive(absoluteFile);
 		}
 	}
-
-	private void startWatching() {
-		//Initiate the WatchService and WatchKeys by registering the test and code paths
+		
+	private void processFileEvent(Path absolutePath) {
+		if (!absolutePath.toString().endsWith(".class"))
+			return;
+		
+		String changedClassName = absolutePathToClassName(absolutePath);	
+		CodeChange data = new CodeChange(rootDescription, changedClassName, new Date());
+		onDataCollected(data);
+	}
+	
+	protected String absolutePathToClassName(Path path) {
+		Path codeDir = absoluteCodeDir.toPath();
+		Path testDir = absoluteTestDir.toPath();
+		Path baseDir;
+		if (path.startsWith(codeDir))
+			baseDir = codeDir;
+		else if (path.startsWith(testDir))
+			baseDir = testDir;
+		else
+			throw new AssertionError();
+		
+		String relativePath = baseDir.relativize(path).toString();
+		
+		// Don't just replace ".class" with "" since ".class" could be 
+		// part of the path, for example in bin/.classfiles/File.class
+		int indexOfDotClass = relativePath.lastIndexOf(".class");
+		if (indexOfDotClass == -1)
+			throw new AssertionError();
+		
+		String className = relativePath.substring(0, indexOfDotClass);
+		return className;
+	}
+	
+	private void registerPathRecursive(File file) {
+		if (!file.isDirectory())
+			return;
+		
 		try {
-			watchService = FileSystems.getDefault().newWatchService();
-			registerPathRecursive(testDir);
-			registerPathRecursive(codeDir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private WatchKey registerPath(File file)
-			throws IOException {
-		Path path = FileSystems.getDefault().getPath(file.getPath());
-		return path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-	}
-	
-	private void registerPathRecursive(File file) throws IOException {
-		for(File f : file.listFiles()){
-			if(f.isDirectory()){
-				registerPath(f);
+			file.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+			for (File f : file.listFiles()) {
 				registerPathRecursive(f);
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
