@@ -175,6 +175,9 @@ public class Daemon {
 		while (keepRunning) {			
 			try {
 				mayRunSemaphore.acquire();
+				// In case of grouped file changes, let the system 
+				// stabilize a bit before really starting
+				Thread.sleep(500);
 				doTestRun();
 			} catch (InterruptedException e) {
 				keepRunning = false;
