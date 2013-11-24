@@ -116,7 +116,7 @@ public class Daemon {
 	}
 	
 	/**
-	 * This method will be called once a policy is chosen through the consoleView.
+	 * This method will be called once a policy has been chosen through the consoleView.
 	 * 
 	 * 
 	 */

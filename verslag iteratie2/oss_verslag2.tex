@@ -242,6 +242,12 @@ No assumptions should be made about who these interested parties are. The only t
 %Stef: TODO werking van elke collectors
 
 
+\subsection{Deamon}
+
+Deamon is de core of the program. It is responsible for running the testruns. The flow is ass follow: First it will execute the main. Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \emph{policies} will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the Deamon by calling the method start. If the Deamon is still running nothing is done. If the deamon is not yet running then there will be created a new thread and it will subscribe itself to the DataEnroller. 
+%TODO klopt dit?
+Then the startCore() method is called. Now the real execution of the Deamon is started.
+
 %-------------KLASSENDIAGRAMMA------------------------------------------
 \subsection{Class diagrams}
 \label{ssec:Klassendiagramma}

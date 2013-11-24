@@ -52,7 +52,7 @@
         \end{flushright}%
       \end{minipage}\\%
       \vspace{30mm}%
-      {\large Computerwetenschappen 2013 -- 2014}%
+      {\large Computer Science 2013 -- 2014}%
     \end{center}%
   \end{titlepage}%
 }
