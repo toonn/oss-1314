@@ -23,10 +23,10 @@
 \titlespacing*{\paragraph}
 {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
 
-\newcommand{\class}[1]{\emph{#1}}
-\newcommand{\method}[1]{\emph{#1}}
+\newcommand{\class}[1]{\texttt{#1}}
+\newcommand{\method}[1]{\texttt{#1}}
 \newcommand{\junit}{\emph{JUnit }}
-\newcommand{\Deamon}{\emph{Deamon }}
+\newcommand{\Deamon}{\class{Daemon  }}
 \newcommand{\gloss}[1]{\textbf{#1}}
 \newcommand{\comment}[1]{{\huge \textcolor{green}{#1}}\\}
 
@@ -66,7 +66,7 @@ repository.
 This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
 takes away the burden of manually starting tests.
 
-The task of this iteration was to make a deamon that improves \junit.
+The task of this iteration was to make a daemon that improves \junit.
 \comment{belangrijkste elementen van ons ontwerp nog toevoegen}
 
 In the first section the general decisions regarding this design are described. The next section describes how the design is implemented with the help of the class diagram and sequence diagrams.
@@ -84,7 +84,7 @@ change even if the test or the code that is being tested doesn't change
 time-dependent behaviour like a network connection or a database).
 However, because it's better to use mock objects in those cases this was
 not considered in the current design.
-%# Stuk toegevoegd over non-deterministische resultaten
+
 A granularity of picked up changes has to be chosen.
 A distinction between code changes in different classes should obviously be made.
 It is however not immediately clear at which granularity changes inside a class should be detected.
@@ -168,11 +168,10 @@ need to be run.
 
 A \class{Policy} is responsible for transforming a \class{Request} into a \class{Request} that is run according to the rules of the \class{Policy}. 
 
-%# Ik heb dit stuk een beetje herschikt, het is op dit moment nog een beetje kort voor een eigen subsubsectie maar we kunnen het eventueel afsplitsen als het te groot wordt.
 To enable handling tests in different ways in response to different 
 events that can occur during testing, \class{Statistic}'s calculate any 
 necessary information for the ordering from data collected by dedicated 
-\class{Data}'s. %% welke events? misschien hier dieper op ingaan
+\class{DataCollector}'s.
 Examples of data that has to be collected for the supported policies: 
 every failure of a test, which code a test depends on and which code 
 changes on disk during execution.
@@ -181,9 +180,7 @@ The original design included a kind of data storage class where collected
 data or statistics could be kept, but this caused too much coupling
 and placed too much responsibility on this single class.
 The structure was altered and in the current design a \class{Statistic}
-only keeps (--holds on to?) the data that it needs.
-\comment{TODO: hierboven inline comment wegdoen}
-%-- http://www.youtube.com/watch?v=HgAZ5uyZUDg
+only holds on to the data that it needs.
 
 A \class{Policy} gains access to one or more \class{Statistic}'s through
 the \class{StatisticProvider}.
@@ -208,7 +205,58 @@ It also enables sharing of different \class{Statistic}'s between
 \subsection{JUnit extensions}
 \label{subssec:JUnit extensions}
 
-\comment{TODO: RunNotificationSubscriber etc}
+Our implementation does not modify anything in \junit.
+The structure of \junit is used as much as possible.
+Only three classes were implemented which offer an extended or modified behaviour of \junit classes, as is discussed as follows.
+
+\subsubsection{FlattenedRequest and MethodRunner}
+
+For this assignment, a great level of flexibility is needed for ordering tests in the best possible order, so that the most relevant tests are executed first and the most relevant results are presented as fast as possible to the user.
+Therefore, it should be possible to compare all the tests with each other.
+
+The \junit \class{Request} class is used to get a \junit \class{Runner} which executes all tests.
+When a \class{Request} is created, all tests are configured in a hierarchy of \class{Runner}s.
+Consequently, the actual test methods are mostly nested a few levels deep in the hierarchy.
+It is not even required that all test methods are on the same level in the hierarchy.
+When a \class{Request} is sorted, for each node in the hierarchy, its direct children are sorted under each other.
+This is a problem, since an order should be imposed between \emph{all} tests.
+
+To accommodate this problem, the \class{FlattenedRequest} class is introduced.
+This class inherits from the \junit \class{Request}, and it flattens all tests in an existing request, so that all test methods are located on the same level in the hierarchy.
+More specifically, the runner of a \class{FlattenedRequest} is a \class{Suite}, which directly contains test methods as its children (no suites).
+This class is mostly based on \class{MaxCore} in the \junit experimental package.
+However, in \class{MaxCore}, the runners that represent a single test method are created via \class{Request.method}.
+This creates a runner for a test class, which is filtered for one test method.
+
+Here lies the problem: the \junit \class{Description} for this runner is the \class{Description} of the test \emph{class}!
+The runner therefore does not directly expose information on the test \emph{method} that it actually executes.
+Since an order is imposed by looking at the \class{Description}s of tests, the goal of being able to sort all methods directly is not achieved.
+
+To solve this problem, a custom runner is introduced: \class{MethodRunner}.
+This is a runner of which the \class{Description} directly is the \class{Description} of the actual test \emph{method}.
+A \class{MethodRunner} can be created for a certain test method in a certain class.
+From these details, the correct \class{Description} is created.
+Internally, this runner wraps another runner, which is created in the same way as in \junit: via \class{Request.method}.
+However, the importance of the \class{MethodRunner} lies in the correct \class{Description}.
+
+\subsubsection{RunNotificationSubscriber}
+
+In \junit, a \class{RunNotifier} is created, by which tests fire events in the testrun flow.
+Parties that are interested in these events can register a \class{RunListener} with this \class{RunNotifier}, so that they will be notified.
+
+However, the \class{RunNotifier} also exposes methods to fire these events.
+It is therefore dangerous to just pass this object to all parties that want to subscribe themselves, since they could fire events, which we don't want them to do.
+
+An alternative would be to ask for the listener of an interested party and register it ourselves.
+However, this is not our responsibility.
+
+Another approach is possible.
+Indeed, this problem can be solved by the Proxy pattern, more specifically, by a protection proxy.
+In this pattern, access is controlled to an object.
+This pattern is implemented by only exposing an \method{addListener} and \method{removeListener} method in the \class{RunNotificationSubscriber} class.
+These calls are delegated to the original \class{RunNotifier}.
+Other methods of the \class{RunNotifier} are not exposed.
+Whenever an object is interested in events of the testrun flow, it can be passed this \class{RunNotificationSubscriber}, by which it can subscribe itself.
 
 
 %-----DATA COLLECTORS-----
@@ -360,7 +408,7 @@ This creation, together with an example of a subscription of a listener, is illu
 
 \subsubsection{Improvement: chain of factories}
 
-Creating collectors is now done by \class{DataEnroller.createConfiguredDataEnroller}.
+Creating collectors is now done by \method{DataEnroller.createConfiguredDataEnroller}.
 This is not an optimal solution, since this is not the responsibility of the \class{DataEnroller}.
 This is now partially solved by putting the creational aspect inside a static method, that could easily be moved somewhere else.
 However, better designs exist.
@@ -375,6 +423,19 @@ By doing this, the \class{DataEnroller} can ask the chain to create a collector 
 The first factory in the chain would check if it can handle the request.
 If not, it passes the request to the next factory.
 If no link in the chain can handle the request, an exception would again be thrown.
+
+\subsubsection{Start and stop collecting}
+
+Some collectors have an expensive execution process.
+Consequently, if they are not used, they don't have to execute.
+Furthermore, some collectors use resources that should be released when the program ends or when an isolated piece of code has reached its end.
+An example of these resources are threads.
+When a collector should only be used a limited amount of time, there should be a possibility to stop it.
+For this reason, a collector has the methods \method{startCollecting()} and \method{stopCollecting()}.
+
+A simple example for which it is necessary to stop the collectors is in unit tests.
+Different unit tests need to be executed in isolation. 
+Therefore, one should be able to stop them.
 
 \subsubsection{Data collector implementations}
 
@@ -464,38 +525,16 @@ This isn't even a rare event. For example, Eclipse removes all subdirectories in
 As was said, a code change is notified of by linking it to the root test suite \class{Description}.
 While it can be argued that one is certain that a code change indeed applies to the root suite, this choice however is not great.
 Two alternatives can be thought of.
+
 The first would be that a data collector can also collect data items that are not tied to a \junit \class{Description}.
 The responsibility of a data collector would then shift to the responsibility of collecting just \emph{a} data item, instead of a data item that applies to a certain \class{Description}.
-However, a lot of classes notify others of new data, so they would al f
+However, a lot of classes notify others of new data, so this isn't really specific to a data collector.
 
+The other alternative would be that the \class{CodeChangeCollector} actually links the code change to the directly corresponding test.
+It would however not become responsible for computing this dependency information itself.
+Instead, it could retrieve this information from the \class{TestDependencyCollector}.
 
-
-%-------DAEMON--------
-
-\subsection{Daemon}
-\label{subssec: deamon}
-
-\class{Daemon} is responsible for repeated testing of a set of test classes. It monitors the directories of the tests and the nested classes. When a testrun is running it can message to the test-runs that a change in a file has occured. By handling the user input it will report the testrun that the active policy has changed or adding tests or removing tests . It will also receive the output of the testruns.  
-% 
-At the moment the \method{main} funtion is situated in the \class{Deamon}. This is not bounded with the \class{Deamon} but it was the most logical place to put the main. \class{Deamon} executes the testruns and if you would look for the \method{main()} you would search in the \class{Deamon}.
-
-A difference between de \class{JUnitCore} and Deamon is that we could provide the \class{JUnitCore} with several suites, but to \class{Deamon} we can only give one \class{rootSuiteClass}. This \class{rootSuiteClass} consists of multiple suitesclasses.
-
-Deamon functions as a Facade. It provides a simple interface. The Client will interact with the Deamon to the complex system that lays behind it.
-
-%redenen voor een facade en waarom het een facade is.
-
-% Facade ? 
-
-
-%figuur oud klassendiagram
-\begin{figure}[tbp]
-\begin{center}
-    \includegraphics[width=0.8\textwidth]{RunATestrun}
-    \caption{Sequence Diagram of a testrun}
-	\label{fig:seq testrun}
-\end{center}
-\end{figure}
+At this time however, none of these alternatives have been implemented.
 
 
 %-------STATISTICS-------
@@ -508,6 +547,14 @@ Deamon functions as a Facade. It provides a simple interface. The Client will in
 %    \includegraphics[width=\textwidth]{Statistics}
 %    \caption{Statistics Class Diagram}
 %	\label{fig:statistics}
+%\end{center}
+%\end{figure}
+
+%\begin{figure}[tbp]
+%\begin{center}
+%    \includegraphics[width=\textwidth]{Statistics-sd}
+%    \caption{Statistics Sequence Diagram}
+%	\label{fig:statistics-sd}
 %\end{center}
 %\end{figure}
 
@@ -642,12 +689,13 @@ Originally we wanted to implement policies so they could be combined,
 the composite pattern would be a good fit for this problem,
 we decided against this because it was not required by the assignment.
 However this would be a simple extension of the current design.
-This combination of policies would be useful for example when you want
-to use the frequent failure first policy but many tests fail with the
+
+This combination of policies would be useful for example when you use
+the frequent failure first policy but many tests fail with the
 same frequency, you might want all tests with the same frequency ordered
 by the last failure first policy.
-Another use would be using a policy that filters all tests that haven't
-failed yet together with a sorting policy.
+Another use would be combining a policy that filters all tests that 
+haven't failed yet with a sorting policy.
 
 \subsubsection{Frequent Failure First}
 
@@ -685,7 +733,7 @@ This is because it doesn't really matter if a certain test goes before
 another or not, what matters is that distinct failures are tested as 
 quickly as possible.
 For example if we have some tests (single methods) that failed in four
-different ways, let's say failures A, B, C and D, then any test from 
+different ways, let's say failures A, B, C and D, any test from 
 one of these can go first, let's say a test from C goes first, then 
 any test that failed on something different can go second, so now 
 tests from A, B and D have priority over tests from C (A, B, D < C), 
@@ -704,14 +752,14 @@ a policy is responsible for determining an order for tests,
 however what tests it does this for should not be explicit in the 
 policy.
 
-When you need to sort not single tests but an entire suites of tests the 
-ordering is even more difficult.
-One suite may cover a part or everything of another suite, one suite 
-may cover everything in two or more other suites but contain more tests 
-without a failure and thus be less interesting to execute even if the 
-suites it covers partly overlap.
+When you need to sort not only single tests but entire suites of tests 
+the ordering is even more difficult.
+One suite may cover a part of or everything another suite covers, one 
+suite may cover everything in two or more other suites but contain more 
+tests without a failure and thus be less interesting to execute even if 
+the suites it covers partly overlap.
 This problem is similar to but not quite the same as the
-"Set covering problem" (ref wikipedia), which is np-hard.
+"Set covering problem" \cite{scp}, which is np-hard.
 Because a complete and optimal solution is not critical and probably 
 not worth the computational effort, we chose to implement a suboptimal 
 solution. (i.e. a suite may go first if it contains a test that might 
@@ -719,7 +767,7 @@ have gone first if it was not in the suite. This suite could contain a
 method with a failure that has already been covered more times than any 
 other but we don't check for this.)
 We also decided to order single tests before suites for a specific 
-failure because this increases the rate at which results for different 
+failure, because this increases the rate at which results for different 
 failures can be shown, however between different failures a suite could 
 go before a single test.
 
@@ -727,46 +775,51 @@ What follows is a description of the algorithm we implemented as a
 suboptimal solution to this problem.
 (This algorithm determines an order and we will mention the term bucket,
 however this algorithm has little to do with Bucket sort.)
-When the DistinctFailureFirst policy is applied it first determines a 
-(nearly) total order for all the descriptions in the request it is 
-applied to.
+When the distinct failures first policy is applied it first determines a 
+(nearly) total order for all the \class{description}'s in the request it 
+is applied to.
+(It does not determine an order for \class{description}'s that have no
+failure.)
 The first step is to create a bucket for every failure that has 
 happened during the previous testrun.
 Then the bucket's are filled with every test and suite that fail on a 
 particular failure.
 A bucket contains every test(method) that fails on a certain failure 
 and every suite that contains a test that fails on that failure and a 
-counter for how many of it's descriptions have been selected.
-When the bucket's have been created an iterative process of selection is
+counter for how many of its \class{description}'s have been selected.
+When the buckets have been created an iterative process of selection is
 started:
 \begin{enumerate}
 	\item Choose a bucket with a minimal counter.
-	\item Pick a description from this bucket.
-	\item Remove this description from every bucket it appears in
+	\item Pick a \class{description} from this bucket.
+	\item Remove this \class{description} from every bucket it appears in
     		(in case of a suite).
-	\item Increment the counter for every bucket this description
+	\item Increment the counter for every bucket this \class{description}
     		appeared in.
-	\item Record the description in a list that will contain a total 
-    		order
-            (only for failed tests, not for tests that did not fail)
-			for all tests that failed.
+	\item Record the \class{description} in a list that will contain a 
+    		total order (only for failed tests, not for tests that did 
+            not fail) for all tests that failed.
 	\item Repeat until all buckets are empty (actually empty buckets 
     		are removed, so until you run out of buckets).
 \end{enumerate}
-This leaves the order for tests without failures undetermined, but this policy is only interested in failures so this doesn't matter.
             
 When using this policy's comparator the result is determined by the 
 following rules:
-If both descriptions appear in the list (total order) the order for the 
-list applies.
-If only one description appears in the list, it is ordered first.
-If both description do not appear in the list then the order is not 
-determined.
+If both \class{description}'s appear in the list (total order) the order 
+for the list applies.
+If only one \class{description} appears in the list, it is ordered first.
+If both \class{description}'s do not appear in the list then the order 
+is not determined.
 
 \subsubsection{Changed Code First}
 
-
-
+The changed code first policy runs tests for which the containing class 
+or the classes it tests have changed, first.
+This way new code or altered code is tested early on to give the 
+developer feedback as soon as possible.
+This policy uses \class{LastDependencyChangeStatistic} which contains the
+\class{Date} of the last dependency change and sorts tests with the most 
+recent dependency change date first.
 
 %-------------KLASSENDIAGRAMMA------------------------------------------
 %\subsection{Class diagrams} %-- Hier maken we geen aparte sectie van, en een volledig klassediagram zou veel groter moeten.
@@ -786,30 +839,57 @@ determined.
 
 
 
+%-------DAEMON--------
+
+\subsection{Daemon}
+\label{subssec: daemon}
+
+\Deamon is responsible for running a collection of tests 
+
+
+%figuur oud klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{RunATestrun}
+    \caption{Sequence Diagram of a testrun}
+	\label{fig:seq testrun}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Interaction with the user}
+
+Users must be notified when new results of tests are available.
+Minimal interaction is required in the other direction: a user could possibly change the active policy and he could request to immediately run a new testrun, as opposed to waiting on code changes.
+The user also needs to be able to stop the program.
+
+Different user interfaces should be supported.
+The first idea was to support this requirement by implementing the Model-View-Controller pattern.
+However, this pattern is rather heavy-weight, since the user interaction is mostly unidirectional: from the programming to the user.
+Moreover, \junit already has its own mechanism for this.
+Users of \junit can already be notified of these events by the use of \class{RunListener}s.
+
+
+
 %-------------Interactie Diagrammas-------------------------------------
 \subsection{Execution of Deamon}
 
-The execution of the application starts with the \method{main()} method that is situated in the \class{Deamon}. The \method{main()} asks for three parameters. The first parameter is the suite of tests, the second is the directory were the code is that will be tested and the third parameter is the directory where the tests that will be executed are situated. If the parameters are correct, the deamon class will be created and given the three parameters and a console of his deamon will be started.  
+The execution of the application starts with the \method{main()} method that is situated in the \class{Deamon}. The \method{main()} asks for three parameters. The first parameter is the suite of tests, the second is the directory were the code is that will be tested and the third parameter is the directory where the tests that will be executed are situated. If the parameters are correct, the daemon class will be created and given the three parameters and a console of his daemon will be started.  
 
-When a \class{Deamon} is created there is also a \class{runNotifier} created. After that a \class{runNotificationSubscriber} is created with the \class{runNotifier}. Then a \class{DataEnroller} is created with the \class{runNotificationSubscriber} and the three parameters given with the \method{main()} function. The \class{DataEnroller} will create multiple data collectors. After that a \class{StatisticProvider} is created with the \class{DataEnroller} and the \class{RunNotificationSubscriber}. This \class{StatisticProvider} will create \class{Statistics}. At last the \class{FileChangedListener} is created that a \class{DataCollectorListener} is that will listen to  code changes.
+When a \class{Daemon} is created there is also a \class{runNotifier} created. After that a \class{runNotificationSubscriber} is created with the \class{runNotifier}. Then a \class{DataEnroller} is created with the \class{runNotificationSubscriber} and the three parameters given with the \method{main()} function. The \class{DataEnroller} will create multiple data collectors. After that a \class{StatisticProvider} is created with the \class{DataEnroller} and the \class{RunNotificationSubscriber}. This \class{StatisticProvider} will create \class{Statistics}. At last the \class{FileChangedListener} is created that a \class{DataCollectorListener} is that will listen to  code changes.
 
 After \Deamon is created the \class{ConsoleView} is started. The \class{ConsoleView} will ask the user to provide an active policy out of the list of registered policies. When the user has chosen the active policie, the \class{ConsoleView} will start the \Deamon. After that the user can still use commands throught the console by entering the right command. This command can incluse changing of policy, queue with a new testrun or quit. 
 
-When \method{deamon.start()} is invoked in the \class{ConsoleView} it will subscribe to a \class{DataCollector} that collects data of code changes and it subscribes with the fileChangeListener that has been made previously. The \class{Semaphore} is set on one and the \method{startCore()} method is called. It will invoke the \class{Semaphore} to give a permit. In case of a grouped file changesm the system will stabilize first before really starting. After that the \method{doTestRun()} is invoked. This method will start the testrun.
+When \method{daemon.start()} is invoked in the \class{ConsoleView} it will subscribe to a \class{DataCollector} that collects data of code changes and it subscribes with the fileChangeListener that has been made previously. The \class{Semaphore} is set on one and the \method{startCore()} method is called. It will invoke the \class{Semaphore} to give a permit. In case of a grouped file changesm the system will stabilize first before really starting. After that the \method{doTestRun()} is invoked. This method will start the testrun.
 
 
 The \method{doTestRun()} method is where it really starts. First a classLoader is created with the paths of the code directory and the test directory. It will then try to create a rootSuiteClass with the name that was provided with the main and the classLoader.
-After that a \class{Request} is being made with the rootSuiteClass and the active policy. When the \class{Request} has been created, the runner is created of the \class{Request}. 
+After that a \class{Request} is being made with the rootSuiteClass and the active policy. When the \class{Request} has been created, the runner is created of the \class{Request}. Then the method \method{fireTestRunStarted()} is invoked on the \class{runNotifier} with the \class{/} of the \emph{runner}. This method indicates to the \emph{runNotifier} that the test run is started. 
+After that a \class{Result} is created and with that a \class{runListener} is created.  The \class{resultListener} must be the first listener added to the \class{runListener}. Then the \class{runner} is runned with the \class{runNotifier}. When the \class{runNotifier} is runned it will remove the \class{resultListener} and it will notify the \class{runNotifier} that the test run had finished.
 
-%The flow is as follows: first it will execute the main method. 
-
-%-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
-
-%Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
-%TODO klopt dit?
-%Then the \method{startCore()} method is called. Now the real execution of the Deamon is started
-%# TODO
-
+%TODO hitchhikersguide to the galaxy - adventure game
 
 
 %-----------------------------------------------------------------------
@@ -820,11 +900,13 @@ After that a \class{Request} is being made with the rootSuiteClass and the activ
 
 For testing the application a two-fold approach was used: unit tests for
 important classes and a dummy project to use the application on.
-%# Voor zo ver ik gezien heb gebruiken we niet echt mocks, mocks verzamelen intern ook gegevens over de tests (zo kan een methode bijhouden hoe veel keer die is opgeroepen en zo'n dingen) en bestaan uit meer dan alleen maar stubs van methoden die opgeroepen worden in de tests.
-%-- application vind ik eigenlijk niet zo'n goed woord voor wat we maken. En de two-fold is niet heel erg two-fold, we hebben geen twee manieren van testen, we hebben een nepproject om onze unit tests mee te kunnen doen.
-%# Ah ik dacht dat het dummy project ook diende om de daemon zelf op te testen?
-This dummy project includes some stub classes which contain methods that
-exhibit behaviour that is interesting to test on.
+There's a unit test for each \class{DataCollector}, for the 
+\class{LastFailureStatistic} and \class{MaxFailureCountStatistic}, and  \class{FlattenedRequest}.
+These unit tests make use of stub objects to simulate the external 
+components that some of these classes use.
+For example the test for \class{MaxFailureCountStatistic} 
+This dummy project also includes some stub classes which contain methods 
+that exhibit behaviour that is interesting to test on.
 For example there are classes that only include methods that throw 
 exceptions.
 There are also tests in this project that fail non-deterministically with 
@@ -838,29 +920,30 @@ to a test's failure rate happens correctly.
 %-----------------------------------------------------------------------
 \section{Project management}
 \label{ssec:Projectmanag}
-%taakverdeling elk lid en welke taak
-%uren
+%Een beschrijving van de taakverdeling voor elk teamlid: een concrete beschrijving van
+%elke taak en activiteit en de tijd die hierin werd genvesteerd.
+% Een schatting van de totale tijd die elk teamlid in dit project heeft genvesteerd
 
-We spent a lot of time on group discussions about the design of deamon and how we could implement everything. We did not always agree on everything and a lot of discussions followed. The first three weeks we spent a lot of time thinking about a good design for our program.\\ 
+The division of tasks was about the same for everybody. We worked in group most of the time. In figure \ref{tab:werkuren} the workhours per teammember can be seen for the different parts of the assignment. The different parts are various (setting up eclipse, visual paradigm, \junit, .. ), design, implementation and report. 
+
+In the first weeks the emphasis was layed on a good design. Our classdiagram was undergoing three big changes. We put a lot of time in making a good design. We did not always agree on everything and a lot of discussions followed. After a couple of sessions with the assistent we knew how to improve our design. 
 %-- Moet dit echt op deze manier? Het ligt toch nogal voor de hand dat we veel gediscussieerd/overlegd hebben als we er veel tijd in gestoken hebben. %% ja we zijn over de 40uur gegaan dat ze hadden gezegd en in verhouding hebben we veel meer gediscussieerd dan dat we geimplementeerd hebben
 
-In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. \\
+In the last half of week three and week four we started implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. After the implementation was done, the whole group worked on the report. During the design and implementation notes were kept in the wiki of GitHub.
 %TODO tekst
 
-The division of tasks was about the same for everybody. We worked in group most of the time. In figure \ref{tab:werkuren} the workhours per teammember can be seen for the different part of the assignment.
 
-\comment{alles aanvullen!!}
+
+
 \begin{table}[h!]
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
      & Joren & Toon & Stef & Sophie \\ \hline
-    Algemeen & 3u35 & 4u00 & 4u00 & 4u00\\
-           Tools & 00u00 & 00u00 & 00u00 & 00u00 \\
-        Analyse & 00u00 & 00u00 & 00u00 & 00u00 \\
+    Various & 3u35 & 4u00 & 4u00 & 4u00\\
         Design & 14u45 & 20u30 & 24u45 & 20u30 \\
-        Implementation & 00u00 & 00u00 & 00u00 & 00u00\\
-        Report & 9u00 & 9u00 & 9u00 & 9u00 \\
-        Total & 29u30 & 29u30 & 31u15 & 27u30  
+        Implementation & 28u00 & 24u30 & 40u30 & 16u50\\
+        Report & 9u00 & 10u00 & 14u00 & 14u40 \\
+        Total & 55u50 & 69u00 & 88u15 & 56u00  
     \end{tabular}
     \caption{Overview of the workhours per subject}
     \label{tab:werkuren}
@@ -939,8 +1022,11 @@ We spent a lot of time discussing the design of the \class{Daemon}. Sometimes we
 
 
 \begin{description}
+\item \gloss{CodeChange}\\
+\class{CodeChange} contains the name of a class that has changed and the date of the change.
+
 \item \gloss{CodeChangeCollector}\\
-The class \class{CodeChangeCollector} collects dqtq from files that have been modified in the directory of tests and in the directory of code being tested. 
+The class \class{CodeChangeCollector} collects data from files that have been modified in the directory of tests and in the directory of code being tested. 
 	
 
 \item \gloss{Collector}\\
@@ -956,7 +1042,7 @@ A comparator imposes a total ordening on some collection of objects
 A \class{DataCollector} is responsible for collecting a certain type of information on tests. Any type is possible because the class had a generic type.
 
 \item \gloss{DataEnroller}\\
-\comment{TODO}
+A \class{DataEnroller} class will internally keep track of data collectors and will delegate a subscription or unsubscription request of listeners to a collector that supports the requested type of \class{ITestData}.
 
 \item \gloss{Date}\\
 The class \class{Date} represents a specific instant in time, with millisecond precision.
@@ -979,8 +1065,14 @@ A \class{FailureTraceStatistic} is a \class{Statistic} that stores \class{Failur
 \item \gloss{FlattenedRequest}\\
 A \class{FLattenedRequest} flattens the test hierarchy of a given of a given \class{Request} by putting all the leaves at the same, single level. This can be useful to allow ordening of test methods across the levels and nodes of the original hierachy.
 
-\item \gloss{filtering}\\
-\comment{TODO}
+\item \gloss{ITestData} \\
+The class \class{ITestData} contains the data for a test.
+
+\item \gloss{java.nio.file} \\
+java.nio.file determines a package that defines interfaces and classes for the Java virtual machine to access files, file attributes, and file systems.
+
+\item \gloss{JUnitCore} \\
+\class{JUnitCore} is a facade for running tests. It will run the testruns.
 
 \item \gloss{LastDependencyChange} \\
 \class{LastDependencyChange} is a \class{teststatistic} that contains the date of the last change to a dependency for a test.
@@ -1001,10 +1093,21 @@ The \class{LastDependencyChangeStatistic} is a \class{Statistic} that makes use 
 \class{MaxCore} is a replacement for JUnitCore, which keeps track of runtime and failure history, and reorders tests to maximize the chances that a failing test occurs early in the test run.
 
 \item \gloss{MaxFailureCountStatistic} \\
-\comment{TODO}
+The class \class{MaxFailureCountStatistic} is a test class. It will check if the count is done right.
+
+\item \gloss{MethodCalls} \\
+The class \class{MethodCalls} has data of method calls for a test, that are produced by a \class{TestDependencyCollector}.
 
 \item \gloss{MethodRunner}\\
-\comment{TODO}
+A \class{MethodRunner} is a custom runner that has a \class{description} that directly corresponds with a testmethod.
+
+\item \gloss{Monitor} \\
+By subscribing a \class{Monitor} to the \class{MonitorEntrypoint} the notification of called methods is done. It receives notification for every method that is called.
+
+\item \gloss{OSSRewriter}\\
+The \class{OSSRewriter} can detect which code is being executed by a test. This tool has a java-agent that modifies the classes if they are being loaded in the virtual machine. At the beginning of each method, a callback is added to a monitor
+class. In this class self made monitors can be registered. In that way you
+can gather information on the execution of a test 
 
 \item \gloss{Policy} \\
 A \class{Policy} imposes an order or filtering 
@@ -1012,14 +1115,24 @@ A \class{Policy} imposes an order or filtering
 \item \gloss{Request} \\
 A \class{Request} is an abstract description of tests to be run. 
 
+\item \gloss{rootSuiteClass}\\
+A \class{rootSuiteClass} will contain all the tests that will run if the \Deamon is processed
+
+\item \gloss{RunListener} \\
+Junit provides support for adding listeners while executing the testcases via \class{RunListener}. 
+
 \item \gloss{Runner} \\  A \gloss{Runner} is created for each class implied by the \gloss{Request}. The \class{Runner} returns a detailed \class{Description} which is a tree structure of the tests to be run.
 
 \item \gloss{RunNotificationSubscriber} \\
-\comment{TODO}
+Whenever an object is interested in events of the testrun flow, it is passed to the \class{RunNotificationSubscriber}, by which it can subscribe to itself.
 
 
 \item \gloss{RunNotifier} \\
-\comment{TODO}
+A \class{RunNotifier} is a class, by which test fire events in the testrun flow.
+Parties that are interested in these events can register a \class{RunListener} with this \class{RunNotifier}, so that they will be notified.
+
+\item \gloss{Semaphore} \\
+A \class{Semaphore} maintains a set of permits. Each \method{acquire()} blocks if necessary until a permit is available, and then takes it. Each \method{release()} adds a permit, potentially releasing a blocking acquirer. However, no actual permit objects are used. So the \class{Semaphore} just keeps a count of the number available and acts accordingly.
 
 \item \gloss{SortingPolicy}\\
  A \class{SortingPolicy} determines an order for tests and suites. Examples of possible criteria for ordering: most frequent failures, shortest execution time.
@@ -1037,45 +1150,50 @@ A \class{StatisticProvider} keeps the statistics and it will provide the \class{
 \item \gloss{TestDependencyCollector} \\
 \class{TestDependencyCollector} is a \class{Collector} that collects all methods called by each test. This \class{Collector} assumes that the tests are run sequentially. If they are runned in parallel, the data collected by this \class{Collector} may be incorrect.
 
+\item \gloss{TestFailureCollector} \\
+A \class{TestFailureCollector} is a \class{Collector} that collects every failure for every test that is runned.
+
 
 \item \gloss{Testrun} \\ 
 	The run that executes the tests to be run.
 
 
 \item \gloss{Unit Tests} \\
-\comment{TODO}
+\class{Unit Tests} are test that will test pieces of the sourcecode (units). For every unit there exist one or more tests. 
 
- 
+\item \gloss{WatchService} \\
+The \class{WatchService} is used from the \class{java.nio.file} package. It watches registered objects for changes and events.
+
 \end{description}
 
 %TODO hier kunnen we de patterns en strategies in vermelden
 \newpage
-\comment{Dit mogen we zeker niet vergeten aan te passen.}
+
 \begin{flushleft}
 \begin{thebibliography}{9}
 
-\bibitem{TeamTreasure} 
-\textit{Team Treasure Trek}
+\bibitem{JUnit} 
+\textit{JUnit}
 \begin{scriptsize}
-geraadpleegd op 7/5/2013 via: \mbox{www.nintendo-europe.com/}
+geraadpleegd op 28/10/2013 via: \mbox{http://junit.sourceforge.net/javadoc/}
 \end{scriptsize}
 
-\bibitem{RabbitMQ}
-\textit{RabbitMQ}
+\bibitem{OSSRewriter}
+\textit{OSSRewriter}
 \begin{scriptsize}
-geraadpleegd op 7/5/2013 via: \mbox{http://en.wikipedia.org/wiki/RabbitMQ}
+geraadpleegd op 18/11/2013 via: \mbox{http://toledo.kuleuven.be}
 \end{scriptsize}
 
-\bibitem{mindstorms}
-\textit{Lego Mindstorms}
+\bibitem{Applying UML and Patterns}
+\textit{Applying UML and Patterns}
 \begin{scriptsize}
-geraadpleegd op 7/5/2013 via: \mbox{www.lego.com} en \mbox{http://en.wikipedia.org/wiki/Lego\textendash Mindstorms}
+geraadpleegd op 1/11/2013 
 \end{scriptsize}
 
-\bibitem{leJOS}
-\textit{leJOS}
+\bibitem{scp}
+\textit{Set Covering Problem}
 \begin{scriptsize}
-geraadpleegd op 7/5/2013 via: \mbox{http://lejos.sourceforge.net/}
+geraadpleegd op 25/11/2013 via: \mbox{http://en.wikipedia.org/wiki/Set\_cover\_problem}
 \end{scriptsize}
 
 
