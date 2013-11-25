@@ -160,24 +160,6 @@ It can make use of different \class{Policy}'s to order the tests that
 need to be run. 
 
 A \class{Policy} is responsible for transforming a \class{Request} into a \class{Request} that is run according to the rules of the \class{Policy}. 
-These can be all different kinds of rules, but only policies that sort the executing tests have been implemented. 
-An example of another possible rule is the filtering of requests.
-%# Ik kon niet zo direct iets anders bedenken dat ze zouden kunnen doen maar als iemand nog ergens op komt schrijf het er bij.
-The abstract \class{SortingPolicy} class implements a policy that can sort its executing test methods. It asks of its concrete classes only a comparator that determines an order between two \class{Description}s, which correspond to a test.
-All implemented sorting policies make use of \class{Statistic}s to determine
-an order for tests, but this is not required.
-At the moment, the following policies are supported: last failure first, 
-frequent failure first, distinct failure first and changed code 
-first.
-Each of these determines a different order that can be useful for
-developers.
-For example, tests that consistently order first under the frequent
-%failure first policy might indicate brittle/(badly written) code.
-failure first policy might indicate over-complicated or badly written code. 
-%# Ik heb nog nooit het woord brittle gebruikt zien worden voor code, het klinkt een beetje vreemd, maar als ge zeker weet dat Mario gaat weten wat ge bedoelt zet het er maar bij
-%-- Brittle betekent dat iets heel gemakkelijk breekt, iemand die engels spreekt zal dat wel begrijpen denk ik, slecht geschreven vindt ik een beetje teveel oordelend, misschien 'fragile'?
-%# Ja ik weet wat brittle betekent. Ik vind het alleen vreemd om code broos te noemen. Breekbaar misschien maar broos slaagt echt nergens op.
-%-- Hoe zegt ge dan breekbaar, iets dat broos is breekt als ge er te hard op slaagt. Maar zoals ik al zei moet het voor mij niet brittle zijn vandaar de /. Ik wil vooral duidelijk maken dat de code misschien wel werkt en ook goed geschreven kan zijn maar dat het misschien te ingewikkeld is voor mensen om te begrijpen en daardoor breekbaar, dus misschien: code that is too complicated and is often broken because of that, of iets in die trant?
 
 %# Ik heb dit stuk een beetje herschikt, het is op dit moment nog een beetje kort voor een eigen subsubsectie maar we kunnen het eventueel afsplitsen als het te groot wordt.
 To enable handling tests in different ways in response to different 
@@ -212,6 +194,16 @@ way using factories in a chain of responsibility.
 %# TODO nog iets vermelden over waarom we het niet doen, maar moet refereren naar stuk over collectors
 It also enables sharing of different \class{Statistic}'s between 
 \class{Policy}'s. \\
+
+
+%-----JUNIT EXTENSIONS----
+\subsection{JUnit extensions}
+\label{subssec:JUnit extensions}
+
+\comment{TODO: RunNotificationSubscriber etc}
+
+
+%-----DATA COLLECTORS-----
 
 \subsection{Data collectors}
 \label{subssec:Data collectors}
@@ -338,7 +330,7 @@ It is the collector itself that knows if it can produce a certain kind of \class
 Internally, this \class{DataEnroller} will ask each of its tracked \class{DataCollector}s if it can produce the requested type of data, until it finds one that can.
 To this collector, it will delegate the subscription or unsubscription request.
 
-If it does not find a collector that can produce the request type of data, a \class{NoSuitableCollectorException} is thrown to indicate that the request can't be handled.
+If it does not find a collector that can produce the requested type of data, a \class{NoSuitableCollectorException} is thrown to indicate that the request can't be handled.
 
 One thing that hasn't been discussed yet, is the creation of these collectors.
 It certainly not is the responsibility of an interested party to create a collector. 
@@ -358,9 +350,9 @@ This creation, together with an example of a subscription of a listener, is illu
 \end{center}
 \end{figure}
 
-\subsubsection{Improvements: chain of factories}
+\subsubsection{Improvement: chain of factories}
 
-Creating collectors now is done by \class{DataEnroller.createConfiguredDataEnroller}.
+Creating collectors is now done by \class{DataEnroller.createConfiguredDataEnroller}.
 This is not an optimal solution, since this is not the responsibility of the \class{DataEnroller}.
 This is now partially solved by putting the creational aspect inside a static method, that could easily be moved somewhere else.
 However, better designs exist.
@@ -402,12 +394,40 @@ Only the code under test should be looked at by this collector.
 Therefore, this collector needs to know which classes belong to the code under test.
 This is why the root directory of the code under test is passed when creating this collector.
 It traverses this directory and keeps track of a list of all class files that it finds.
-At this time, the collector knows which classes should be looked at for method calls, so it sets a
+At this time, the collector knows which classes should be looked at for method calls, so it sets an exclusion filter on the \class{OSSRewriter}, so that other classes won't be rewritten by the \class{OSSRewriter} and only called methods in these classes are being notified of.
 
+The actual notification of called methods is done by subscribing a \class{Monitor} to the \class{MonitorEntrypoint}, of which the \method{enterMethod(String methodName)} is called when a method of a rewritten class is entered. Note: these classes are classes of the \class{OSSRewriter} package, they are not written by us.
 
-%Stef: TODO werking van elke collector
+The only thing left to do, is determining which method call is executed by which test.
+This is why this collector also needs to be passed a \class{RunNotificationSubscriber} during creation.
+As with the \class{TestFailureCollector}, it will register an internal concrete \junit \class{RunListener}, which listens to the \emph{testStarted} and \emph{testFinished} event.
+In response to the \emph{testStarted} event, this collector creates a new list of called methods (represented by strings).
+The \emph{testStarted} event notifies of the end of a test, so this is the time that the collected method calls are complete. Consequently, a \class{MethodCalls} object is created with the collected list of called methods and interested parties are notified.
+Of course, between the two events, the \method{enterMethod} method of the \class{Monitor} adds the method it is being notified of to the current \class{MethodCalls} object.
 
-%Stef: TODO start/stopCollecting
+\subparagraph{Problems}
+
+There is, however, one problem with this approach for which we have not implemented a solution at this time.
+Tests running in parallel cause problems with the approach discussed here, since every \class{Monitor} receives notifications for every method that is called.
+Thus, the \class{Monitor} can not easily make a distinction between methods executed by different tests.
+
+One solution would be to check the stacktrace for each notification of a method execution. 
+From this, the executing test could be determined.
+However, it is suspected that this approach would be very expensive, since a stacktrace should be retrieved at each and every method call of the code under test.
+
+Another solution would be to check in which thread a called method is run in.
+This however is not always correct, since tests could cause other threads to be started.
+
+Thus, it appears there is no clear solution for this problem.
+Fortunately, the parallel scheduling of tests is only an experimental feature in \junit at this time.
+
+\comment{TODO: multiple instances problem}
+
+\paragraph{CodeChangeCollector}
+
+\comment{TODO}
+
+%-------DAEMON--------
 
 \subsection{Daemon}
 \label{subssec: deamon}
@@ -418,110 +438,18 @@ Three arguments are given with the execution. The first argument is the suite of
 %TODO klopt dit?
 Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
 
-\subsection{Policies}
-\label{subssec: Policies}
-
-\subsubsection{Distinct Failures First}
-
-The distinct failures first policy specifies the most difficult 
-ordering of tests.
-Even at the level of single tests (i.e. a single method in a testcase)
-the ordering is not trivial.
-This is because it doesn't really matter if a certain test goes before 
-another or not, what matters is that distinct failures are tested as 
-quickly as possible.
-For example if we have some tests (single methods) that failed in four
-different ways, let's say failures A, B, C and D, then any test from 
-one of these can go first, let's say a test from C goes first, then 
-any test that failed on something different can go second, so now 
-tests from A, B and D have priority over tests from C (A, B, D < C), 
-when one test from every category has been executed, the order is again 
-undefined.
-This is a problem for the current implementation of \junit's 
-\class{request} class.
-This class uses a comparator to sort all of its tests, but as we can 
-see, you can not define an order between any two tests because that 
-order depends on what tests have already been chosen.
-Because of this we decided that the distinct failures first policy would
-determine a complete order for all it's tests.
-This is a slight breach of the responsibilities of a sortingpolicy,
-a policy is responsible for determining an order for tests,
-however what tests it does this for should not be explicit in the 
-policy.
-When you need to sort not single tests but entire suites of tests the 
-ordering is even more difficult.
-One suite may cover a part or everything of another suite, one suite 
-may cover everything in two or more other suites but contain more tests 
-without a failure and thus be less interesting to execute even if the 
-suites it covers partly overlap.
-This problem is similar to but not quite the same as the
-"Set covering problem" (ref wikipedia), which is np-hard.
-Because a complete and optimal solution is not critical and probably 
-not worth the computational effort, we chose to implement a suboptimal 
-solution. (i.e. a suite may go first if it contains a test that might 
-have gone first if it was not in the suite. This suite could contain a 
-method with a failure that has already been covered more times than any 
-other but we don't check for this.)
-We also decided to order single tests before suites for a specific 
-failure because this increases the rate at which results for different 
-failures can be shown, however between different failures a suite could 
-go before a single test.
-
-What follows is a description of the algorithm we implemented as a 
-suboptimal solution to this problem.
-(This algorithm determines an order and we will mention the term bucket,
-however this algorithm has little to do with Bucket sort.)
-When the DistinctFailureFirst policy is applied it first determines a 
-(nearly) total order for all the descriptions in the request it is 
-applied to.
-The first step is to create a bucket for every failure that has 
-happened during the previous testrun.
-Then the bucket's are filled with every test and suite that fail on a 
-particular failure.
-A bucket contains every test(method) that fails on a certain failure 
-and every suite that contains a test that fails on that failure and a 
-counter for how many of it's descriptions have been selected.
-When the bucket's have been created an iterative process of selection is
-started:
-\begin{enumerate}
-	\item Choose a bucket with a minimal counter.
-	\item Pick a description from this bucket.
-	\item Remove this description from every bucket it appears in
-    		(in case of a suite).
-	\item Increment the counter for every bucket this description
-    		appeared in.
-	\item Record the description in a list that will contain a total 
-    		order
-            (only for failed tests, not for tests that did not fail)
-			for all tests that failed.
-	\item Repeat until all buckets are empty (actually empty buckets 
-    		are removed, so until you run out of buckets).
-	\item This leaves the order for tests without failures 
-    		undetermined, but this policy is only interested in 
-           	failures so this doesn't matter.
-\end{enumerate}
-When using this policy's comparator the result is determined by the 
-following rules:
-If both descriptions appear in the list (total order) the order for the 
-list applies.
-If only one description appears in the list, it is ordered first.
-If both description do not appear in the list then the order is not 
-determined.
-
-
-\subsubsection{Frequent Failure First}
+% Facade ? 
 
 
 
-\subsubsection{Last Failure First}
 
 
-
-\subsubsection{Changed Code First}
-
+%-------STATISTICS-------
 
 \subsection{Statistics}
 \label{subssec: statistics}
+
+\class{Statistic}'s 
 
 The implemented \class{Statistic}'s will be discussed here in greater 
 detail.
@@ -561,6 +489,158 @@ The \class{Statistic} then combines these data into
 These objects wrap the most recent date at which a dependency of the 
 test it's associated with changed.
 \end{description}
+
+The statistics that are returned by \class{Statistic}'s implement the
+\class{ITestStatistic} interface.
+This interface specifies only the \method{getTestDescription()} method 
+(perhaps not the most general name as the \class{Description} it returns
+could be for a single test or a suite of tests).
+Each implementing class then provides a getter method for the object it
+wraps.
+
+As with the \class{DataCollector}'s the abstract \class{Statistic} class
+is generic in the type of \class{ITestStatistic} it returns but concrete
+classes fill in this generic parameter to indicate which implementing
+type of \class{ITestStatistic} they return, also to eliminate type 
+checking that would be necessary in the \class{Policy}'s that receive
+the collected \class{ITestStatistic}'s.
+
+\class{Policy}'s that need the statistic value for a certain test call
+the \method{getTestStatistic()} method on the \class{Statistic} object
+they received from the \class{StatisticProvider}.
+The \class{Statistic} does not (need to) know about what kind of objects
+request this statistic data.
+The clients of the \class{Statistic} class also don't need to be 
+notified when the statistic value for a test changes as they may only
+need a small subset of the available \class{ITestStatistic}'s and don't
+need to be up-to-date on all of them all of the time.
+
+The \class{StatisticProvider} is passed to a \class{Policy} on creation.
+
+
+%------POLICIES-------
+
+\subsection{Policies}
+\label{subssec: Policies}
+
+Policies determine certain properties of a testrun, examples are
+the order of tests and which tests are allowed to run (a filter).
+The abstract \class{SortingPolicy} defines the behaviour of sorting
+policies with a template method, policies that extend this class have
+only to implement a method \method{getComparator} that returns a 
+\class{Comparator} that can compare two \class{Description}'s.
+All implemented sorting policies make use of \class{Statistic}s to 
+determine an order for tests, but this is not required.
+At the moment, the following policies are supported: last failure first, 
+frequent failure first, distinct failures first and changed code  first.
+Each of these determines a different order that can be useful for
+developers.
+For example, tests that consistently order first under the frequent
+failure first policy might indicate over-complicated or fragile code.
+Originally we 
+
+\subsubsection{Distinct Failures First}
+
+The distinct failures first policy specifies the most difficult 
+ordering of tests.
+Even at the level of single tests (i.e. a single method in a testcase)
+the ordering is not trivial.
+This is because it doesn't really matter if a certain test goes before 
+another or not, what matters is that distinct failures are tested as 
+quickly as possible.
+For example if we have some tests (single methods) that failed in four
+different ways, let's say failures A, B, C and D, then any test from 
+one of these can go first, let's say a test from C goes first, then 
+any test that failed on something different can go second, so now 
+tests from A, B and D have priority over tests from C (A, B, D < C), 
+when one test from every category has been executed, the order is again 
+undefined.
+
+
+
+This is a problem for the current implementation of \junit's 
+\class{request} class.
+This class uses a comparator to sort all of its tests, but as we can 
+see, you can not define an order between any two tests because that 
+order depends on what tests have already been chosen.
+Because of this we decided that the distinct failures first policy would
+determine a complete order for all it's tests.
+This is a slight breach of the responsibilities of a sortingpolicy,
+a policy is responsible for determining an order for tests,
+however what tests it does this for should not be explicit in the 
+policy.
+
+
+When you need to sort not single tests but an entire suites of tests the 
+ordering is even more difficult.
+One suite may cover a part or everything of another suite, one suite 
+may cover everything in two or more other suites but contain more tests 
+without a failure and thus be less interesting to execute even if the 
+suites it covers partly overlap.
+This problem is similar to but not quite the same as the
+"Set covering problem" (ref wikipedia), which is np-hard.
+Because a complete and optimal solution is not critical and probably 
+not worth the computational effort, we chose to implement a suboptimal 
+solution. (i.e. a suite may go first if it contains a test that might 
+have gone first if it was not in the suite. This suite could contain a 
+method with a failure that has already been covered more times than any 
+other but we don't check for this.)
+We also decided to order single tests before suites for a specific 
+failure because this increases the rate at which results for different 
+failures can be shown, however between different failures a suite could 
+go before a single test.
+
+
+What follows is a description of the algorithm we implemented as a 
+suboptimal solution to this problem.
+(This algorithm determines an order and we will mention the term bucket,
+however this algorithm has little to do with Bucket sort.)
+When the DistinctFailureFirst policy is applied it first determines a 
+(nearly) total order for all the descriptions in the request it is 
+applied to.
+The first step is to create a bucket for every failure that has 
+happened during the previous testrun.
+Then the bucket's are filled with every test and suite that fail on a 
+particular failure.
+A bucket contains every test(method) that fails on a certain failure 
+and every suite that contains a test that fails on that failure and a 
+counter for how many of it's descriptions have been selected.
+When the bucket's have been created an iterative process of selection is
+started:
+\begin{enumerate}
+	\item Choose a bucket with a minimal counter.
+	\item Pick a description from this bucket.
+	\item Remove this description from every bucket it appears in
+    		(in case of a suite).
+	\item Increment the counter for every bucket this description
+    		appeared in.
+	\item Record the description in a list that will contain a total 
+    		order
+            (only for failed tests, not for tests that did not fail)
+			for all tests that failed.
+	\item Repeat until all buckets are empty (actually empty buckets 
+    		are removed, so until you run out of buckets).
+\end{enumerate}
+This leaves the order for tests without failures undetermined, but this policy is only interested in failures so this doesn't matter.
+            
+When using this policy's comparator the result is determined by the 
+following rules:
+If both descriptions appear in the list (total order) the order for the 
+list applies.
+If only one description appears in the list, it is ordered first.
+If both description do not appear in the list then the order is not 
+determined.
+
+\subsubsection{Frequent Failure First}
+
+
+
+\subsubsection{Last Failure First}
+
+
+
+\subsubsection{Changed Code First}
+
 
 %-------------KLASSENDIAGRAMMA------------------------------------------
 %\subsection{Class diagrams} %-- Hier maken we geen aparte sectie van, en een volledig klassediagram zou veel groter moeten.
@@ -648,7 +728,7 @@ to a test's failure rate happens correctly.
 We spent a lot of time on group discussions about the design of deamon and how we could implement everything. We did not always agree on everything and a lot of discussions followed. The first three weeks we spent a lot of time thinking about a good design for our program.\\ 
 %-- Moet dit echt op deze manier? Het ligt toch nogal voor de hand dat we veel gediscussieerd/overlegd hebben als we er veel tijd in gestoken hebben. %% ja we zijn over de 40uur gegaan dat ze hadden gezegd en in verhouding hebben we veel meer gediscussieerd dan dat we geimplementeerd hebben
 
-In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and did not have much time to help with the implementation. \\
+In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. \\
 %TODO tekst
 
 The division of tasks was about the same for everybody. We worked in group most of the time. 
@@ -760,6 +840,7 @@ A comparator imposes a total ordening on some collection of objects
 A \class{DataCollector} is responsible for collecting a certain type of information on tests. Any type is possible because the class had a generic type.
 
 \item \gloss{DataEnroller}\\
+\comment{TODO}
 
 \item \gloss{Date}\\
 The class \class{Date} represents a specific instant in time, with millisecond precision.
@@ -783,7 +864,7 @@ A \class{FailureTraceStatistic} is a \class{Statistic} that stores \class{Failur
 A \class{FLattenedRequest} flattens the test hierarchy of a given of a given \class{Request} by putting all the leaves at the same, single level. This can be useful to allow ordening of test methods across the levels and nodes of the original hierachy.
 
 \item \gloss{filtering}\\
-
+\comment{TODO}
 
 \item \gloss{LastDependencyChange} \\
 \class{LastDependencyChange} is a \class{teststatistic} that contains the date of the last change to a dependency for a test.
@@ -804,8 +885,10 @@ The \class{LastDependencyChangeStatistic} is a \class{Statistic} that makes use 
 \class{MaxCore} is a replacement for JUnitCore, which keeps track of runtime and failure history, and reorders tests to maximize the chances that a failing test occurs early in the test run.
 
 \item \gloss{MaxFailureCountStatistic} \\
+\comment{TODO}
 
-\item \gloss{MethodRunner}
+\item \gloss{MethodRunner}\\
+\comment{TODO}
 
 \item \gloss{Policy} \\
 A \class{Policy} imposes an order or filtering 
@@ -816,17 +899,21 @@ A \class{Request} is an abstract description of tests to be run.
 \item \gloss{Runner} \\  A \gloss{Runner} is created for each class implied by the \gloss{Request}. The \class{Runner} returns a detailed \class{Description} which is a tree structure of the tests to be run.
 
 \item \gloss{RunNotificationSubscriber} \\
+\comment{TODO}
 
 
-\item \gloss{RunNotifier}
+\item \gloss{RunNotifier} \\
+\comment{TODO}
 
-\item \gloss{SortingPolicy}
+\item \gloss{SortingPolicy}\\
+ A \class{SortingPolicy} determines an order for tests and suites. Examples of possible criteria for ordering: most frequent failures, shortest execution time.
 
-\item \gloss{Statistic}
+\item \gloss{Statistic} \\
+A \class{Statistic} listens to ITestData for tests and creates ITestStatistics for those tests.
+%TODO misschien nog niet duidelijk zo
 
-\item \gloss{StatisticPool}
-
-\item \gloss{StatisticProvider}
+\item \gloss{StatisticProvider} \\
+A \class{StatisticProvider} keeps the statistics and it will provide the \class{Policy} with the right \class{Statistic}.
 
 \item \gloss{Testclass} \\
  A \class{TestClass} wraps a class to be run, providing method validation and annotation searching.
@@ -838,9 +925,9 @@ A \class{Request} is an abstract description of tests to be run.
 \item \gloss{Testrun} \\ 
 	The run that executes the tests to be run.
 
-\item \gloss{TestRunStarted}
 
-\item \gloss{Unit Tests}
+\item \gloss{Unit Tests} \\
+\comment{TODO}
 
  
 \end{description}
@@ -878,36 +965,6 @@ geraadpleegd op 7/5/2013 via: \mbox{http://lejos.sourceforge.net/}
 
 \end{thebibliography}
 \end{flushleft}
-
-Daemon met een policy en een testinformation Klasse en een Statistic information 
-
-Pattern Model-View-Controller
-View:  GUI, CLI, passive view
-Controller:
-Input besturingsview, handeld input/output
-Model: Daemon, Policy, TestInfomation, DataCollector, Statistic, TestRun
-Daemon is bedoeld als interface voor het model
-\\
-Verantwoordelijkheden
-Policy: ordening, filtering
-Statistic: berekent de statistieken, legt een strategie vast om data op te vragen.
-TestInformation:  Houdt de statistieken bij (alles dat uit de collectors wordt opgevraagd)
-DataCollector: Data verzameling, inpluggen in een TestRun, change code bijhouden (apart in een andere Collector)
-Daemon:  Starten van TestRuns
-TestRun:  runnen van testen
-\\
-Implementaties:
-Policy als Composit/Decorator/Strategy
-We weten niet zeker of het een composit is want er werd getwijfeld tussen Composit en Decorator Pattern. 
-Statistic en DataCollector zijn een Strategy
-TestInfomation
-Eerst mapte Description met een lijst van tuples. Dit is veranderd naar TestSummary
-Map\textless Description,OrderedSet\textless TestSummary\textgreater \textgreater
-	TestSummary	-Map\textless Collector, Object\textgreater
-			- TestID \\
-We streven voor low-coupling. 
-
-Verslag: beginnen met de analyse van wat we nodig hebben en daarna uitleggen hoe we dit oplossen en analyseren en bediscussi\"eren.
 
  
 
