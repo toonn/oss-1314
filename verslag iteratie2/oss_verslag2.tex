@@ -292,9 +292,9 @@ They have no reason to be, since they should know which data they collect.
 For example, a \class{TestFailureCollector<MethodCalls>} would not make sense.
 Therefore, the collectors are declared as follows, as is seen in figure \ref{fig:diagram:collectors}:
 \begin{description}
-\item[TestFailureCollector extends DataCollector<TestFailure>] collects failures of tests
-\item[TestDependencyCollector extends DataCollector<MethodCalls>] collects the dependencies of a test, i.e. the methods that it calls
-\item[CodeChangeCollector extends DataCollector<CodeChange>] collects code changes that apply to tests
+\item[TestFailureCollector extends DataCollector<TestFailure>] \hfill \\ collects failures of tests
+\item[TestDependencyCollector extends DataCollector<MethodCalls>] \hfill \\ collects the dependencies of a test, i.e. the methods that it calls
+\item[CodeChangeCollector extends DataCollector<CodeChange>] \hfill \\ collects code changes that apply to tests
 \end{description}
 
 It follows that the \class{IDataCollectedListener} interface should also be generic (\class{IDataCollectedListener<T extends ITestData>}), since interested parties want to be notified only of a certain known concrete \class{ITestData} type.
@@ -373,7 +373,8 @@ If no link in the chain can handle the request, an exception would again be thro
 Three types of collectors have been implemented, as can be seen in the class diagram in figure \ref{fig:diagram:collectors}.
 They each are discussed in the following paragraphs.
 
-\paragraph{TestFailureCollector}
+\paragraph{TestFailureCollector} 
+\hfill
 
 The \class{TestFailureCollector} extends \class{DataCollector<TestFailure>}.
 As such, it notifies interested parties of \class{TestFailure}s it collects.
@@ -382,8 +383,8 @@ Subscribed \class{RunListener}s are notified by \junit when events in the flow o
 The event this collector needs is the event of a test failure.
 When this event occurs, it will wrap the \junit failure inside a \class{TestFailure} instance, which this collector then passes to its subscribed interested parties.
 
-\paragraph{TestDependencyCollector}
-
+\paragraph{TestDependencyCollector} 
+\hfill \\
 The \class{TestDependencyCollector} extends \class{DataCollector<MethodCalls>}.
 It will notify interested parties when it has collected a \class{MethodCalls} instance.
 This \class{MethodCalls} object contains a list of methods that have been called by a test.
@@ -405,7 +406,7 @@ In response to the \emph{testStarted} event, this collector creates a new list o
 The \emph{testStarted} event notifies of the end of a test, so this is the time that the collected method calls are complete. Consequently, a \class{MethodCalls} object is created with the collected list of called methods and interested parties are notified.
 Of course, between the two events, the \method{enterMethod} method of the \class{Monitor} adds the method it is being notified of to the current \class{MethodCalls} object.
 
-\subparagraph{Problems}
+\subparagraph{Unsolved issues}
 
 There is, however, one problem with this approach for which we have not implemented a solution at this time.
 Tests running in parallel cause problems with the approach discussed here, since every \class{Monitor} receives notifications for every method that is called.
@@ -419,7 +420,7 @@ Another solution would be to check in which thread a called method is run in.
 This however is not always correct, since tests could cause other threads to be started.
 
 Thus, it appears there is no clear solution for this problem.
-Fortunately, the parallel scheduling of tests is only an experimental feature in \junit at this time.
+Fortunately, the parallel scheduling of tests is only an experimental feature in \junit at this time, but in the future, this could become a problem.
 
 \comment{TODO: multiple instances problem}
 
@@ -432,16 +433,29 @@ Fortunately, the parallel scheduling of tests is only an experimental feature in
 \subsection{Daemon}
 \label{subssec: deamon}
 
-\class{Daemon} is the core of the program. %-- daemon start alles maar is het daarom ook de core?
-It is responsible for running the tests. The flow is as follows: first it will execute the main method. %-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
-Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
+\class{Daemon} is responsible for repeated testing of a set of test classes. It monitors the directories of the tests and the nested classes. When a testrun is running it can message to the test-runs that a change in a file has occured. By handling the user input it will report the testrun that the active policy has changed. It will also receive the output of the testruns. 
+Deamon functions as a Facade. It provides a simple interface. %-- daemon start alles maar is het daarom ook de core?
+ 
+
+%The flow is as follows: first it will execute the main method. 
+
+%-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
+
+%Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
 %TODO klopt dit?
-Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
+%Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
 
 % Facade ? 
 
 
-
+%figuur oud klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{RunATestrun}
+    \caption{Sequence Diqgram of a testrun}
+	\label{fig:seq testrun}
+\end{center}
+\end{figure}
 
 
 %-------STATISTICS-------
@@ -516,6 +530,21 @@ need a small subset of the available \class{ITestStatistic}'s and don't
 need to be up-to-date on all of them all of the time.
 
 The \class{StatisticProvider} is passed to a \class{Policy} on creation.
+To get its needed \class{Statistic}(s) it passes the class of the 
+\class{ITestStatistic}(s) it requires to the \class{StatisticProvider}
+which then returns a \class{Statistic} that can produce this kind of
+\class{ITestStatistic}.
+To know which \class{Statistic} object to return the 
+\class{StatisticProvider} keeps a \class{Set} of \class{Statistic}'s 
+that are queried when a \class{Policy} requests a \class{Statistic}.
+The \class{StatisticProvider} calls the \method{canSummarize()} method
+on every \class{Statistic} in the set with the given 
+\class{ITestStatistic} class and returns the first \class{Statistic}
+for which this method returns \emph{true}.
+In this way \class{Statistic}'s can be shared between \class{Policy}'s
+which ensures consistency (if 2 different \class{Policy}'s request the
+same statistic for the same test the response does not depend on when
+the \class{Statistic} that that 
 
 
 %------POLICIES-------
@@ -537,7 +566,17 @@ Each of these determines a different order that can be useful for
 developers.
 For example, tests that consistently order first under the frequent
 failure first policy might indicate over-complicated or fragile code.
-Originally we 
+
+Originally we wanted to implement policies so they could be combined,
+the composite pattern would be a good fit for this problem,
+we decided against this because it was not required by the assignment.
+However this would be a simple extension of the current design.
+This combination of policies would be useful for example when you want
+to use the frequent failure first policy but many tests fail with the
+same frequency, you might want all tests with the same frequency ordered
+by the last failure first policy.
+Another use would be using a policy that filters all tests that haven't
+failed yet together with a sorting policy.
 
 \subsubsection{Distinct Failures First}
 
@@ -731,9 +770,9 @@ We spent a lot of time on group discussions about the design of deamon and how w
 In the last half of week three and week four we started  implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. \\
 %TODO tekst
 
-The division of tasks was about the same for everybody. We worked in group most of the time. 
+The division of tasks was about the same for everybody. We worked in group most of the time. In figure \ref{tab:werkuren} the workhours per teammember can be seen for the different part of the assignment.
 
-%TODO laatste week aanvullen!!
+\comment{alles aanvullen!!}
 \begin{table}[h!]
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
@@ -969,6 +1008,3 @@ geraadpleegd op 7/5/2013 via: \mbox{http://lejos.sourceforge.net/}
  
 
 \end{document}
-
-
-
