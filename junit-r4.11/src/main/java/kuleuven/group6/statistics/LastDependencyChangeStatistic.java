@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
@@ -36,7 +36,7 @@ public class LastDependencyChangeStatistic extends
 	
 
 	protected class CodeChangeListener implements
-			DataCollectedListener<CodeChange> {
+			IDataCollectedListener<CodeChange> {
 
 		@Override
 		public void dataCollected(CodeChange data) {
@@ -46,7 +46,7 @@ public class LastDependencyChangeStatistic extends
 	}
 
 	protected class TestDependencyListener implements
-			DataCollectedListener<MethodCalls> {
+			IDataCollectedListener<MethodCalls> {
 
 		@Override
 		public void dataCollected(MethodCalls data) {

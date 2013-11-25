@@ -1,7 +1,7 @@
 package kuleuven.group6.statistics;
 
 import org.junit.runner.Description;
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
@@ -17,7 +17,7 @@ public abstract class FailureCountStatistic extends Statistic<FailureCount> {
 	}
 
 	protected class FailureCountListener implements
-			DataCollectedListener<TestFailure> {
+			IDataCollectedListener<TestFailure> {
 
 		@Override
 		public void dataCollected(TestFailure data) {

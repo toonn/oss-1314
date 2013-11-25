@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
-
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.DataEnroller;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.policies.*;
@@ -39,7 +38,7 @@ public class Daemon {
 	protected String activePolicyName = null;
 	protected Thread runThread = null;
 	protected Semaphore mayRunSemaphore = null;
-	protected DataCollectedListener<CodeChange> fileChangedListener;
+	protected IDataCollectedListener<CodeChange> fileChangedListener;
 
 	protected Daemon(String rootSuiteClassName, File codeDirectory, File testDirectory) {
 		if (! codeDirectory.exists() || ! codeDirectory.isDirectory() ||
@@ -59,7 +58,7 @@ public class Daemon {
 		this.statisticProvider = StatisticProvider.createConfiguredStatisticProvider(
 				dataEnroller, runNotificationSubscriber);
 		
-		this.fileChangedListener = new DataCollectedListener<CodeChange>() {
+		this.fileChangedListener = new IDataCollectedListener<CodeChange>() {
 			@Override
 			public void dataCollected(CodeChange data) {
 				onFileChanged();
@@ -201,17 +200,12 @@ public class Daemon {
 
 
 	/**
-	 *  //TODO Uitleggen. heb misschien niet goed begrepen 
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-
 	protected void doTestRun() throws Exception {
 		URL[] paths = { 
 			codeDirectory.toURI().toURL(), 
 			testDirectory.toURI().toURL()
-			// TODO waarom hebben we hier een verschil nu ook alweer tussen code en test?
 		};
 		URLClassLoader classLoader = URLClassLoader.newInstance(paths);
 		try {
@@ -221,11 +215,11 @@ public class Daemon {
 			Request request = createNewRequest(rootSuiteClass);
 			// creating a runner that is the runner of the above request
 			Runner runner = request.getRunner();
-			
+
 			// ..
 			runNotifier.fireTestRunStarted(runner.getDescription());
-			
 			// collects the information from the running tests
+
 			Result result = new Result();
 			// creating a runlistener from result
 			RunListener resultListener = result.createListener();
@@ -243,7 +237,6 @@ public class Daemon {
 		// rootSuiteClass contains all the tests that will be run if request is processed
 		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
-		
 		// the active Policy is applied on the request
 		return getActivePolicy().apply(flattenedRequest);
 	}

@@ -2,7 +2,7 @@ package kuleuven.group6.statistics;
 
 import java.util.Date;
 
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
@@ -24,7 +24,7 @@ public class LastFailureStatistic extends Statistic<LastFailureDate> {
 	}
 
 	protected class LastFailureListener implements
-			DataCollectedListener<TestFailure> {
+			IDataCollectedListener<TestFailure> {
 
 		@Override
 		public void dataCollected(TestFailure data) {

@@ -10,9 +10,9 @@ import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 public interface IDataEnroller {
 
 	public <T extends ITestData> void subscribe(Class<T> testDataClass,
-			DataCollectedListener<? super T> listener);
+			IDataCollectedListener<? super T> listener);
 	public <T extends ITestData> void unsubscribe(Class<T> testDataClass,
-			DataCollectedListener<? super T> listener);
+			IDataCollectedListener<? super T> listener);
 
 	public void close();
 

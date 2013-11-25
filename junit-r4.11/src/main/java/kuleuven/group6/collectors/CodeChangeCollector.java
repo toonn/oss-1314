@@ -46,11 +46,13 @@ public class CodeChangeCollector extends DataCollector<CodeChange> {
 			watchService = FileSystems.getDefault().newWatchService();
 		} catch (IOException e) {
 			e.printStackTrace();
+			// TODO may not continue after this!!!
 		}
 		registerPathRecursive(absoluteTestDir);
 		registerPathRecursive(absoluteCodeDir);
 		//Start watching directories
 		ccwt = new CodeChangeWatchThread();
+		ccwt.setDaemon(true);
 		ccwt.start();
 	}
 	

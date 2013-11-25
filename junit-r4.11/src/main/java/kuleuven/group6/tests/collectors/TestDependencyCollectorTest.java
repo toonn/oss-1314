@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.TestDependencyCollector;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
 import kuleuven.group6.tests.testsubject.source.Dummy;
@@ -141,7 +141,7 @@ public class TestDependencyCollectorTest {
 	}
 
 	
-	protected class CallTraceListener implements DataCollectedListener<MethodCalls> {
+	protected class CallTraceListener implements IDataCollectedListener<MethodCalls> {
 		
 		@Override
 		public void dataCollected(MethodCalls methodCalls) {
