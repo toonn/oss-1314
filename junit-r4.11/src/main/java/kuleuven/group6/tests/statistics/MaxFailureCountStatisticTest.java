@@ -15,7 +15,7 @@ import org.junit.runner.notification.Failure;
 
 /**
  * 
- * @author Team 6
+ * @author Team 6 TODO beschrijvind klasse maxfailurecountstatistictest
  *
  *
  */

@@ -3,7 +3,7 @@ package kuleuven.group6.testcharacteristics.teststatistics;
 import org.junit.runner.Description;
 
 /**
- * Contains the failurCount for a test.
+ * Contains the numbers of failures of a test.
  */
 public class FailureCount implements ITestStatistic {
 

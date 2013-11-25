@@ -4,7 +4,8 @@ import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
 /**
  * This interface provides a way to subscribe to a DataCollector that collects a
- * specific kind of data.
+ * specific kind of data. 
+ * TODO
  */
 public interface IDataEnroller {
 

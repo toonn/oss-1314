@@ -7,9 +7,9 @@ import java.util.Set;
 import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 
-/*
- * (non-Javadoc)
- * @see IDataEnroller
+/**
+ * 
+ * The DataEnroller .. TODO
  *
  */
 public class DataEnroller implements IDataEnroller {

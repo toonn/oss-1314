@@ -215,15 +215,22 @@ public class Daemon {
 		};
 		URLClassLoader classLoader = URLClassLoader.newInstance(paths);
 		try {
+			// creating rootSuiteClass of instance Class<?>
 			Class<?> rootSuiteClass = Class.forName(rootSuiteClassName, true, classLoader);
+			// creating a request with rootSuitClass and the active policy
 			Request request = createNewRequest(rootSuiteClass);
+			// creating a runner that is the runner of the above request
 			Runner runner = request.getRunner();
 			
+			// ..
 			runNotifier.fireTestRunStarted(runner.getDescription());
-			//TODO fireTestRunStarted ? do not invoke? 
+			
+			// collects the information from the running tests
 			Result result = new Result();
+			// creating a runlistener from result
 			RunListener resultListener = result.createListener();
 			runNotifier.addFirstListener(resultListener);
+			// run the runner with the runNotifier
 			runner.run(runNotifier);
 			runNotifier.removeListener(resultListener);
 			runNotifier.fireTestRunFinished(result);
@@ -233,8 +240,11 @@ public class Daemon {
 	}
 	
 	public Request createNewRequest(Class<?> rootSuiteClass) {
+		// rootSuiteClass contains all the tests that will be run if request is processed
 		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
+		
+		// the active Policy is applied on the request
 		return getActivePolicy().apply(flattenedRequest);
 	}
 	
