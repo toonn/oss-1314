@@ -1,8 +1,4 @@
 \documentclass[i2]{oss}
-\setlength{\topmargin}{-.5in}
-\setlength{\textheight}{9in}
-\setlength{\oddsidemargin}{.100in}
-\setlength{\textwidth}{6.25in}
 \usepackage[english]{babel}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -13,7 +9,12 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+
+% Automatically introduces paragraph spacing
 \usepackage{parskip}
+
+% Lets Latex correctly interpret the symbols: < >
+\usepackage[T1]{fontenc}
 
 \newcommand{\class}[1]{\emph{#1}}
 \newcommand{\method}[1]{\emph{#1}}
@@ -49,18 +50,19 @@ Unit Tests are important because today's software systems are very
 complex.
 \junit is the most popular framework for unit testing in the Java 
 language.
-Currently running the tests is either done manually by developers or
+Currently, running the tests is either done manually by developers or
 automatically by a continuous integration tool on a central server.
 A disadvantage of these approaches is that tests only run when a 
 developer decides to or when a developer commits work to the central 
-repository.\\
+repository.
+
 This can be improved by using a daemon (background process) that continuously runs tests, this gives the developer rapid feedback and 
-takes away the burden of manually starting tests.\\
+takes away the burden of manually starting tests.
 
 The task of this iteration was to make a deamon that improves \junit.
 \comment{belangrijkste elementen van ons ontwerp nog toevoegen}
 
-In the first section the general decisions regarding this design are described. In de next section describes how the design is implemented with the help of the classdiagram and sequence diagrams.
+In the first section the general decisions regarding this design are described. The next section describes how the design is implemented with the help of the class diagram and sequence diagrams.
 
 %-----------------------------------------------------------------------
 %	ALGEMENE BESLISSINGEN
@@ -69,35 +71,41 @@ In the first section the general decisions regarding this design are described. 
 \label{ssec:general-decisions}
 
 A new testrun should be executed when source code changes, either in tests or in classes that are being tested. 
-%-- Misschien hier ook zeggen dat ge dan uw testen niet echt test, daarvoor zou ge continu testruns moeten herhalen, als uw testen niet deterministisch zijn bvb. En ook zeggen dat als ge dat doet, dat ge met het probleem zit dat failurecount's niet meer echt kloppen enzo...
+In hindsight this might be a problem because the output of a test might
+change even if the test or the code that is being tested doesn't change
+(for example if the test depends on some external resource that has 
+time-dependent behaviour like a network connection or a database).
+However, because it's better to use mock objects in those cases this was
+not considered in the current design.
+%# Stuk toegevoegd over non-deterministische resultaten
 A granularity of picked up changes has to be chosen.
 A distinction between code changes in different classes should obviously be made.
 It is however not immediately clear at which granularity changes inside a class should be detected.
 Changes in methods could be detected separately.
 Even a distinction between different execution paths inside a method could be made.
-However, we argue that a class should be coherent and as such, a change of the code of a method would have a high possibility of impacting the behavior of the whole class.
-Therefore, code changes will be looked at only at the level of classes and a finer distinction will not be made.\\
+However, we argue that a class should be coherent and as such, a change of the code inside a method would have a high possibility of impacting the behavior of the whole class.
+Therefore, code changes are looked at only at the level of classes and a finer distinction is not made.
 
-Changes to the classes will be detected by monitoring their *.class files.
+Changes to the classes are detected by monitoring their *.class files.
 An alternative would be to monitor the actual *.java source files, but most integrated development environments already offer automatic building functionality.
 Moreover, the test daemon would have to know the specifics of how to compile the entire project. 
-Therefore, it will be required that users of the automatic test daemon use the automatic building feature of their IDE.
-The test daemon will pick up changes in the compiled *.class files and as a result, it will queue a new testrun.\\
+Therefore, it is required that users of the automatic test daemon use the automatic building feature of their IDE.
+The test daemon picks up changes in the compiled *.class files and as a result, it queues a new testrun.
 
 Testruns should always always be executed completely.
 Otherwise, when a developer is constantly making changes to the code, some tests would only be executed after a very long time.
-Only when the developer would eventually take a break longer than the duration of a testrun, these tests would be executed.
-While it could be argued that this is acceptable for some tests that are scheduled by a policy to run at the very end of a testrun, there are significant drawbacks to this approach.\\
+Only when the developer eventually takes a break longer than the duration of a testrun, these tests would be executed.
+While it could be argued that this is acceptable for some tests that are scheduled by a policy to run at the very end of a testrun, there are significant drawbacks to this approach.
 
-An important drawback is starvation. Some policies can only change the execution order based on new information of runs of the tests.
+An important drawback is starvation. Some policies can only change the execution order based on new information gained by running the tests.
 This would mean that for tests that are initially scheduled at the very end, it would be very hard to raise their priority, even though some code changes could significantly affect their test result.
-Even though techniques as aging could partially solve this starvation problem, the root of this problem would still be the same: new information on these tests is simply not available. Another solution would be to discard new information on all tests when the testrun has not completed entirely. However, this would undermine the purpose of the policy, since it could take very long until a policy would take new information into account.\\
+Even though techniques as aging could partially solve this starvation problem, the root of this problem would still be the same: new information on these tests is simply not available. Another solution would be to discard new information on all tests when the testrun has not completed entirely. However, this would undermine the purpose of the policy, since it could take very long until a policy takes new information into account.
 
-Sometimes, a comparison between tests that are run more often and tests that starve at the end of the testrun, wouldn't even make sense.
+Sometimes a comparison between tests that are run more often and tests that starve at the end of the testrun wouldn't even make sense.
 Consider the priority of tests under the frequent failure first policy.
-It is not clear how to do a fair comparison between tests under this policy when different tests are run more often than others.\\
+It is not clear how to do a fair comparison between tests under this policy when different tests are run more often than others.
 
-Because of these reasons, when a testrun is executed, it will execute all the tests and leave no single one out.\\
+Because of these reasons, when a testrun is executed, it will execute all the tests and leave no single one out.
 
 \comment{Nog algemene beslissingen?}
 
@@ -110,13 +118,13 @@ Because of these reasons, when a testrun is executed, it will execute all the te
 
 In this section we describe how our design followed from an analysis
 of responsibilities and we go through the start-up and execution of 
-our application.\\
+our application.
 
 \subsection{Design overview and responsibilities}
 \label{subssec: Design overview}
 
 The guiding principle for our design is a clear separation of 
-responsibilities. The first step is an analysis of necessary actions:\\
+responsibilities. The first step is an analysis of necessary actions:
 
 \begin{itemize}
 	\item Run tests
@@ -130,32 +138,32 @@ Each of these is different enough to merit an entire entity responsible
 for that action. Those entities were implemented as \class{Daemon},
 \class{DataCollector}, \class{Statistic}, \class{Policy} and
 \class{ConsoleView} respectively. Our daemon makes as much use of the 
-existing \junit infrastructure as possible. \\
+existing \junit infrastructure as possible. 
 
 %Stef: Misschien eerder eerst de belangrijke zaken uitleggen en deze details pas later vermelden?
 %-- Ik vond dat we dit heel vroeg konden vermelden omdat dat een sterk punt is van ons ontwerp, eigenlijk hebben we maar twee klassen moeten 'veranderen'. Maar er staan inderdaad misschien teveel details in.
 We only needed to extend three existing classes: \class{FlattenedRequest}
 is a request that flattens all tests in an existing Request, so that it only contains test methods (no suites) as children. 
-This class is mostly based on \class{MaxCore} in the \junit experimental package. \
+This class is mostly based on \class{MaxCore} in the \junit experimental package. 
 However, it makes use of a custom runner: \class{MethodRunner}. 
 This class was necessary because when sorting a \class{FlattenedRequest}, the description of the children was actually the
 description of the testclass containing the method and not the method 
-itself.\\
+itself.
 
 \class{RunNotificationSubscriber} does not extend anything from 
 \junit but is used as a protection proxy so \class{Daemon} does not have 
 to pass an actual \class{RunNotifier} which could be used to fire events 
-(testRunStarted, testFailed...). \\
+(testRunStarted, testFailed...). 
 
 The \class{Daemon} is responsible for executing testruns.
 It can make use of different \class{Policy}'s to order the tests that 
-need to be run. \\
+need to be run. 
 
 A \class{Policy} is responsible for transforming a \class{Request} into a \class{Request} that is run according to the rules of the \class{Policy}. 
 These can be all different kinds of rules, but only policies that sort the executing tests have been implemented. 
 An example of another possible rule is the filtering of requests.
 %# Ik kon niet zo direct iets anders bedenken dat ze zouden kunnen doen maar als iemand nog ergens op komt schrijf het er bij.
-The abstract \class{SortingPolicy} class implements a policy that can sort its executing test methods. It asks of its concrete classes only a comparator that determines an order between two \class{Description}s, which correspond to a test.\\
+The abstract \class{SortingPolicy} class implements a policy that can sort its executing test methods. It asks of its concrete classes only a comparator that determines an order between two \class{Description}s, which correspond to a test.
 All implemented sorting policies make use of \class{Statistic}s to determine
 an order for tests, but this is not required.
 At the moment, the following policies are supported: last failure first, 
@@ -165,7 +173,7 @@ Each of these determines a different order that can be useful for
 developers.
 For example, tests that consistently order first under the frequent
 %failure first policy might indicate brittle/(badly written) code.
-failure first policy might indicate fragile / badly written code. \\
+failure first policy might indicate over-complicated or badly written code. 
 %# Ik heb nog nooit het woord brittle gebruikt zien worden voor code, het klinkt een beetje vreemd, maar als ge zeker weet dat Mario gaat weten wat ge bedoelt zet het er maar bij
 %-- Brittle betekent dat iets heel gemakkelijk breekt, iemand die engels spreekt zal dat wel begrijpen denk ik, slecht geschreven vindt ik een beetje teveel oordelend, misschien 'fragile'?
 %# Ja ik weet wat brittle betekent. Ik vind het alleen vreemd om code broos te noemen. Breekbaar misschien maar broos slaagt echt nergens op.
@@ -175,100 +183,237 @@ failure first policy might indicate fragile / badly written code. \\
 To enable handling tests in different ways in response to different 
 events that can occur during testing, \class{Statistic}'s calculate any 
 necessary information for the ordering from data collected by dedicated 
-\class{DataCollector}'s. %% welke events? misschien hier dieper op ingaan
+\class{Data}'s. %% welke events? misschien hier dieper op ingaan
 Examples of data that has to be collected for the supported policies: 
 every failure of a test, which code a test depends on and which code 
-changes on disk during execution.\\
+changes on disk during execution.
 
-%# Verzoek voor goedkeuring volgend deel
 The original design included a kind of data storage class where collected
-data or statistics could be kept, but this generated too much coupling
-%-- Ik zou niet zeggen generated, maar entailed/caused ofzo
+data or statistics could be kept, but this caused too much coupling
 and placed too much responsibility on this single class.
 The structure was altered and in the current design a \class{Statistic}
-only keeps (--holds on to?) the data that it needs.\\
+only keeps (--holds on to?) the data that it needs.
 %-- http://www.youtube.com/watch?v=HgAZ5uyZUDg
 
-%# idem
 A \class{Policy} gains access to one or more \class{Statistic}'s through
 the \class{StatisticProvider}.
-A \class{Policy} sends the kind of statistic it needs to the 
-%-- miss hier zeggen type ofzo, want het klinkt alsof de policy een statistic krijgt door er een te geven.
+A \class{Policy} sends the type of statistic it needs to the 
 \class{StatisticProvider}, which then responds with a \class{Statistic}
 that can provide it if it knows about such a \class{Statistic}, otherwise
-an exception is thrown.\\
+an exception is thrown.
 This way a layer of indirection is created between \class{Policy}'s and
 \class{Statistic}'s so another class that produces the same kind of 
 statistic data as an existing \class{Statistic} but in a different way 
-can easily be substituted for that existing \class{Statistic}. 
-%-- by changing/implementing a/extending statisticprovider ? Misschien ook zeggen hoe?
+can easily be substituted for that existing \class{Statistic} by 
+extending \class{StatisticProvider} and overriding the 
+\method{createConfiguredStatisticProvider} method.
+As with \class{DataCollector}'s this could be solved in a more flexible
+way using factories in a chain of responsibility.
+%# TODO nog iets vermelden over waarom we het niet doen, maar moet refereren naar stuk over collectors
 It also enables sharing of different \class{Statistic}'s between 
 \class{Policy}'s. \\
-%# Zouden we hier ook iets bij zetten over dat alternatief design met de chain of responsibility van factories voor het aanmaken van Statistics?
-%-- Dat hoort ook bij de statistics net als de datacollectors, dus als het ergens vermeld wordt moet het op een of andere manier bij de twee, en ja ik zou het vermelden want dat verdeeld de responsibilities die wij zo belangrijk vinden beter.
 
-%# Ook niet genoeg voor een eigen subsubsectie
-%\subsubsection{Collecting data for statistics}
-\class{DataCollector}'s are responsible for collecting necessary data 
-during execution.
-Some \class{DataCollector}'s collect data about tests that have been run,
-some collect data about changes in the testing environment such as files that have been changed.\\
-
-%# Hier misschien wat meer over hoe ze werken (als in met welke delen van junit etc. ze gekoppeld zijn en zo)
-\class{DataCollector}'s are available through the \class{DataEnroller}
-that provides the service of subscribing \class{Statistic}'s to specific
-\class{DataCollector}'s.
-%# TODO: meer informatie over design decisions over DataCollectors
-\class{DataCollector}'s that gather information about tests currently
-don't support parallel testing because this was not seen as a 
-high-priority issue, \junit itself only supports parallel testing as an
-experimental feature.
-
-
-
-%# Mag dit dan weg?
-
-%\begin{description}
-%\item Collecting Statistics.( rejecting of the statistic pool)
-%At the beginning of the brainstorm of the design we included a class {Statistic Pool}. This class would have kept all the statistics. By a request there will be checked if it owns a specific statistic. If the requested statistic is not owned by the \emph{StatisticPool} then the statistic will be registered. This was eventually rejected because there would be too much dependenty on this class. Statistics are still beeing kept but this is now done in the \emph{StatisticManager}.
-
-%\item Policies
-%Composite filters and sorting policies.
-%A \emph{Policy} has an apply. This apply will operates on a request and it will return a request. In addition, every policy has a child as Policy. If an apply is called, then it will first call the apply of the child and after that it will call its own apply on the resulting request. We can not guarantee that the result is correct according to the multiple sorting policies that are done. SortingRequest can not be applied over multiple niveaus (if there is a filterRequest in between). The assumption we are making here is that the new sorting will wipe out the older sorting instead of putting it together.
-%TODO dit was veranderd naar een ander ontwerp
-
-%\item Collectors
-%For \emph{FailureTraceCollector} are the parallel tests not suported. This is not supported because it will take a lot of time to implement it and there are other priorities.
-%\end{description}
-
-\subsubsection{Data collectors}
+\subsection{Data collectors}
 \label{subssec:Data collectors}
 
-A \class{DataCollector} is responsible for collecting a certain type of information on tests.
-It has to link this information to a certain \junit \class{Description}, which corresponds with a \junit test. %-- Ik zou het nooit hebben over een junit test, maar unit test of gewoon test.
-When it has collected such a data item for a \class{Description}, it has to notify all interested parties of this event.
-Therefore, it also has to keep track of its interested parties.
-%# Tof, maar zou ge dit niet beter bij het deel hier boven bij schrijven of de tekst van daar naar hier verplaatsen of iets dergelijks?
-%Stef: ja het zou kunnen dat daar iets bij moet of van daar naar hier, maar ik denk dat in deze "detailsectie" alles wel volledig moet zijn, niet? Dus dan moet het wel een klein beetje dubbele info zijn, hiervoor is het tenslotte een samenvatting van wat in deze sectie allemaal komt
-%# Bwa we hoeven onszelf toch sowieso niet te herhalen? Maar inderdaad er zou wel wat van boven naar hier opgeschoven kunnen worden.
+\class{DataCollector}'s are responsible for collecting necessary data 
+during execution.
+Some \class{DataCollector}'s collect data about tests that have been 
+run, some collect data about changes in the testing environment such as 
+files that have been changed.
+They link this information to a certain \junit \class{Description}, which corresponds with a test.
+When they have collected such a data item for a \class{Description}, they have to notify all interested parties of this event.
+Therefore, they also have to keep track of their interested parties.
 %-- Zou ge hier wel spreken over "it has to link this to ... description", dat is niet echt de responsibility van de collectors toch? Het is eerder ze verzamelen events en soms hangt aan zo'n event inderdaad een description vast.
+%# Ik heb has to link veranderd naar links
 
-%Stef: TODO waarom generic + exact uitleggen hoe
-\class{DataCollector}s are generic in the type of data they collect.
+\subsubsection{Notification of interested parties}
 
-No assumptions should be made about who these interested parties are. The only thing a \class{DataCollector} should  know, is that it is a party that is interested in the events that it collects (a data item). This notification problem is a typical problem that can be solved by the Observer pattern.\\
+No assumptions should be made about who these interested parties are.
+The only thing a \class{DataCollector} should  know, is that there is a party that is interested in the events that it collects (a data item).
+This notification problem is a typical problem that can be solved by the Observer pattern.
+The \class{DataCollector} defines an interface by which interested parties can subscribe themselves: it has an \method{addListener} and a \method{removeListener} method. 
+An interested party is a concrete class that realizes the \class{IDataCollectedListener} interface. This exposes the \method{dataCollected} method by which a \class{DataCollector} can notify the concrete listener.
+A \class{DataCollector} does not know the concrete type of the listener, and a \class{IDataCollectedListener} does not know the concrete type of the collector, as is prescribed by the Observer pattern.
+This minimizes the coupling between the two.
 
-%Stef: TODO Modifications to the Observer pattern: 
-%- in the original observer pattern: interested parties are only notified of the change event, after which they themselves will look for the new state
-%- afscherming van de echte datacollectors via de dataenroller
+However, the Observer pattern has been implemented with a few modifications.
 
-%Stef: TODO werking van elke collectors
+Firstly, when strictly applying the Observer pattern, a listener should check the new state of the collector when it is notified.
+However, the purpose of the collectors is not to store the data they collect, but only to pass this data to those who are interested.
+Collectors should therefore not hold state with respect to the collected data (they can, however, hold state with respect to the collection \emph{process}). 
+For this reason, the collector passes a collected data item directly to the notification method of the listener (the \method{dataCollector} method).
+
+Secondly, there could be more than one way to collect the same data.
+However, an interested party does not need to know which one is being used.
+In fact, it doesn't even need to know that a \class{DataCollector} is being used to collect the data.
+It only cares about the data itself.
+For these reasons, subscribing and unsubscribing is done via an additional abstraction layer: via an \class{IDataEnroller}.
+There is another reason for introducing this abstraction layer, namely the creation and sharing of collectors, which is explained in more detail later in this section.
+
+\subsubsection{Types of collected data}
+
+Different data collectors collect different kinds of data.
+However, all kinds of collected data share one common property: they are linked to a \junit \class{Description}, which corresponds to a test.
+To this end, the \class{ITestData} class is defined, which specifies the \method{getTestDescription()} method.
+All concrete data collectors collect data items of which the type is a subtype of \class{ITestData}.
+In general, an interested party will subscribe itself on a data collector for the specific concrete type of \class{ITestData} that the data collector collects.
+%Stef: het volgende heb ik gezegd omdat de assistent zei dat je normaal een abstractie maakt om ermee te kunnen werken zonder dat je het concrete type hoeft te weten. We kunnen met onze implementatie met deze abstractie werken, vandaar heb ik dit expliciet zo gezegd.
+However, it could also subscribe itself for \class{ITestData}.
+Via the \method{getTestDescription()} method, it would know which test corresponds with this data and it could pass this data item to another object which knows more to do with it.
+%Stef: toegegeven, dit voorbeeld hoeft er misschien niet echt bij...
+A simple example would be a logger that would log, per test, a string representation of each collected data item.
+
+As can be seen in figure \ref{fig:diagram:collectors}, the following three types of data have been implemented:
+\begin{description}
+\item[TestFailure] a failure of a test, produced by a \class{TestFailureCollector}
+\item[MethodCalls] a list of method calls for a test, produced by a \class{TestDependencyCollector}
+\item[CodeChange] a change in code that applies to a test, produced by a \class{CodeChangeCollector}
+\end{description}
+The verb \emph{produce} is used here as opposed to collect, since a collector collects raw data and produces a user friendly version of it, rather than directly collecting existing instances of the \class{MethodCalls} class for example.
+
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{DataCollectors}
+    \caption{A class diagram of the package of data collectors}
+	\label{fig:diagram:collectors}
+\end{center}
+\end{figure}
+
+\subsubsection{Data collectors for specific types of data}
+
+A concrete data collector is responsible for collecting only one kind of data.
+Even though different data collectors can collect different kinds of data, their interface still remains the same, except for the type of the data itself. 
+Moreover, an interested party is only interested in that kind of data, and nothing else.
+
+An interested party does not want to check that the data item which it is being notified of, is actually of the type it is interested in.
+This could be forced by a contract of the subscription, i.e. that the listener will only be notified of collected data of the type it is interested in.
+However, the received data would still have to be cast to the correct type to actually be able to access the data and do something with it.
+
+For these reasons, the \class{DataCollector} class is made generic in the type of data that it collects and notifies of.
+It is thus actually declared as \class{DataCollector<T extends ITestData>}.
+A concrete collector inherits from this class by filling in this generic type parameter \class{T}.
+This type must extend \class{ITestData}, since collectors collect a subtype of \class{ITestData}, as was elaborated on in the previous subsection.
+
+Concrete collectors are not generic themselves!
+They have no reason to be, since they should know which data they collect.
+For example, a \class{TestFailureCollector<MethodCalls>} would not make sense.
+Therefore, the collectors are declared as follows, as is seen in figure \ref{fig:diagram:collectors}:
+\begin{description}
+\item[TestFailureCollector extends DataCollector<TestFailure>] collects failures of tests
+\item[TestDependencyCollector extends DataCollector<MethodCalls>] collects the dependencies of a test, i.e. the methods that it calls
+\item[CodeChangeCollector extends DataCollector<CodeChange>] collects code changes that apply to tests
+\end{description}
+
+It follows that the \class{IDataCollectedListener} interface should also be generic (\class{IDataCollectedListener<T extends ITestData>}), since interested parties want to be notified only of a certain known concrete \class{ITestData} type.
+Because it is generic, a concrete listener can fix the type of data it is interested in at compile time, rather than at run time. Casts are not necessary anymore and no additional checking of the validity of passed data items is required.
+
+\subsubsection{Abstraction layer}
+
+As was noted earlier, the design would benefit from an abstraction layer around the data collectors.
+
+A first reason was that an interested party does not need to know which implementation of \class{DataCollector} is used to notify it of a collected data item. It does not even have to know of \class{DataCollector}s.
+
+A second reason is that, however simple in interface, some data collectors may have an expensive mechanism to retrieve the data items in terms of resource usage.
+These collectors should be shared.
+For example, a \class{CodeChangeCollector} will have to watch directories and their subdirectories for file changes.
+If multiple parties are interested in code changes, they should use the same underlying \class{CodeChangeCollector} (whether they know it or not).
+The Observer pattern already allows the subscription of multiple listeners, but this does not mean that there's a good place by which the listeners can access them. 
+Therefore, it is beneficial that an object exists which keeps track of all these collectors.
+
+\class{IDataEnroller} is an interface for this new functionality imposed by the mentioned improvements.
+Its only responsibility is to handle a subscription/unsubscription request for a listener for a specific kind of data.
+Through classes that implement this interface, parties that are interested in a certain type of \class{ITestData} can register and unregister a listener.
+As seen in the class diagram in figure \ref{fig:diagram:collectors}, a listener has to communicate the class of the \class{ITestData} it is interested in.
+
+This abstraction does not communicate anything about \class{DataCollector}s to its users, so the first issue is solved.
+The second one is not explicitly solved: sharing of data collectors is not required by this abstraction, since it doesn't even have to use \class{DataCollector}s.
+However, the problem of sharing collectors is now moved to concrete \class{IDataEnroller}s.
+They can decide for themselves what is best.
+
+In our design, the concrete class \class{DataEnroller} is an implementation of the \class{IDataEnroller} interface.
+This class will internally keep track of data collectors and will delegate a subscription or unsubscription request of listeners to a collector that supports the requested type of \class{ITestData}.
+It is however not its responsibility to know which collector this is.
+It is the collector itself that knows if it can produce a certain kind of \class{ITestData}, hence the method \method{canProduce(Class<T extends ITestData> testDataClass)} on the \class{DataCollector}.
+Internally, this \class{DataEnroller} will ask each of its tracked \class{DataCollector}s if it can produce the requested type of data, until it finds one that can.
+To this collector, it will delegate the subscription or unsubscription request.
+
+If it does not find a collector that can produce the request type of data, a \class{NoSuitableCollectorException} is thrown to indicate that the request can't be handled.
+
+One thing that hasn't been discussed yet, is the creation of these collectors.
+It certainly not is the responsibility of an interested party to create a collector. 
+It is only interested in the data the collector produces.
+This also isn't the responsibility of the \class{DataEnroller}, since it doesn't have to know how to create each possible collector.
+However, due to a limited time, this creational aspect is not entirely implemented as it should be.
+At this time, a static method \method{DataEnroller.createConfiguredDataEnroller} is present that creates a new \class{DataEnroller}, together with the collectors that have been implemented.
+These created collectors are added to the new \class{DataEnroller} and the resulting instance is returned.
+
+This creation, together with an example of a subscription of a listener, is illustrated in the sequence diagram in figure \ref{fig:sequence:subscribe-collector-listener}.
+
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{SubscribeToDataCollector}
+    \caption{A sequence diagram of the subscription of a listener to DataEnroller}
+	\label{fig:sequence:subscribe-collector-listener}
+\end{center}
+\end{figure}
+
+\subsubsection{Improvements: chain of factories}
+
+Creating collectors now is done by \class{DataEnroller.createConfiguredDataEnroller}.
+This is not an optimal solution, since this is not the responsibility of the \class{DataEnroller}.
+This is now partially solved by putting the creational aspect inside a static method, that could easily be moved somewhere else.
+However, better designs exist.
+
+Now, the \method{createConfiguredDataEnroller} method must know how each collector has to be created.
+It would be better to put the creation of each concrete \class{DataCollector} inside its own factory.
+The \class{DataEnroller} would then only need to create the factories and ask the relevant factory for a collector.
+Question remains how it can determine the relevant factory.
+A solution would be to organize all these factories in a chain of responsibility.
+Each factory would know itself for which concrete \class{ITestData} type it can create a collector.
+By doing this, the \class{DataEnroller} can ask the chain to create a collector for a given class of \class{ITestData}.
+The first factory in the chain would check if it can handle the request.
+If not, it passes the request to the next factory.
+If no link in the chain can handle the request, an exception would again be thrown.
+
+\subsubsection{Data collector implementations}
+
+Three types of collectors have been implemented, as can be seen in the class diagram in figure \ref{fig:diagram:collectors}.
+They each are discussed in the following paragraphs.
+
+\paragraph{TestFailureCollector}
+
+The \class{TestFailureCollector} extends \class{DataCollector<TestFailure>}.
+As such, it notifies interested parties of \class{TestFailure}s it collects.
+When this collector is created, a \class{RunNotificationSubscriber} object is passed to it, on which it will subscribe an internal subclass of the \junit \class{RunListener} class.
+Subscribed \class{RunListener}s are notified by \junit when events in the flow of a testrun occur.
+The event this collector needs is the event of a test failure.
+When this event occurs, it will wrap the \junit failure inside a \class{TestFailure} instance, which this collector then passes to its subscribed interested parties.
+
+\paragraph{TestDependencyCollector}
+
+The \class{TestDependencyCollector} extends \class{DataCollector<MethodCalls>}.
+It will notify interested parties when it has collected a \class{MethodCalls} instance.
+This \class{MethodCalls} object contains a list of methods that have been called by a test.
+It is important that this is a list as opposed to another type of collection, since the order of executed methods may be important for some interested parties.
+The executed methods are detected by using the provided \class{OSSRewriter} package.
+
+Only the code under test should be looked at by this collector.
+Therefore, this collector needs to know which classes belong to the code under test.
+This is why the root directory of the code under test is passed when creating this collector.
+It traverses this directory and keeps track of a list of all class files that it finds.
+At this time, the collector knows which classes should be looked at for method calls, so it sets a
+
+
+%Stef: TODO werking van elke collector
+
+%Stef: TODO start/stopCollecting
 
 \subsection{Daemon}
 \label{subssec: deamon}
 
-\class{Daemon} is the core of the program. % daemon start alles maar is het daarom ook de core?
-It is responsible for running the tests. The flow is as follows: first it will execute the main method. % Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
+\class{Daemon} is the core of the program. %-- daemon start alles maar is het daarom ook de core?
+It is responsible for running the tests. The flow is as follows: first it will execute the main method. %-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
 Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
 %TODO klopt dit?
 Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
@@ -276,6 +421,103 @@ Then the \method{startCore()} method is called. Now the real execution of the De
 \subsection{Policies}
 \label{subssec: Policies}
 
+\subsubsection{Distinct Failures First}
+
+The distinct failures first policy specifies the most difficult 
+ordering of tests.
+Even at the level of single tests (i.e. a single method in a testcase)
+the ordering is not trivial.
+This is because it doesn't really matter if a certain test goes before 
+another or not, what matters is that distinct failures are tested as 
+quickly as possible.
+For example if we have some tests (single methods) that failed in four
+different ways, let's say failures A, B, C and D, then any test from 
+one of these can go first, let's say a test from C goes first, then 
+any test that failed on something different can go second, so now 
+tests from A, B and D have priority over tests from C (A, B, D < C), 
+when one test from every category has been executed, the order is again 
+undefined.
+This is a problem for the current implementation of \junit's 
+\class{request} class.
+This class uses a comparator to sort all of its tests, but as we can 
+see, you can not define an order between any two tests because that 
+order depends on what tests have already been chosen.
+Because of this we decided that the distinct failures first policy would
+determine a complete order for all it's tests.
+This is a slight breach of the responsibilities of a sortingpolicy,
+a policy is responsible for determining an order for tests,
+however what tests it does this for should not be explicit in the 
+policy.
+When you need to sort not single tests but entire suites of tests the 
+ordering is even more difficult.
+One suite may cover a part or everything of another suite, one suite 
+may cover everything in two or more other suites but contain more tests 
+without a failure and thus be less interesting to execute even if the 
+suites it covers partly overlap.
+This problem is similar to but not quite the same as the
+"Set covering problem" (ref wikipedia), which is np-hard.
+Because a complete and optimal solution is not critical and probably 
+not worth the computational effort, we chose to implement a suboptimal 
+solution. (i.e. a suite may go first if it contains a test that might 
+have gone first if it was not in the suite. This suite could contain a 
+method with a failure that has already been covered more times than any 
+other but we don't check for this.)
+We also decided to order single tests before suites for a specific 
+failure because this increases the rate at which results for different 
+failures can be shown, however between different failures a suite could 
+go before a single test.
+
+What follows is a description of the algorithm we implemented as a 
+suboptimal solution to this problem.
+(This algorithm determines an order and we will mention the term bucket,
+however this algorithm has little to do with Bucket sort.)
+When the DistinctFailureFirst policy is applied it first determines a 
+(nearly) total order for all the descriptions in the request it is 
+applied to.
+The first step is to create a bucket for every failure that has 
+happened during the previous testrun.
+Then the bucket's are filled with every test and suite that fail on a 
+particular failure.
+A bucket contains every test(method) that fails on a certain failure 
+and every suite that contains a test that fails on that failure and a 
+counter for how many of it's descriptions have been selected.
+When the bucket's have been created an iterative process of selection is
+started:
+\begin{enumerate}
+	\item Choose a bucket with a minimal counter.
+	\item Pick a description from this bucket.
+	\item Remove this description from every bucket it appears in
+    		(in case of a suite).
+	\item Increment the counter for every bucket this description
+    		appeared in.
+	\item Record the description in a list that will contain a total 
+    		order
+            (only for failed tests, not for tests that did not fail)
+			for all tests that failed.
+	\item Repeat until all buckets are empty (actually empty buckets 
+    		are removed, so until you run out of buckets).
+	\item This leaves the order for tests without failures 
+    		undetermined, but this policy is only interested in 
+           	failures so this doesn't matter.
+\end{enumerate}
+When using this policy's comparator the result is determined by the 
+following rules:
+If both descriptions appear in the list (total order) the order for the 
+list applies.
+If only one description appears in the list, it is ordered first.
+If both description do not appear in the list then the order is not 
+determined.
+
+
+\subsubsection{Frequent Failure First}
+
+
+
+\subsubsection{Last Failure First}
+
+
+
+\subsubsection{Changed Code First}
 
 
 \subsection{Statistics}
@@ -501,55 +743,80 @@ We spent a lot of time discussing the design of the \class{Daemon}. Sometimes we
 
 
 \begin{description}
-\item \gloss{CodeChangeCollector}
-
-\item \gloss{Collector}
-
-\item \gloss{Comparator}
-
-\item \gloss{ConsoleView}
-
-\item \gloss{DataCollector}
-
-\item \gloss{DataEnroller}
-
-\item \gloss{Date}
-
-\item \gloss{Deamon}
-
-\item \gloss{Description}
-
-\item \gloss{FailureCount}
-
-\item \gloss{FailureCountStatistic}
-
-\item \gloss{FailureTraceStatistic}: 
+\item \gloss{CodeChangeCollector}\\
+The class \class{CodeChangeCollector} collects dqtq from files that have been modified in the directory of tests and in the directory of code being tested. 
 	
 
-\item \gloss{FlattenedRequest}
+\item \gloss{Collector}\\
+A collector collects information.
 
-\item \gloss{filtering}
+\item \gloss{Comparator}\\
+A comparator imposes a total ordening on some collection of objects
 
-\item \gloss{LastDependencyChangeStatistic}
+\item \gloss{ConsoleView}\\
+\class{ConsoleView} is the class that is the console view of the Deamon. It will give output to the user and the user can decide through the console view wich policy has to be set as active policy.
 
-\item \gloss{LastFailureDate}
+\item \gloss{DataCollector}\\
+A \class{DataCollector} is responsible for collecting a certain type of information on tests. Any type is possible because the class had a generic type.
 
-\item \gloss{LastFailureStatistic}: \\
+\item \gloss{DataEnroller}\\
+
+\item \gloss{Date}\\
+The class \class{Date} represents a specific instant in time, with millisecond precision.
+
+\item \gloss{Deamon} \\
+	Deamon is responsible for executing the testruns. It can make use of different \class{Policy}'s to order the tests that need to be run.
+
+\item \gloss{Description} \\ A \class{Description} describes a test which is to be run or has been run. 
+
+\item \gloss{FailureCount} \\ 
+\class{FailureCount} is a teststatistic that contains the number of fails for a test
+
+\item \gloss{FailureCountStatistic}\\
+A \class{FailureCountStatistic} is a \class{Statistic} that will collects the number of times a certain test has failed.
+
+\item \gloss{FailureTraceStatistic}\\
+A \class{FailureTraceStatistic} is a \class{Statistic} that stores \class{FailureTrace} instances for each test it has data for. When a new testrun starts, all stored \class{FailureTrace} instances are removed, since they don't have a use anymore.
+	
+
+\item \gloss{FlattenedRequest}\\
+A \class{FLattenedRequest} flattens the test hierarchy of a given of a given \class{Request} by putting all the leaves at the same, single level. This can be useful to allow ordening of test methods across the levels and nodes of the original hierachy.
+
+\item \gloss{filtering}\\
+
+
+\item \gloss{LastDependencyChange} \\
+\class{LastDependencyChange} is a \class{teststatistic} that contains the date of the last change to a dependency for a test.
+
+\class{LastDependencyChange} is a \class{Collector} that collects dependencies for tests and one that collects which files have changed.
+
+\item \gloss{LastDependencyChangeStatistic} \\
+
+The \class{LastDependencyChangeStatistic} is a \class{Statistic} that makes use of tzo \class{DataCollectors} to create \class{LastDependencyChange}'s. This \class{Statistic} will then combine that information to create \class{LastDependecyChange}'s.
+
+\item \gloss{LastFailureDate} \\
+\class{LastFailureDate} is a \class{teststatistic} that contains the date of the most recent failure of a test.
+
+\item \gloss{LastFailureStatistic}\\
  The \class{LastFailureStatistic} is a \class{Statistic} that keeps the last time a test failed with a \class{LastFailureDate} object, which wraps a \class{Date} object.
 
-\item \gloss{LastFailureTrace}
+\item \gloss{MaxCore} \\
+\class{MaxCore} is a replacement for JUnitCore, which keeps track of runtime and failure history, and reorders tests to maximize the chances that a failing test occurs early in the test run.
 
-\item \gloss{MaxCore}
-
-\item \gloss{MaxFailureCountStatistic}
+\item \gloss{MaxFailureCountStatistic} \\
 
 \item \gloss{MethodRunner}
 
-\item \gloss{Policy}
+\item \gloss{Policy} \\
+A \class{Policy} imposes an order or filtering 
 
-\item \gloss{Request}
+\item \gloss{Request} \\
+A \class{Request} is an abstract description of tests to be run. 
 
-\item \gloss{RunNotificationSubscriber}
+\item \gloss{Runner} \\  A \gloss{Runner} is created for each class implied by the \gloss{Request}. The \class{Runner} returns a detailed \class{Description} which is a tree structure of the tests to be run.
+
+\item \gloss{RunNotificationSubscriber} \\
+
 
 \item \gloss{RunNotifier}
 
@@ -561,15 +828,15 @@ We spent a lot of time discussing the design of the \class{Daemon}. Sometimes we
 
 \item \gloss{StatisticProvider}
 
-\item \gloss{Testclass}
+\item \gloss{Testclass} \\
+ A \class{TestClass} wraps a class to be run, providing method validation and annotation searching.
 
-\item \gloss{LastDependencyChange}
+\item \gloss{TestDependencyCollector} \\
+\class{TestDependencyCollector} is a \class{Collector} that collects all methods called by each test. This \class{Collector} assumes that the tests are run sequentially. If they are runned in parallel, the data collected by this \class{Collector} may be incorrect.
 
-\item \gloss{TestDependencyCollector}
 
-\item \gloss{TestFailed}
-
-\item \gloss{Testrun}
+\item \gloss{Testrun} \\ 
+	The run that executes the tests to be run.
 
 \item \gloss{TestRunStarted}
 
