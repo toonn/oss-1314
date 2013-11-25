@@ -9,6 +9,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+\usepackage{titlesec}
 
 % Automatically introduces paragraph spacing
 \usepackage{parskip}
@@ -16,12 +17,17 @@
 % Lets Latex correctly interpret the symbols: < >
 \usepackage[T1]{fontenc}
 
+\setcounter{secnumdepth}{4}
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
 \newcommand{\class}[1]{\emph{#1}}
 \newcommand{\method}[1]{\emph{#1}}
 \newcommand{\junit}{\emph{JUnit }}
 \newcommand{\gloss}[1]{\textbf{#1}}
 \newcommand{\comment}[1]{{\huge \textcolor{green}{#1}}\\}
-
 
 \begin{document}
 
@@ -175,6 +181,7 @@ data or statistics could be kept, but this caused too much coupling
 and placed too much responsibility on this single class.
 The structure was altered and in the current design a \class{Statistic}
 only keeps (--holds on to?) the data that it needs.
+\comment{TODO: hierboven inline comment wegdoen}
 %-- http://www.youtube.com/watch?v=HgAZ5uyZUDg
 
 A \class{Policy} gains access to one or more \class{Statistic}'s through
@@ -373,19 +380,14 @@ If no link in the chain can handle the request, an exception would again be thro
 Three types of collectors have been implemented, as can be seen in the class diagram in figure \ref{fig:diagram:collectors}.
 They each are discussed in the following paragraphs.
 
-\paragraph{TestFailureCollector} 
-\hfill
-
-The \class{TestFailureCollector} extends \class{DataCollector<TestFailure>}.
+\paragraph{TestFailureCollector} The \class{TestFailureCollector} extends \class{DataCollector<TestFailure>}.
 As such, it notifies interested parties of \class{TestFailure}s it collects.
 When this collector is created, a \class{RunNotificationSubscriber} object is passed to it, on which it will subscribe an internal subclass of the \junit \class{RunListener} class.
 Subscribed \class{RunListener}s are notified by \junit when events in the flow of a testrun occur.
 The event this collector needs is the event of a test failure.
 When this event occurs, it will wrap the \junit failure inside a \class{TestFailure} instance, which this collector then passes to its subscribed interested parties.
 
-\paragraph{TestDependencyCollector} 
-\hfill \\
-The \class{TestDependencyCollector} extends \class{DataCollector<MethodCalls>}.
+\paragraph{TestDependencyCollector} The \class{TestDependencyCollector} extends \class{DataCollector<MethodCalls>}.
 It will notify interested parties when it has collected a \class{MethodCalls} instance.
 This \class{MethodCalls} object contains a list of methods that have been called by a test.
 It is important that this is a list as opposed to another type of collection, since the order of executed methods may be important for some interested parties.
@@ -406,9 +408,8 @@ In response to the \emph{testStarted} event, this collector creates a new list o
 The \emph{testStarted} event notifies of the end of a test, so this is the time that the collected method calls are complete. Consequently, a \class{MethodCalls} object is created with the collected list of called methods and interested parties are notified.
 Of course, between the two events, the \method{enterMethod} method of the \class{Monitor} adds the method it is being notified of to the current \class{MethodCalls} object.
 
-\subparagraph{Unsolved issues}
+\subparagraph{Unsolved issue}
 
-There is, however, one problem with this approach for which we have not implemented a solution at this time.
 Tests running in parallel cause problems with the approach discussed here, since every \class{Monitor} receives notifications for every method that is called.
 Thus, the \class{Monitor} can not easily make a distinction between methods executed by different tests.
 
@@ -422,28 +423,41 @@ This however is not always correct, since tests could cause other threads to be 
 Thus, it appears there is no clear solution for this problem.
 Fortunately, the parallel scheduling of tests is only an experimental feature in \junit at this time, but in the future, this could become a problem.
 
-\comment{TODO: multiple instances problem}
+\subparagraph{OSSRewriter remark}
+
+The \class{OSSRewriter} package has a static interface.
+Therefore, it is not easy to allow multiple parties to use this functionality.
+The static interface forces one party to be responsible of setting up the \class{OSSRewriter}.
+At this time, the \class{TestDependencyCollector} is the only class that uses it and only one instance is created of this collector.
+Due to limited time, that instance was made responsible for enabling \class{OSSRewriter} and setting up the filter that excludes all code that is not code under test.
+This should however be changed.
+Ideally, a wrapper should be made around the \class{OSSRewriter} package that is responsible for enabling it.
+This wrapper then could allow multiple parties to each register their own rewrite exclusion filter.
 
 \paragraph{CodeChangeCollector}
 
-\comment{TODO}
+The \class{CodeChangeCollector} extends \class{DataCollector<CodeChange>}.
+It thus notifies its interested parties with \class{CodeChange} instances.
+A \class{CodeChange} contains the name of the class name of a code change and the date that this change occurred.
+The \class{CodeChangeCollector} needs to link a code change to a certain \class{Description}.
+It however does not always know to which test this change corresponds, since it is not its responsibility to know which tests execute which code.
+Therefore, it links a code change to the root test suite.
+
 
 %-------DAEMON--------
 
 \subsection{Daemon}
 \label{subssec: deamon}
 
-\class{Daemon} is responsible for repeated testing of a set of test classes. It monitors the directories of the tests and the nested classes. When a testrun is running it can message to the test-runs that a change in a file has occured. By handling the user input it will report the testrun that the active policy has changed. It will also receive the output of the testruns. 
-Deamon functions as a Facade. It provides a simple interface. %-- daemon start alles maar is het daarom ook de core?
- 
+\class{Daemon} is responsible for repeated testing of a set of test classes. It monitors the directories of the tests and the nested classes. When a testrun is running it can message to the test-runs that a change in a file has occured. By handling the user input it will report the testrun that the active policy has changed or adding tests or removing tests . It will also receive the output of the testruns.  
+% 
+At the moment the \method{main} funtion is situated in the \class{Deamon}. This is not bounded with the \class{Deamon} but it was the most logical place to put the main. \class{Deamon} executes the testruns and if you would look for the \method{main()} you would search in the \class{Deamon}.
 
-%The flow is as follows: first it will execute the main method. 
+A difference between de \class{JUnitCore} and Deamon is that we could provide the \class{JUnitCore} with several suites, but to \class{Deamon} we can only give one \class{rootSuiteClass}. This \class{rootSuiteClass} consists of multiple suitesclasses.
 
-%-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
+Deamon functions as a Facade. It provides a simple interface. The Client will interact with the Deamon to the complex system that lays behind it.
 
-%Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
-%TODO klopt dit?
-%Then the \method{startCore()} method is called. Now the real execution of the Deamon is started.
+%redenen voor een facade en waarom het een facade is.
 
 % Facade ? 
 
@@ -463,12 +477,11 @@ Deamon functions as a Facade. It provides a simple interface. %-- daemon start a
 \subsection{Statistics}
 \label{subssec: statistics}
 
-\class{Statistic}'s 
-
 The implemented \class{Statistic}'s will be discussed here in greater 
 detail.
 \begin{description}
-\item \class{FailureCountStatistic}: Collects the amount of times a test 
+
+\item [\class{FailureCountStatistic}] Collects the amount of times a test 
 has failed until now.
 A test is identified by its \class{Description}.
 A \class{FailureCount} object is associated with this description,
@@ -476,14 +489,17 @@ representing the failure count.
 When the \class{DataCollector} that this \class{Statistic} listens to
 signals that a test has failed the counter inside the 
 \class{FailureCount} is incremented.
-\item \class{MaxFailureCountStatistic}: This is a special kind of 
+
+\item [\class{MaxFailureCountStatistic}] This is a special kind of 
 \class{FailureCountStatistic} where if the \class{Description} that it's
 associated with is for multiple tests the highest failure count of its 
 children is returned.
-\item \class{LastFailureStatistic}: This \class{Statistic} keeps the 
+
+\item [\class{LastFailureStatistic}] This \class{Statistic} keeps the 
 last time a test failed with a \class{LastFailureDate} object, which
 wraps a \class{Date} object.
-\item \class{FailureTraceStatistic}: This \class{Statistic}, in contrast
+
+\item [\class{FailureTraceStatistic}] This \class{Statistic}, in contrast
 with other \class{Statistic}'s, does not keep its state across multiple
 test runs.
 For each failing test in a test run a stack trace is collected. 
@@ -491,7 +507,8 @@ The last element in this stack trace is then the point of failure for
 this test.
 A \class{String} that represents this point of failure is then wrapped
 in a \class{FailureTrace} object.
-\item \class{LastDependencyChangeStatistic}: This \class{Statistic} uses
+
+\item [\class{LastDependencyChangeStatistic}] This \class{Statistic} uses
 two different \class{DataCollector}'s to gather its statistics.
 The first is a \class{TestDependencyCollector} which finds out which 
 tests use which other classes by tracking the methods called by each
@@ -502,6 +519,7 @@ The \class{Statistic} then combines these data into
 \class{LastDependencyChange} objects.
 These objects wrap the most recent date at which a dependency of the 
 test it's associated with changed.
+
 \end{description}
 
 The statistics that are returned by \class{Statistic}'s implement the
@@ -529,6 +547,14 @@ notified when the statistic value for a test changes as they may only
 need a small subset of the available \class{ITestStatistic}'s and don't
 need to be up-to-date on all of them all of the time.
 
+The \method{getStatisticMethod()} is a template method.
+It makes use of the abstract \method{composeTestStatistic()} method 
+that differs in behaviour depending on the type of statistic that the
+subclass collects.
+The method can be used to calculate a compound statistic for a 
+\class{Description} 
+In the case of \class{MaxFailureCountStatistic} the 
+
 The \class{StatisticProvider} is passed to a \class{Policy} on creation.
 To get its needed \class{Statistic}(s) it passes the class of the 
 \class{ITestStatistic}(s) it requires to the \class{StatisticProvider}
@@ -544,7 +570,10 @@ for which this method returns \emph{true}.
 In this way \class{Statistic}'s can be shared between \class{Policy}'s
 which ensures consistency (if 2 different \class{Policy}'s request the
 same statistic for the same test the response does not depend on when
-the \class{Statistic} that that 
+the \class{Statistic} that that \class{Policy} uses was created).
+It also makes switching \class{Policy}'s easier: when switching to 
+another \class{Policy} that uses the same kind of 
+\class{ITestStatisticData} statistics are already available.
 
 
 %------POLICIES-------
@@ -567,6 +596,7 @@ developers.
 For example, tests that consistently order first under the frequent
 failure first policy might indicate over-complicated or fragile code.
 
+Policies implement an interface \class{IPolicy} that specifies
 Originally we wanted to implement policies so they could be combined,
 the composite pattern would be a good fit for this problem,
 we decided against this because it was not required by the assignment.
@@ -595,8 +625,6 @@ tests from A, B and D have priority over tests from C (A, B, D < C),
 when one test from every category has been executed, the order is again 
 undefined.
 
-
-
 This is a problem for the current implementation of \junit's 
 \class{request} class.
 This class uses a comparator to sort all of its tests, but as we can 
@@ -608,7 +636,6 @@ This is a slight breach of the responsibilities of a sortingpolicy,
 a policy is responsible for determining an order for tests,
 however what tests it does this for should not be explicit in the 
 policy.
-
 
 When you need to sort not single tests but an entire suites of tests the 
 ordering is even more difficult.
@@ -628,7 +655,6 @@ We also decided to order single tests before suites for a specific
 failure because this increases the rate at which results for different 
 failures can be shown, however between different failures a suite could 
 go before a single test.
-
 
 What follows is a description of the algorithm we implemented as a 
 suboptimal solution to this problem.
@@ -672,7 +698,18 @@ determined.
 
 \subsubsection{Frequent Failure First}
 
-
+The frequent failure first policy is used to identify tests that fail
+frequently.
+This would be useful because a particular test failing may often indicate 
+that the code it tests is too complicated, so developers often break it 
+or bugs don't get fixed (because people introduce separate handling of 
+exceptions when finding a bug takes too much effort).
+This policy makes use of \class{FailureCountStatistic}, tests with a 
+higher number of failures go first, the order between tests with the same 
+number of failures is undefined.
+(\junit actually uses a stable sort, so this order would be the same as 
+the original order, but this stability is not advertised in a contract 
+and cannot be relied upon.)
 
 \subsubsection{Last Failure First}
 
@@ -688,30 +725,6 @@ determined.
 %# Mij goed, dan mag de subsectie weg.
 %\label{ssec:Klassendiagramma}
 
-
-%figuur oud klassendiagram
-\begin{figure}[tbp]
-\begin{center}
-    \includegraphics[width=0.8\textwidth]{klassendiagramOud}
-    \caption{The old classdiagram}
-	\label{fig:kd-oud}
-\end{center}
-\end{figure}
-
-
-
-%figuur nieuw klassendiagram
-\begin{figure}[tbp]
-\begin{center}
-    \includegraphics[width=0.8\textwidth]{klassendiagram}
-    \caption{The intermediate classdiagram}
-	\label{fig:kd-tt}
-\end{center}
-\end{figure}
-
-
-
-
 %figuur nieuw klassendiagram
 \begin{figure}[tbp]
 \begin{center}
@@ -724,13 +737,20 @@ determined.
 
 
 %-------------Interactie Diagrammas-------------------------------------
-\subsection{Execution of the application}
+\subsection{Execution of Deamon}
 
-%# TODO
+The execution of the application starts with the \method{main()} method that is situated in the \class{Deamon}. The \method{main()} asks for three parameters. The first parameter is the suite of tests, the second is the directory were the code is that will be tested and the third parameter is the directory where the tests that will be executed are situated. If the parameters are correct, the deamon class will be created and given the three parameters and a console of his deamon will be started.  
 
-\subsection{Interaction diagrams}
-\label{ssec:Interactiedia}
+By 
 
+
+%The flow is as follows: first it will execute the main method. 
+
+%-- Ho, stop, deze sectie moet daemon uitleggen, hier moogt ge nog niets zeggen over de execution van het programma dat is een grote subsectie binnen de sectie ontwerp.
+
+%Three arguments are given with the execution. The first argument is the suite of tests, the second is the directory were the code is that will be tested and the third argument is the directory where the tests that will be executed are situated. After that it will start the \class{ConsoleView}. Through the \class{ConsoleView} the user can select which of the registered \class{Policy}'s will be used for the testrun. After the user selected a valid policy the \class{ConsoleView} will start the \class{Daemon} by calling the method start. If the \class{Daemon} is still running nothing this has no effect. If the \class{Daemon} is not yet running then a new thread will be created and it will subscribe itself to the \class{DataEnroller}. 
+%TODO klopt dit?
+%Then the \method{startCore()} method is called. Now the real execution of the Deamon is started
 %# TODO
 
 
@@ -738,8 +758,8 @@ determined.
 %-----------------------------------------------------------------------
 %	TESTEN
 %-----------------------------------------------------------------------
-\section{Tests}
-\label{ssec:tests}
+\section{Testing}
+\label{ssec:testing}
 
 For testing the application a two-fold approach was used: unit tests for
 important classes and a dummy project to use the application on.
@@ -977,14 +997,14 @@ A \class{StatisticProvider} keeps the statistics and it will provide the \class{
 \begin{flushleft}
 \begin{thebibliography}{9}
 
-\bibitem{TeamTreasure} 
-\textit{Team Treasure Trek}
+\bibitem{JUnit} 
+\textit{JUnit}
 \begin{scriptsize}
 geraadpleegd op 7/5/2013 via: \mbox{www.nintendo-europe.com/}
 \end{scriptsize}
 
-\bibitem{RabbitMQ}
-\textit{RabbitMQ}
+\bibitem{Facade pattern}
+\textit{Facade pattern}
 \begin{scriptsize}
 geraadpleegd op 7/5/2013 via: \mbox{http://en.wikipedia.org/wiki/RabbitMQ}
 \end{scriptsize}
