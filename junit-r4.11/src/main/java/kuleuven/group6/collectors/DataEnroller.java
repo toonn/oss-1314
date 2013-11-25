@@ -60,7 +60,7 @@ public class DataEnroller implements IDataEnroller {
 	}
 
 	@Override
-	public <T extends ITestData> void subscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+	public <T extends ITestData> void subscribe(Class<T> testDataClass, IDataCollectedListener<? super T> listener) {
 		DataCollector<? extends T> collector = findCollector(testDataClass);
 		if (!collector.isCollecting())
 			collector.startCollecting();
@@ -68,7 +68,7 @@ public class DataEnroller implements IDataEnroller {
 	}
 	
 	@Override
-	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, IDataCollectedListener<? super T> listener) {
 		DataCollector<? extends T> collector = findCollector(testDataClass);
 		collector.removeListener(listener);
 	}

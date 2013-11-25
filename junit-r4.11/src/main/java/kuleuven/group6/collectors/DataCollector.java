@@ -16,20 +16,20 @@ import kuleuven.group6.testcharacteristics.testdatas.ITestData;
  */
 public abstract class DataCollector<TestDataT extends ITestData> {
 
-	protected Collection<DataCollectedListener<? super TestDataT>> listeners = new HashSet<>();
+	protected Collection<IDataCollectedListener<? super TestDataT>> listeners = new HashSet<>();
 	protected boolean isCollecting = false;
 
-	public void addListener(DataCollectedListener<? super TestDataT> listener) {
+	public void addListener(IDataCollectedListener<? super TestDataT> listener) {
 		this.listeners.add(listener);
 	}
 	
-	public void removeListener(DataCollectedListener<? super TestDataT> listener) {
+	public void removeListener(IDataCollectedListener<? super TestDataT> listener) {
 		this.listeners.remove(listener);
 	}
 	
 	
 	protected void onDataCollected(TestDataT data) {
-		for (DataCollectedListener<? super TestDataT> listener : this.listeners) {
+		for (IDataCollectedListener<? super TestDataT> listener : this.listeners) {
 			listener.dataCollected(data);
 		}
 	}

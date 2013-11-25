@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
 import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
@@ -27,7 +27,7 @@ public class FailureTraceStatistic extends Statistic<FailureTrace> {
 	}
 
 	protected class FailureTraceListener implements
-			DataCollectedListener<TestFailure> {
+			IDataCollectedListener<TestFailure> {
 
 		@Override
 		public void dataCollected(TestFailure data) {

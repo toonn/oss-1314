@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import kuleuven.group6.collectors.CodeChangeCollector;
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import kuleuven.group6.tests.testsubject.tests.AllTests;
@@ -118,7 +118,7 @@ public class CodeChangeCollectorTest {
 //		assertTrue(true);
 //	}
 
-	protected class CodeChangeListener implements DataCollectedListener<CodeChange> {
+	protected class CodeChangeListener implements IDataCollectedListener<CodeChange> {
 
 		CodeChange lastCollectedCodeChange = null;
 		

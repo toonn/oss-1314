@@ -1,6 +1,6 @@
 package kuleuven.group6.tests.statistics;
 
-import kuleuven.group6.collectors.DataCollectedListener;
+import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.DataCollector;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.collectors.NoSuitableCollectorException;
@@ -21,7 +21,7 @@ public class MockDataEnroller implements IDataEnroller {
 	}
 	
 	@Override
-	public <T extends ITestData> void subscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+	public <T extends ITestData> void subscribe(Class<T> testDataClass, IDataCollectedListener<? super T> listener) {
 		DataCollector<? extends T> collector = findCollector(testDataClass);
 		collector.addListener(listener);
 		if (! collector.isCollecting())
@@ -29,7 +29,7 @@ public class MockDataEnroller implements IDataEnroller {
 	}
 	
 	@Override
-	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, DataCollectedListener<? super T> listener) {
+	public <T extends ITestData> void unsubscribe(Class<T> testDataClass, IDataCollectedListener<? super T> listener) {
 		DataCollector<? extends T> collector = findCollector(testDataClass);
 		collector.removeListener(listener);
 	}
