@@ -226,7 +226,7 @@ public class Daemon {
 		}
 	}
 	
-	public Request createNewRequest(Class<?> rootSuiteClass) {
+	protected Request createNewRequest(Class<?> rootSuiteClass) {
 		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
 		return getActivePolicy().apply(flattenedRequest);
