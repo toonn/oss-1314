@@ -8,7 +8,7 @@ import org.junit.runner.notification.RunListener;
 
 /**
  * 
- * TestFailureCollector collects every failure for every test that is run.
+ * TestFailureCollector collects every failure for every test that is runned.
  *
  */
 public class TestFailureCollector extends DataCollector<TestFailure> {

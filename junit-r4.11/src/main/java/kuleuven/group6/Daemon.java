@@ -233,8 +233,9 @@ public class Daemon {
 		}
 	}
 	
-	public Request createNewRequest(Class<?> rootSuiteClass) {
-		// rootSuiteClass contains all the tests that will be run if request is processed
+
+	protected Request createNewRequest(Class<?> rootSuiteClass) {
+
 		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
 		// the active Policy is applied on the request

@@ -7,7 +7,7 @@ import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
 
-/*
+/**
  * (non-Javadoc)
  * @see IStatisticProvider
  */

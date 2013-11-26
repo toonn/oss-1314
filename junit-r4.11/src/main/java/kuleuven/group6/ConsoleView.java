@@ -12,7 +12,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 /**
- * This class is the console view of the deamon. It will give output to the programmer and report ... TODO
+ * This class is the console view of the Deamon. It will give output to the programmer and report ... TODO
  * @author Team 6
  *
  */
@@ -50,7 +50,7 @@ public class ConsoleView {
 	
 	
 	/**
-	 * Method that will be called once the Deamon is made. It will also stop the Deamon when the program is done.
+	 * Method that will be called once the Deamon is created. It will also stop the Deamon when the program is done.
 	 */
 	public void start() {
 		console = new Scanner(System.in);

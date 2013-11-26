@@ -15,7 +15,6 @@ import org.junit.runners.model.InitializationError;
  * the same, single level. This can be useful to allow an ordering of test methods across the levels
  * and nodes of the original hierarchy.
  * 
- * @author Team 6
  *
  */
 public class FlattenedRequest extends Request {
