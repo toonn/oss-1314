@@ -19,11 +19,14 @@ The project folder is `junit-r4.11`. This project requires Java 7, which must be
 Our project includes a test project, which is used to test the daemon.
 This sample project requires a few settings.
 
-Two folders need to be set as source folder:
+Two folders need to be set as source folder (right click > Build Path > Use as source folder):
 - src/main/java/kuleuven/group6/tests/testsubject/source  `(1)`
 - src/main/java/kuleuven/group6/tests/testsubject/tests  `(2)`
+At this time, these source folders are still used under the src/main/java source folder, so exclude them under this source folder (Right click > Build path > Exclude).
+Otherwise, they will be compiled twice, once under the src/main/java source folder and once under its own source folder.
 
-These also need their own bin folder. To do this, configure the following:
+These new source folders also need their own bin folder. 
+Configure the following:
 - Go to the `Java Build Path` tab in the settings of the project.
 - Under libraries, add the following:
   - junit-r4.11/lib/hamcrest-core-1.3.jar
@@ -33,6 +36,7 @@ These also need their own bin folder. To do this, configure the following:
   - To use the provided `run.sh` script, use the following output folders: 
     - For the source folder (1), specify the output folder: `junit-r4.11/testsubjectbin/source`
     - For the tests folder (2), specify the output folder: `junit-r4.11/testsubjectbin/tests`
+  - These output folders possibly have to be created.
     
 Report and class diagram
 ------------------------
