@@ -1,7 +1,7 @@
 \documentclass[i2]{oss}
 \usepackage[english]{babel}
 \usepackage{graphicx}
-\usepackage{amsmath}
+
 \usepackage{fullpage}
 \usepackage{color}
 \usepackage{soul}
@@ -10,7 +10,7 @@
 \usepackage{subcaption}
 \usepackage[section]{placeins}
 \usepackage{titlesec}
-
+\usepackage{wrapfig}
 % Automatically introduces paragraph spacing
 \usepackage{parskip}
 
@@ -26,7 +26,7 @@
 \newcommand{\class}[1]{\texttt{#1}}
 \newcommand{\method}[1]{\texttt{#1}}
 \newcommand{\junit}{\emph{JUnit }}
-\newcommand{\Deamon}{\class{Daemon  }}
+\newcommand{\Daemon}{\class{Daemon  }}
 \newcommand{\gloss}[1]{\textbf{#1}}
 \newcommand{\comment}[1]{{\huge \textcolor{green}{#1}}\\}
 
@@ -67,7 +67,6 @@ This can be improved by using a daemon (background process) that continuously ru
 This gives the developer rapid feedback and takes away the burden of manually starting tests.
 
 The task of this iteration was to make a daemon that improves \junit.
-\comment{belangrijkste elementen van ons ontwerp nog toevoegen}
 
 In section \ref{ssec:general-decisions}, the general decisions that are independent of the realisation in code are described. Section \ref{ssec:design} describes how the system is designed. First an overview is given, after which the design is discussed in detail, together with class diagrams and sequence diagrams.
 
@@ -518,7 +517,7 @@ The first would be that a data collector can also collect data items that are no
 The responsibility of a data collector would then shift to the responsibility of collecting just \emph{a} data item, instead of a data item that applies to a certain \class{Description}.
 However, a lot of classes notify others of new data, so this isn't really specific to a data collector.
 
-The other alternative would be that the \class{CodeChangeCollector} actually links the code change to the tests impacted by the code chang.
+The other alternative would be that the \class{CodeChangeCollector} actually links the code change to the tests that are impacted by it.
 It would however not become responsible for computing this dependency information itself.
 Instead, it could retrieve this information from the \class{TestDependencyCollector}.
 
@@ -535,7 +534,7 @@ At this time however, none of these alternatives have been implemented.
 \begin{figure}[tbp]
 \begin{center}
     \includegraphics[width=\textwidth]{Statistics}
-    \caption{Statistics Class Diagram}
+    \caption{A class diagram of the package of statistics}
 	\label{fig:statistics}
 \end{center}
 \end{figure}
@@ -543,7 +542,7 @@ At this time however, none of these alternatives have been implemented.
 \begin{figure}[tbp]
 \begin{center}
     \includegraphics[width=\textwidth]{Statistics-sd}
-    \caption{Statistics Sequence Diagram}
+    \caption{A sequence diagram of the retrieval of a statistic}
 	\label{fig:statistics-sd}
 \end{center}
 \end{figure}
@@ -553,100 +552,90 @@ These information objects implement the \class{ITestStatistic} interface. Note t
 The \class{ITestStatistic} interface specifies only the \method{getTestDescription()} method 
 (perhaps not the most general name, since the \class{Description} it returns
 could be for a single test, a test class or a suite of tests).
-Each implementing class then provides methods by which more information can be retrieved. In figure \ref{fig:statistics}, the different \
+Each implementing class then provides methods by which more information can be retrieved. In figure \ref{fig:statistics}, the different \class{ITestStatistic} realizations are shown, together with the information they add to the \class{ITestStatistic} itself.
 
+As with the \class{DataCollector}s the abstract \class{Statistic} class
+is generic in the type of \class{ITestStatistic} it stores and returns. Concrete \class{Statistic} implementations fill in this generic parameter to indicate which implementing
+type of \class{ITestStatistic} they return. The reasons are the same as with the \class{DataCollector}s. The generic \class{Statistic}s eliminate the need of type 
+checking that would be necessary in the \class{Policy}s that request the collected concrete \class{ITestStatistic}s.
 
-The implemented \class{Statistic}s will be discussed here in greater detail.
+A \class{Statistic} will typically summarize data it retrieves from \class{DataCollector}s. This mechanism is discussed later. However, a \class{Statistic} will not always have stored data for each and every test. For example, test failures are only collected on a test that actually fails, so its parent (the testclass) and possibly suites higher up in the hierarchy of tests have no failure that is collected for them. 
+
+In case of the \class{Statistic} a test statistic is requested for a \class{Description} for which no data is stored, the \class{Statistic} has the responsibility to check if the given \class{Description} is of an atomic test or a composed test (test class or suite or something else). If it is, it has to compose a new concrete \class{ITestStatistic} out of the test statistics it has of the children of the given \class{Description}. The \class{Statistic} retrieves the values for the child descriptions by calling the \method{getTestStatistic} method on itself, with the child description as its argument.
+
+It is also possible that the given \class{Description} corresponds to an atomic test, and that no \class{ITestStatistic} is available for it. In this case, a default value must be constructed.
+
+The \method{getTestStatistic} method does not know itself how to compose test statistics of the children of a \class{Description}. It also does not know which default values have to be used. These things are only known to the implementing concrete \class{Statistic} class. This can be solved by using the Template Method pattern. The \method{getTestStatistic} thus becomes a template method, which  makes use of the abstract \method{composeTestStatistic} method and the abstract \method{getDefaultTestStatistic} method. These methods differ in behavior depending on the concrete type of \class{ITestStatistic} a subclass uses.
+
+Concrete \class{Statistic}s thus have to implement these abstract methods. The \method{composeTestStatistic} method can be used to calculate a compound statistic for a 
+\class{Description} that is associated with a suite of tests.
+The concrete implementation of this method then uses the statistics for
+its children and produces some kind of summarized value from those (such as a sum, a maximum, an average, ...).
+
+Following, the implemented \class{Statistic}s are discussed in greater detail.
 \begin{description}
 
-\item [\class{FailureCountStatistic}] Collects the amount of times a test 
+\item [FailureCountStatistic] collects the amount of times a test 
 has failed until now.
 A test is identified by its \class{Description}.
 A \class{FailureCount} object is associated with this description,
 representing the failure count.
 When the \class{DataCollector} that this \class{Statistic} listens to
-signals that a test has failed the counter inside the 
-\class{FailureCount} is incremented.
+signals that a test has failed, a new \class{FailureCount} is instantiated that is the incremented version of the previous one. This is done by the \method{incremented()} method of the \class{FailureCount} instance. The default value for the test statistic is of course failure count of zero. It is not clear how to compose different failure counts, there are multiple possibilities: the sum of failure counts of all the child \class{Description}s, the maximum of the failure counts of the children, etc. This is why the \class{FailureCountStatistic} is abstract and this choice is deferred to a subclass.
 
-\item [\class{MaxFailureCountStatistic}] This is a special kind of 
-\class{FailureCountStatistic} that will return the highest failure count if the \class{Description} that it is associated with is for multiple tests.
+\item [MaxFailureCountStatistic] is a special kind of 
+\class{FailureCountStatistic}. The only thing this class still has to implement, is the \method{composeTestStatistic} method. The choice here is to return the highest failure count of the failure counts of the child decriptions of the given \class{Description}.
 
-\item [\class{LastFailureStatistic}] This \class{Statistic} keeps the 
-last time a test failed with a \class{LastFailureDate} object, which
-wraps a \class{Date} object.
+\item [LastFailureStatistic] is a \class{Statistic} that stores the last time a test failed. This is done with a \class{LastFailureDate} object, of which the date of the last failure can be retrieved with the \method{getDate()} method. The composition of values of the child descriptions is easy: a new \class{LastFailureDate} should in that case be created of which the date equals the last date of the values for the child \class{Description}s.
 
-\item [\class{FailureTraceStatistic}] This \class{Statistic}, in contrast
-with other \class{Statistic}s, does not keep its state across multiple
-test runs.
-For each failing test in a test run a stack trace is collected. 
-The last element in this stack trace is then the point of failure for 
+\item [FailureTraceStatistic] is a \class{Statistic<FailureTrace>}. It is responsible for providing the points at which a certain test has failed. These points of failure are represented by the \class{FailureTrace} class. The actual points of failure are stored by a collection of strings that represent the methods in which a test has failed. An atomic test can of course only have one point of failure, but compound tests (testclasses, suites, etc.) can have more.
+
+For each failing test in a test run a stack trace is retrieved by subscribing for a \class{TestFailure} with a \class{IDataEnroller}. This test failure contains information about the exception that caused the failure. From this exception, the stacktrace can be retrieved. The deepest element in this stack trace is then the point of failure for 
 this test.
-A \class{String} that represents this point of failure is then wrapped
-in a \class{FailureTrace} object.
 
-\item [\class{LastDependencyChangeStatistic}] This \class{Statistic} uses
-two different \class{DataCollector}s to gather its statistics.
-The first is a \class{TestDependencyCollector} which finds out which 
-tests use which other classes by tracking the methods called by each
-test.
-The second is a \class{CodeChangeCollector} which reports changes to
-class files in the project.
-The \class{Statistic} then combines these data into 
-\class{LastDependencyChange} objects.
-These objects wrap the most recent date at which a dependency of the 
-test it's associated with change.
+This statistic, in contrast
+with other \class{Statistic}s, does not keep its state across multiple test runs, since points of failure can not be summarized over multiple test runs. When a new test run starts, this statistic therefore clears all the stored test statistics (\class{FailureTrace}s).
+
+\item [LastDependencyChangeStatistic] is a \class{Statistic<LastDependencyChange>}, it is responsible for collecting the last change of a dependency of tests. This \class{Statistic} uses
+two different \class{ITestData} types to gather its statistics.
+Firstly, it subscribes to \class{MethodCalls} with a \class{IDataEnroller}, by which it knows which 
+tests execute which methods of other classes.
+Secondly, is subscribes to \class{CodeChange}s, by which it knows of changes to classes in the project.
+This \class{Statistic} then combines these data into 
+\class{LastDependencyChange} objects, by finding out which code changes apply to which test. These objects store the most recent date at which a dependency of the 
+test it's associated with has changed.
 
 \end{description}
 
-As with the \class{DataCollector}s the abstract \class{Statistic} class
-is generic in the type of \class{ITestStatistic} it returns but concrete
-classes fill in this generic parameter to indicate which implementing
-type of \class{ITestStatistic} they return, also to eliminate type 
-checking that would be necessary in the \class{Policy}s that receive
-the collected \class{ITestStatistic}s.
-
 \class{Policy}s that need the statistic value for a certain test call
 the \method{getTestStatistic()} method on the \class{Statistic} object
-they received from the \class{StatisticProvider}.
+they received from an \class{IStatisticProvider}.
 The \class{Statistic} does not (need to) know about what kind of objects
 request this statistic data.
-The clients of the \class{Statistic} class also don't need to be 
+The clients of the \class{Statistic} class also do not need to be 
 notified when the statistic value for a test changes as they may only
-need a small subset of the available \class{ITestStatistic}'s and don't
+need a small subset of the available \class{ITestStatistic}s and don't
 need to be up-to-date on all of them all of the time.
 
-The \method{getStatisticMethod()} is a template method.
-It makes use of the abstract \method{composeTestStatistic()} method 
-that differs in behavior depending on the type of statistic that the
-subclass collects.
-The method can be used to calculate a compound statistic for a 
-\class{Description} that is associated with a suite of tests.
-The concrete implementation of this method then uses the statistics for
-its children and produces some kind of summarized value from those (such
-as a maximum, an average, ...)
-In the case of \class{MaxFailureCountStatistic} the 
-\method{composeTestStatistic} method takes the maximum of the failure
-counts of the \class{Description}'s children.
+\class{Policy}s and other parties that are interested in \class{Statistic}s can retrieve a \class{Statistic} by using the \class{IStatisticProvider}. Concrete \class{IStatisticProvider}s must implement the method \method{getStatistic}. It is responsible of giving back a \class{Statistic} that is capable of summarizing the specific type of \class{ITestStatistic} that is requested.
 
-The \class{StatisticProvider} is passed to a \class{Policy} on creation.
-To get its needed \class{Statistic}(s) it passes the class of the 
-\class{ITestStatistic}(s) it requires to the \class{StatisticProvider}
+For example, an \class{IStatisticProvider} is passed to a \class{Policy} on creation.
+To get its needed \class{Statistic}(s), the policy passes the class of the 
+concrete \class{ITestStatistic}(s) it requires to the \class{IStatisticProvider},
 which then returns a \class{Statistic} that can produce this kind of
 \class{ITestStatistic}.
-To know which \class{Statistic} object to return the 
-\class{StatisticProvider} keeps a \class{Set} of \class{Statistic}'s 
-that are queried when a \class{Policy} requests a \class{Statistic}.
-The \class{StatisticProvider} calls the \method{canSummarize()} method
-on every \class{Statistic} in the set with the given 
+
+The class \class{StatisticProvider} implements such an \class{IStatisticProvider}. To know which \class{Statistic} object to return, the \class{StatisticProvider} keeps a \class{Set} of \class{Statistic}s 
+that are queried when the \method{getStatistic} method is called.
+The \class{StatisticProvider} calls the \method{canSummarize} method on every \class{Statistic} in the set with the given 
 \class{ITestStatistic} class and returns the first \class{Statistic}
 for which this method returns \emph{true}.
-In this way \class{Statistic}'s can be shared between \class{Policy}'s
-which ensures consistency (if 2 different \class{Policy}'s request the
-same statistic for the same test the response does not depend on when
-the \class{Statistic} that that \class{Policy} uses was created).
-It also makes switching \class{Policy}'s easier: when switching to 
-another \class{Policy} that uses the same kind of 
-\class{ITestStatisticData} statistics are already available.
+
+In this way, \class{Statistic}s can be shared between \class{Policy}s. All this information is therefore only stored once, but it also ensures consistency: if 2 different \class{Policy}s request the
+same statistic for the same test, the response does not depend on the time that
+the \class{Statistic} that that \class{Policy} uses was created.
+It also makes switching \class{Policy}s easier: when switching to another \class{Policy} that uses the same kind of 
+\class{ITestStatistic}, statistics are already available that have the request data.
 
 
 %------POLICIES-------
@@ -798,6 +787,11 @@ If only one \class{description} appears in the list, it is ordered first.
 If both \class{description}'s do not appear in the list then the order 
 is not determined.
 
+\subparagraph{Remark}
+
+In the original design, this policy was interpreted in a different way than it is implemented currently.
+Now, only points of failure are looked at. These are the methods that actually throw an exception. The previous approach was to look at each called method of a failing test, since test failures are not always caused by actual exceptions.
+
 \subsubsection{Changed Code First}
 
 The changed code first policy runs tests for which the containing class 
@@ -808,17 +802,6 @@ This policy uses \class{LastDependencyChangeStatistic} which contains the
 \class{Date} of the last dependency change and sorts tests with the most 
 recent dependency change date first.
 
-%-------------KLASSENDIAGRAMMA------------------------------------------
-
-%figuur nieuw klassendiagram
-\begin{figure}[tbp]
-\begin{center}
-    \includegraphics[width=0.8\textwidth]{klassendiagram3}
-    \caption{Current classdiagram}
-	\label{fig:kd-h}
-\end{center}
-\end{figure}
-
 
 
 %-------DAEMON--------
@@ -826,31 +809,28 @@ recent dependency change date first.
 \subsection{Daemon}
 \label{subssec: daemon}
 
-\Deamon is responsible for repeatedly running a collection of tests as
-well as creating everything needed by policies...
-Currently \Deamon is implemented as a facade but at the moment it still
+\Daemon is responsible for repeatedly running a collection of tests as well as creating everything needed by policies.
+This includes a \class{RunNotifier} which notifies listeners of events while running tests. A data enroller and a statistic provider also is created.
+
+Currently \Daemon is implemented as a facade but at the moment it still
 contains too much functionality.
-For example testruns are now handled manually by \Deamon, but this is
-not a responsibility of \Deamon, a possible solution is to add a class
+For example testruns are now handled manually by \Daemon, but this is
+not a responsibility of \Daemon, a possible solution is to add a class
 that represents testruns.
 
-Our implementation can be used without \Deamon, but this requires
+Our implementation can be used without \Daemon, but this requires
 knowledge of how to construct a \class{DataEnroller},
 a \class{StatisticProvider}, a \class{RunNotifier}, etc.
 
-\Deamon is very similar to \class{JUnitCore}, however \class{JUnitCore}
-can be created with multiple testclasses.
-A workaround is to create a suite of those testclasses and pass that 
-suite.
+\Daemon is very similar to \class{JUnitCore}, however \class{JUnitCore}
+can be created and asked to run tests of multiple testclasses.
+\Daemon however can only be asked to run a single top level suite class. This is not really a limitation, since it is easy to create a \class{Suite} class that specifies all the testclasses that need to be run and pass this \class{Suite} to \class{Daemon}.
 
 %figuur oud klassendiagram
-\begin{figure}[tbp]
-\begin{center}
-    \includegraphics[width=0.8\textwidth]{RunATestrun}
-    \caption{Sequence Diagram of a testrun}
-	\label{fig:seq testrun}
-\end{center}
-\end{figure}
+
+
+
+
 
 
 
@@ -863,16 +843,10 @@ The user also needs to be able to stop the program.
 
 Different user interfaces should be supported.
 The first idea was to support this requirement by implementing the Model-View-Controller pattern.
-However, this pattern is rather heavy-weight, since the user interaction is mostly unidirectional: from the programming to the user.
-
-Moreover, \junit already has its own mechanism for this.
-Users of \junit can already be notified of these events by the use of \class{RunListener}s.
+However, \junit already has its own mechanisms to notify users of results through the use of \class{RunListener}s.
 It is beneficial to support this same mechanism, since a lot of editors already offer plugins to visualize \junit results.
-With minimal effort, it should be possible to use our automatic test daemon instead of the standard \junit execution.
-
-Since a lot of plugins already exist, only a console program was implemented.
-The class that is responsible for this console interaction is \class{ConsoleView}.
-It is called like this, because it gives the user a view on the program, but this has nothing to do with Model-View-Controller, since that course of action was abandoned.
+With minimal effort, it should be possible to use our automatic test daemon instead of the standard \class{JUnitCore}.
+The \class{ConsoleView} adds a way to handle interaction with the user.
 
 When the \class{ConsoleView} starts, the user is asked for the desired policy.
 It subscribes itself on the \class{Daemon} and starts it.
@@ -881,21 +855,44 @@ For the events it receives, it outputs a textual representation.
 Additionally, a menu is implemented: a user can always press the \emph{<ENTER>} key, to view a list of options.
 Implemented options include changing the policy, queueing a new testrun and stopping the program.
 
+%figuur nieuw klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=\textwidth]{Runattestrun.pdf}
+	\caption{A sequence diagram of the initialization of \class{Daemon}}
+	\label{fig:daemon:initialize}
+\end{center}
+\end{figure}
+
+%figuur nieuw klassendiagram
+\begin{figure}[tbp]
+\begin{center}
+    \includegraphics[width=\textwidth]{Runattestrun2.pdf}
+	\caption{Sequence Diagram of the second part of the testrun}
+	\label{fig:daemon:createrequest}
+\end{center}
+\end{figure}
+
 
 %-------------Interactie Diagrammas-------------------------------------
-\subsection{Execution of Deamon}
+\subsection{Execution of the program}
 
-The execution of the application starts with the \method{main()} method that is situated in the \class{Deamon}. The \method{main()} asks for three parameters. The first parameter is the suite of tests, the second is the directory were the code is that will be tested and the third parameter is the directory where the tests that will be executed are situated. If the parameters are correct, the daemon class will be created and given the three parameters and a console of his daemon will be started.  
+The execution of the application starts in the \method{main} method. The \method{main} method needs three parameters. The first parameter is the top level suite of tests that need to be run. The second is the directory where the code is located that will be tested. The third parameter is the directory where the tests that will be executed are situated. If the parameters are not valid, an error message will be sent to the standard error stream. If they are valid, an instance of \class{Daemon} will be created, passing the three parameters. The \class{Daemon} will not start running tests at this time.
 
-When a \class{Daemon} is created there is also a \class{runNotifier} created. After that a \class{runNotificationSubscriber} is created with the \class{runNotifier}. Then a \class{DataEnroller} is created with the \class{runNotificationSubscriber} and the three parameters given with the \method{main()} function. The \class{DataEnroller} will create multiple data collectors. After that a \class{StatisticProvider} is created with the \class{DataEnroller} and the \class{RunNotificationSubscriber}. This \class{StatisticProvider} will create \class{Statistics}. At last the \class{FileChangedListener} is created that a \class{DataCollectorListener} is that will listen to  code changes.
+When a \class{Daemon} is created a \class{RunNotifier} is also created. Next, a \class{RunNotificationSubscriber} is created that wraps the \class{RunNotifier}. This object can be passed to entities that want to subscribe themselves on events during the testrun. The initialization of \class{Daemon} can be seen in figure \ref{fig:daemon:initialize}.
 
-After \Deamon is created the \class{ConsoleView} is started. The \class{ConsoleView} will ask the user to provide an active policy out of the list of registered policies. When the user has chosen the active policy, the \class{ConsoleView} will start the \Deamon. After that the user can still use commands through the console by entering the right command. This command can include changing of policy, queue with a new testrun or quit. 
+Then, a \class{DataEnroller} is created. It needs to know of the \class{RunNotificationSubscriber}, the name of the top level suite class and the test and code directories, which have been passed to the \method{main} method. The \class{DataEnroller} will create multiple data collectors, which possibly need the former parameters. After that a \class{StatisticProvider} is created. This \class{StatisticProvider} will create \class{Statistic}s. It needs to know of the \class{DataEnroller}, since statistics need to be able to subscribe themselves on collected data events. It also needs to know of the \class{RunNotificationSubscriber}. 
 
-When \method{daemon.start()} is invoked in the \class{ConsoleView} it will subscribe to a \class{DataCollector} that collects data of code changes and it subscribes with the fileChangeListener that has been made previously. The \class{Semaphore} is set on one and the \method{startCore()} method is called. It will invoke the \class{Semaphore} to give a permit. In case of a grouped file changes the system will stabilize first before really starting. After that the \method{doTestRun()} is invoked. This method will start the testrun.
+After \Daemon is created a new instance of \class{ConsoleView} is started. The \class{ConsoleView} will ask the user to provide an active policy out of the list of registered policies. When the user has chosen the active policy, the \class{ConsoleView} will start the \Daemon.
 
-The \method{doTestRun()} method is where it really starts. First a \class{classLoader} is created with the paths of the code directory and the test directory. It will then try to create a \class{rootSuiteClass }with the name that was provided with the main and the classLoader.
-After that a \class{Request} is being made with the \class{rootSuiteClass} and the active policy. When the \class{Request} has been created, the runner is created of the \class{Request}. Then the method \method{fireTestRunStarted()} is invoked on the \class{runNotifier} with the \class{Description} of the \emph{runner}. This method indicates to the \emph{runNotifier} that the test run is started. 
-After that a \class{Result} is created and with that a \class{runListener} is created.  The \class{resultListener} must be the first listener added to the \class{runListener}. Then the \class{runner} has run with the \class{runNotifier}. When the \class{runNotifier} is runned it will remove the \class{resultListener} and it will notify the \class{runNotifier} that the test run had finished.
+\class{Daemon} will run a new testrun everytime code changes or a request for a new testrun is made.
+
+When a new testrun is started, the first step is to create a new \class{URLClassLoader}, with the paths of the code directory and the test directory. By using this class loader, a new instance is created of the top level suite class, by specifying the name of that class which was provided.
+Next, a \class{Request} is created for the top level suite class. This process is shown in the sequence diagram in figure  \ref{fig:daemon:createrequest}. First, a \junit \class{Request} is created for the top level suite. This request then is flattened by the \class{FlattenedRequest} class, so that all method runners are located on the same level in the test hierarchy of the request. The next step is to apply the active policy to this flattened request. Different policies can do this in their own manner, but the implemented policies are sorting policies. Consequently, they ask the request to be sorted with a comparator they specify theirselves.
+
+When the final request has been created, its runner is retrieved. Before that runner runs, the \method{fireTestRunStarted} method is invoked on the \class{RunNotifier}. This call indicates to the \emph{RunNotifier} that the test run has started, it notifies all the registered \class{RunListener}s of this event.
+Following this, the runner is run. It is passed the \class{RunNotifier}, so that it can fire events during the testrun. Because the top level suite class was loaded by our class loader, all test classes are loaded by this same class loader. This ensures that the last version of each class is used and changes to the classes are picked up in a new testrun.
+When the testrun is finished, the \method{fireTestRunFinished} method is called to notify each \class{RunListener} that a testrun has finished.
 
 %TODO hitchhikersguide to the galaxy - adventure game
 
@@ -906,8 +903,7 @@ After that a \class{Result} is created and with that a \class{runListener} is cr
 \section{Testing}
 \label{ssec:testing}
 
-For testing the application a two-fold approach was used: unit tests for
-important classes and a dummy project to use the application on.
+For testing the application we made use of unit tests and a dummy project to use the application on.
 There's a unit test for each \class{DataCollector}, for the 
 \class{LastFailureStatistic} and \class{MaxFailureCountStatistic}, and  \class{FlattenedRequest}.
 These unit tests make use of stub objects to simulate the external 
@@ -922,7 +918,7 @@ There are also tests in this project that fail non-deterministically with
 different rates of failure to enable us to check if the sorting according 
 to a test's failure rate happens correctly.
 The \class{Policy}'s were tested by running the daemon on the dummy 
-project.
+project (not an automatic test).
 
 
 
@@ -935,25 +931,23 @@ project.
 %elke taak en activiteit en de tijd die hierin werd genvesteerd.
 % Een schatting van de totale tijd die elk teamlid in dit project heeft genvesteerd
 
-The division of tasks was about the same for everybody. We worked in group most of the time. In figure \ref{tab:werkuren} the workhours per teammember can be seen for the different parts of the assignment. The different parts are various (setting up eclipse, visual paradigm, \junit, .. ), design, implementation and report. 
+The division of tasks was about the same for everybody. We worked in group most of the time. In table \ref{tab:werkuren} the workhours per teammember can be seen for the different parts of the assignment. The different parts are various (setting up eclipse, visual paradigm, \junit, .. ), design, implementation and report. 
 
-In the first weeks the emphasis was layed on a good design. Our classdiagram was undergoing three big changes. We put a lot of time in making a good design. We did not always agree on everything and a lot of discussions followed. After a couple of sessions with the assistant we knew how to improve our design. 
-%-- Moet dit echt op deze manier? Het ligt toch nogal voor de hand dat we veel gediscussieerd/overlegd hebben als we er veel tijd in gestoken hebben. %% ja we zijn over de 40uur gegaan dat ze hadden gezegd en in verhouding hebben we veel meer gediscussieerd dan dat we geimplementeerd hebben
+In the first weeks the emphasis was place on the design. Our classdiagram went through three iterations. We put a lot of time in making a good design. We did not always agree on everything and a lot of discussions followed. After a session with the assistant we always knew what still had to be improved in our design.
 
-In the last half of week three and week four we started implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. After the implementation was done, the whole group worked on the report. During the design and implementation notes were kept in the wiki of GitHub.
+In the last half of week three we started implementing. One of the team members (Sophie) was on Athens that week and did not have time to help with the implementation. After the implementation was done, the whole group worked on the report. During the design and implementation notes were kept in the wiki on GitHub.
 %TODO tekst
 
-\comment{waarom zoveel tijd besteed}
 
 \begin{table}[h!]
 \begin{center}
     \begin{tabular}{ r | c  c  c  c  c  c}
      & Joren & Toon & Stef & Sophie \\ \hline
-    Various & 3u35 & 4u00 & 4u00 & 4u00\\
-        Design & 14u45 & 20u30 & 24u45 & 20u30 \\
-        Implementation & 28u00 & 24u30 & 40u30 & 16u50\\
-        Report & 9u00 & 10u00 & 14u00 & 14u40 \\
-        Total & 55u50 & 69u00 & 88u15 & 56u00  
+    	Various & 		3u30 & 4u00 & 4u00 & 4u00\\
+        Design & 		14u30 & 20u30 & 25u00 & 20u30 \\
+        Implementation & 28u00 & 34u30 & 40u30 & 16u50\\
+        Report & 		18u00 & 16u00 & 21u00 & 16u40 \\
+        Total & 		64u00 & 75u00 & 90u30 & 58u00  
     \end{tabular}
     \caption{Overview of the workhours per subject}
     \label{tab:werkuren}
@@ -1004,6 +998,8 @@ In the last half of week three and week four we started implementing. One of the
 \section{Conclusion and discussion}
 \label{ssec:conclusion}
 
+The complete class diagram can be found in figure \ref{fig:classdiagram}.
+
 % Een hoofdstuk met een discussie en conclusie waarin interessante ervaringen, problemen en
 %andere opmerkingen omtrent het project worden beschreven
 
@@ -1036,6 +1032,17 @@ Possible improvements and extensions to the current design are:
 \item Integrate the system with existing GUI's.
 \end{itemize}
 
+%-------------KLASSENDIAGRAMMA------------------------------------------
+
+%figuur nieuw klassendiagram
+\begin{sidewaysfigure}[tbp]
+\begin{center}
+    \includegraphics[width=1.1\textwidth]{Class_diagram.png}
+    \caption{The complete classdiagram}
+	\label{fig:classdiagram}
+\end{center}
+\end{sidewaysfigure}
+
 %-----------------------------------------------------------------------
 %	GLOSSARY
 %-----------------------------------------------------------------------
@@ -1059,7 +1066,7 @@ A collector collects information.
 A comparator imposes a total ordening on some collection of objects
 
 \item \gloss{ConsoleView}\\
-\class{ConsoleView} is the class that is the console view of the \Deamon. It will give output to the user and the user can decide through the console view which policy has to be set as active policy.
+\class{ConsoleView} is the class that is the console view of the \Daemon. It will give output to the user and the user can decide through the console view which policy has to be set as active policy.
 
 \item \gloss{DataCollector}\\
 A \class{DataCollector} is responsible for collecting a certain type of information on tests. Any type is possible because the class had a generic type.
@@ -1070,8 +1077,8 @@ A \class{DataEnroller} class will internally keep track of data collectors and w
 \item \gloss{Date}\\
 The class \class{Date} represents a specific instant in time, with millisecond precision.
 
-\item \gloss{Deamon} \\
-	\Deamon is responsible for executing the testruns. It can make use of different \class{Policy}'s to order the tests that need to be run.
+\item \gloss{Daemon} \\
+	\Daemon is responsible for executing the testruns. It can make use of different \class{Policy}'s to order the tests that need to be run.
 
 \item \gloss{Description} \\ A \class{Description} describes a test which is to be run or has been run. 
 
@@ -1138,7 +1145,7 @@ A \class{Policy} imposes an order or filtering
 A \class{Request} is an abstract description of tests to be run. 
 
 \item \gloss{rootSuiteClass}\\
-A \class{rootSuiteClass} will contain all the tests that will run if the \Deamon is processed
+A \class{rootSuiteClass} will contain all the tests that will run if the \Daemon is processed
 
 \item \gloss{RunListener} \\
 Junit provides support for adding listeners while executing the testcases via \class{RunListener}. 
@@ -1194,25 +1201,25 @@ The \class{WatchService} is used from the \class{java.nio.file} package. It watc
 \bibitem{JUnit} 
 \textit{JUnit}
 \begin{scriptsize}
-geraadpleegd op 28/10/2013 via: \mbox{http://junit.sourceforge.net/javadoc/}
+consulted on 28/10/2013 via: \mbox{http://junit.sourceforge.net/javadoc/}
 \end{scriptsize}
 
 \bibitem{OSSRewriter}
 \textit{OSSRewriter}
 \begin{scriptsize}
-geraadpleegd op 18/11/2013 via: \mbox{http://toledo.kuleuven.be}
+consulted on 18/11/2013 via: \mbox{http://toledo.kuleuven.be}
 \end{scriptsize}
 
 \bibitem{Applying UML and Patterns}
 \textit{Applying UML and Patterns}
 \begin{scriptsize}
-geraadpleegd op 1/11/2013 
+consulted on 1/11/2013, Applying UML and Patterns: An Introduction to Object-Oriented Analysis and Design and Iterative Development (3rd Edition), by Craig Larman
 \end{scriptsize}
 
 \bibitem{scp}
 \textit{Set Covering Problem}
 \begin{scriptsize}
-geraadpleegd op 25/11/2013 via: \mbox{http://en.wikipedia.org/wiki/Set\_cover\_problem}
+consulted on 25/11/2013 via: \mbox{http://en.wikipedia.org/wiki/Set\_cover\_problem}
 \end{scriptsize}
 
 
