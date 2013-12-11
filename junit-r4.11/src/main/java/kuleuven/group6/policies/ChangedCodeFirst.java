@@ -18,7 +18,7 @@ public class ChangedCodeFirst extends SortingPolicy {
 	public ChangedCodeFirst(IStatisticProvider statMan) {
 		this.statistic = statMan.getStatistic(LastDependencyChange.class);
 	}
-
+	
 	@Override
 	protected Comparator<Description> getComparator() {
 		return new Comparator<Description>() {
@@ -43,4 +43,9 @@ public class ChangedCodeFirst extends SortingPolicy {
 		};
 	}
 
+	@Override
+	protected boolean hasOrderFor(Description description) {
+		return (statistic.getTestStatistic(description) != null);
+	}
+	
 }

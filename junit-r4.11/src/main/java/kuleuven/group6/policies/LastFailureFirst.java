@@ -44,5 +44,10 @@ public class LastFailureFirst extends SortingPolicy {
 
 		};
 	}
+	
+	@Override
+	protected boolean hasOrderFor(Description description) {
+		return (statistic.getTestStatistic(description) != null);
+	}
 
 }
