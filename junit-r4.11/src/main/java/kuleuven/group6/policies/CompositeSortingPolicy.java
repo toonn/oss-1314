@@ -2,18 +2,15 @@ package kuleuven.group6.policies;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
-import kuleuven.group6.FlattenedRequest;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 
 public class CompositeSortingPolicy extends SortingPolicy {
 	protected List<SortingPolicy> childPolicies = new ArrayList<SortingPolicy>(); 
-	protected Map<Description, Double> testPriorities;
+	protected List<Description> orderedDescriptions;
 	
 	public void addChildPolicy(SortingPolicy childPolicy) {
 		childPolicies.add(childPolicy);
@@ -27,52 +24,34 @@ public class CompositeSortingPolicy extends SortingPolicy {
 		return childPolicies.size();
 	}
 	
-
 	@Override
 	public Request apply(Request request) {
-		testPriorities = new HashMap<Description, Double>();
-		for (SortingPolicy policy : childPolicies) {
-			updateScoresForChild(policy, request);
-		}
+		orderedDescriptions = new ArrayList<Description>();
+		mergeChildOrders(request);
 		return super.apply(request);
 	}
 	
-	protected void updateScoresForChild(SortingPolicy policy, Request request) {
-		Request copiedRequest = FlattenedRequest.flatten(request);
-		copiedRequest = policy.apply(copiedRequest);
-		Description sortedDescription = copiedRequest.getRunner().getDescription();
-		List<Description> sortedDescriptions = getAllDescriptions(sortedDescription);
-		for (int i = 0; i < sortedDescriptions.size(); i++) {
-			Description description = sortedDescriptions.get(i);
-			double score = getScore(i);
-			updateScore(description, score);
-		}
-	}
-	
-	protected double getScore(int sequenceNumber) {
-		return Math.exp(-sequenceNumber);
-	}
-	
-	protected void updateScore(Description description, double additionalValue) {
-		if (! testPriorities.containsKey(description))
-			testPriorities.put(description, 0.0);
-		
-		double currentValue = testPriorities.get(description);
-		testPriorities.put(description, currentValue + additionalValue);
-	}
-	
-	protected List<Description> getAllDescriptions(Description rootDescription) {
-		List<Description> allDescriptions = new ArrayList<Description>();
-		Stack<Description> descriptionsToVisit = new Stack<Description>();
-		
-		descriptionsToVisit.push(rootDescription);
-		while (!descriptionsToVisit.isEmpty()) {
-			Description currentDescription = descriptionsToVisit.pop();
-			allDescriptions.add(currentDescription);
-			descriptionsToVisit.addAll(currentDescription.getChildren());
+	protected void mergeChildOrders(Request request) {
+		LinkedList<List<Description>> childLists = new LinkedList<List<Description>>();
+		for (SortingPolicy childPolicy : childPolicies) {
+			List<Description> childList = childPolicy.getOrderedSubset(request);
+			if (!childList.isEmpty())
+				childLists.add(childList);
 		}
 		
-		return allDescriptions;
+		while (!childLists.isEmpty()) {
+			List<Description> childList = childLists.pop();
+			
+			Description description = childList.remove(0);
+			orderedDescriptions.add(description);
+			
+			for (List<Description> otherList : childLists) {
+				otherList.remove(description);
+			}
+			
+			if (!childList.isEmpty())
+				childLists.offer(childList);
+		}
 	}
 
 	@Override
@@ -80,11 +59,21 @@ public class CompositeSortingPolicy extends SortingPolicy {
 		return new Comparator<Description>() {
 			@Override
 			public int compare(Description o1, Description o2) {
-				double v1 = testPriorities.get(o1);
-				double v2 = testPriorities.get(o2);
-				return Double.compare(v1, v2);
+				int i1 = orderedDescriptions.indexOf(o1);
+				int i2 = orderedDescriptions.indexOf(o2);
+				
+				if (i1 == -1)
+					return (i2 == -1) ? 0 : 1;
+				if (i2 == -1)
+					return -1;
+				return Integer.compare(i1, i2);
 			}
 		};
 	}
 
+	@Override
+	protected boolean hasOrderFor(Description description) {
+		return orderedDescriptions.contains(description);
+	}
+	
 }

@@ -68,6 +68,11 @@ public class DistinctFailureFirst extends SortingPolicy {
 			}
 		};
 	}
+	
+	@Override
+	protected boolean hasOrderFor(Description description) {
+		return fullyOrderedDescriptions.contains(description);
+	}
 
 	private List<Description> createTotalOrder(Request request) {
 		final List<Description> totalOrder = new ArrayList<>();
