@@ -22,7 +22,10 @@ import org.junit.runner.notification.RunNotifier;
 
 /**
  * 
- * @author Team 6
+ * Daemon will execute the testruns. It can make use of different policies to order the tests that need to be run.
+ * 
+ * it is required that users use the automatic building feature of their IDE, so daemon can pickup the changes in the compiled
+ * class files. Testruns should also always be executed completely and it will execute all tests.
  *
  */
 public class Daemon {
