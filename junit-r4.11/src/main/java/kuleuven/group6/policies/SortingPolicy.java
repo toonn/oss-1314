@@ -22,10 +22,26 @@ public abstract class SortingPolicy implements IPolicy {
 	}
 
 	abstract protected Comparator<Description> getComparator();
-	
+
+	public void addChildPolicy(SortingPolicy childPolicy)
+			throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("The child could not be added.");
+	}
+
+	public void removeChildPolicy(SortingPolicy childPolicy)
+			throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(
+				"The child could not be removed");
+	}
+
+	public int getNbChildPolicies() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(
+				"Could not determine the number of child policies.");
+	}
+
 	/**
-	 * Get the ordered subset of the descriptions in the given request that 
-	 * have an explicit order.
+	 * Get the ordered subset of the descriptions in the given request that have
+	 * an explicit order.
 	 * 
 	 * @param request
 	 * @return
@@ -33,24 +49,25 @@ public abstract class SortingPolicy implements IPolicy {
 	public List<Description> getOrderedSubset(Request request) {
 		Request flattenedRequest = FlattenedRequest.flatten(request);
 		flattenedRequest = apply(flattenedRequest);
-		Description sortedDescription = flattenedRequest.getRunner().getDescription();
+		Description sortedDescription = flattenedRequest.getRunner()
+				.getDescription();
 		List<Description> sortedDescriptions = getAllDescriptions(sortedDescription);
 		return sortedDescriptions;
 	}
-	
+
 	abstract protected boolean hasOrderFor(Description description);
-	
+
 	protected List<Description> getAllDescriptions(Description rootDescription) {
 		List<Description> allDescriptions = new LinkedList<Description>();
 		Stack<Description> descriptionsToVisit = new Stack<Description>();
-		
+
 		descriptionsToVisit.push(rootDescription);
 		while (!descriptionsToVisit.isEmpty()) {
 			Description currentDescription = descriptionsToVisit.pop();
 			allDescriptions.add(currentDescription);
 			descriptionsToVisit.addAll(currentDescription.getChildren());
 		}
-		
+
 		return allDescriptions;
 	}
 
