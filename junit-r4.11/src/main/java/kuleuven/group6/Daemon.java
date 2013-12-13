@@ -20,11 +20,6 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
-/**
- * 
- * @author Team 6
- *
- */
 public class Daemon {
 
 	protected String rootSuiteClassName;
@@ -116,8 +111,6 @@ public class Daemon {
 	
 	/**
 	 * This method will be called once a policy has been chosen through the consoleView.
-	 * 
-	 * 
 	 */
 	public void start() {
 		if (isRunning())
@@ -164,9 +157,6 @@ public class Daemon {
 		mayRunSemaphore.release();
 	}
 	
-	/**
-	 * Queue a new testrun.
-	 */
 	public void queueNewTestRun() {
 		if (!isRunning())
 			return;
@@ -174,9 +164,6 @@ public class Daemon {
 		mayRunSemaphore.release();
 	}
 	
-	/**
-	 * TODO hier ook een description toevoegen
-	 */
 	protected void startCore() {
 		boolean keepRunning = true;
 		while (keepRunning) {			
@@ -243,12 +230,8 @@ public class Daemon {
 	}
 	
 	/**
-	 * HOW to run it?? 
-	 * 
 	 * This is the main method. The first argument is the suite of tests, the second is the directory were the code is that will
 	 * be tested and the third argument is the directory where the tests that will be executed are situated. 
-	 *  TODO
-	 * @param args TODO Waarom niet het eerste argument testen?
 	 */
 	public static void main(String[] args) {
 		// This will check if there are three arguments given. It will give an error and a description of how to use it
