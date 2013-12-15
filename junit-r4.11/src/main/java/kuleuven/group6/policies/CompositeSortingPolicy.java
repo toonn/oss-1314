@@ -45,6 +45,8 @@ public class CompositeSortingPolicy extends SortingPolicy {
 
 			for (List<Description> otherList : childLists) {
 				otherList.remove(description);
+				if (otherList.isEmpty())
+					childLists.remove(otherList);
 			}
 
 			if (!childList.isEmpty())

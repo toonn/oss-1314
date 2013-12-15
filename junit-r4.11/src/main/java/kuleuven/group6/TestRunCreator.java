@@ -35,7 +35,6 @@ public class TestRunCreator {
 		try {
 			Class<?> rootSuiteClass = Class.forName(rootSuiteClassName, true, classLoader);
 			request = createNewRequest(rootSuiteClass, policy);
-
 		} finally {
 			classLoader.close();
 		}
@@ -47,7 +46,6 @@ public class TestRunCreator {
 	protected Request createNewRequest(Class<?> rootSuiteClass, IPolicy policy) {
 		Request request = Request.aClass(rootSuiteClass);
 		Request flattenedRequest = FlattenedRequest.flatten(request);
-		// the active Policy is applied on the request
 		return policy.apply(flattenedRequest);
 	}
 }

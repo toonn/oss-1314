@@ -1,35 +1,34 @@
 package kuleuven.group6;
 
 import java.util.concurrent.Semaphore;
+
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.policies.*;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
-import org.junit.runner.notification.RunListener;
-import org.junit.runner.notification.RunNotifier;
-
 
 /**
  * 
- * Daemon will execute the testruns. It can make use of different policies to order the tests that need to be run.
+ * Daemon will execute the testruns. It can make use of different policies to 
+ * manipulate the way tests are run. For example, a SortingPolicy will make
+ * sure the tests are run in a specific order.
  * 
- * it is required that users use the automatic building feature of their IDE, so daemon can pickup the changes in the compiled
- * class files. Testruns should also always be executed completely and it will execute all tests.
- *
+ * It is required that users use the automatic building feature of their IDE, 
+ * so the daemon can pick up the changes in the compiled class files. 
+ * Testruns are always executed completely and all tests are executed.
  */
-
 public class Daemon {
-	protected RunNotifier runNotifier;
 	protected TestRunCreator testRunCreator;
 	protected IDataEnroller dataEnroller;
 
-	protected IPolicy activePolicy;
+	protected IPolicy activePolicy = null;
 	protected Thread runThread = null;
 	protected Semaphore mayRunSemaphore = null;
 	protected IDataCollectedListener<CodeChange> fileChangedListener;
 
-	public Daemon(IPolicy activePolicy, IDataEnroller dataEnroller) {
-		this.activePolicy = activePolicy;
+	public Daemon(TestRunCreator testRunCreator, IDataEnroller dataEnroller) {
+		this.testRunCreator = testRunCreator;
+		this.dataEnroller = dataEnroller;
 		this.fileChangedListener = new IDataCollectedListener<CodeChange>() {
 			@Override
 			public void dataCollected(CodeChange data) {
@@ -38,6 +37,10 @@ public class Daemon {
 		};
 	}
 
+	public boolean hasActivePolicy() {
+		return activePolicy != null;
+	}
+	
 	public IPolicy getActivePolicy() {
 		return activePolicy;
 	}
@@ -45,14 +48,7 @@ public class Daemon {
 	public void setActivePolicy(IPolicy policy) {
 		this.activePolicy = policy;
 	}
-
-	public void addListener(RunListener listener) {
-		runNotifier.addListener(listener);
-	}
-
-	public void removeListener(RunListener listener) {
-		runNotifier.removeListener(listener);
-	}
+	
 
 	public boolean isRunning() {
 		return runThread != null;
@@ -65,6 +61,9 @@ public class Daemon {
 	public void start() {
 		if (isRunning())
 			return;
+		if (!hasActivePolicy())
+			throw new IllegalStateException(
+					"An active policy must be set before the daemon can be started.");
 
 		dataEnroller.subscribe(CodeChange.class, this.fileChangedListener);
 		mayRunSemaphore = new Semaphore(1);

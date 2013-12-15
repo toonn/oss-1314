@@ -1,32 +1,61 @@
-package kuleuven.group6;
+package kuleuven.group6.cli;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
+import kuleuven.group6.Launcher;
+import kuleuven.group6.policies.CompositeSortingPolicy;
+import kuleuven.group6.policies.IPolicy;
+import kuleuven.group6.policies.SortingPolicy;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 /**
- * This class is the console view of the Deamon. It will give output to the programmer and report ... TODO
- * @author Team 6
- *
+ * A console interface of the system.
  */
 public class ConsoleView {
 
-	protected Daemon daemon;
+	protected Launcher launcher;
 	protected boolean isOutputSuspended = false;
 	protected boolean isStopped = false;
 	protected Scanner console = null;
 	
+	protected ConsoleMenu optionsMenu;
 	
-	public ConsoleView(Daemon daemon) {
-		this.daemon = daemon;
-		this.daemon.addListener(new TestRunListener());
+	public ConsoleView(Launcher launcher) {
+		this.launcher = launcher;
+		this.launcher.addListener(new TestRunListener());
+		initializeOptionsMenu();
+	}
+	
+	protected void initializeOptionsMenu() {
+		optionsMenu = new ConsoleMenu("Available commands:", "Enter a choice: ");
+		optionsMenu.addMenuAction(new ConsoleMenuAction("P", "Change the active policy") {
+			@Override
+			protected void execute() {
+				askForPolicy();
+			}
+		});
+		optionsMenu.addMenuAction(new ConsoleMenuAction("C", "Continue running") {
+			@Override
+			protected void execute() { }
+		});
+		optionsMenu.addMenuAction(new ConsoleMenuAction("N", "Queue a new testrun") {
+			@Override
+			protected void execute() {
+				launcher.queueNewTestRun();
+			}
+		});
+		optionsMenu.addMenuAction(new ConsoleMenuAction("Q", "Quit") {
+			@Override
+			protected void execute() {
+				stop();
+			}
+		});
 	}
 	
 	
@@ -57,14 +86,12 @@ public class ConsoleView {
 		showInfo();
 		askForPolicy();
 		
-		daemon.start();
+		launcher.start();
 		while (!isStopped()) {
 			console.nextLine();
 			askForCommand();
 		}
-		daemon.stop();
-		
-		console.close();
+		launcher.stop();
 	}
 	
 	protected void stop() {
@@ -78,87 +105,88 @@ public class ConsoleView {
 	private void showInfo() {
 		System.out.println();
 		System.out.println("IMPORTANT:");
-		System.out.println("Press enter during testing to access the menu.");
+		System.out.println("Press <ENTER> during testing to access the menu.");
 	}
 	
 	private void askForCommand() {
 		suspendOutput();
-		
-		System.out.println();
-		System.out.println("Available commands:");
-		System.out.println("\tP : change policy");
-		System.out.println("\tC : continue");
-		System.out.println("\tN : queue new testrun");
-		System.out.println("\tQ : quit");
-		System.out.println();
-			
-		boolean isCommandProcessed = false;
-		while (! isCommandProcessed) {
-			System.out.print("Enter command: ");
-			String command = console.nextLine().toLowerCase();
-			if (command.length() == 0)
-				continue;
-			
-			switch (command.charAt(0)) {
-				case 'p':
-					askForPolicy();
-					break;
-				case 'c':
-					break;
-				case 'n':
-					daemon.queueNewTestRun();
-					break;
-				case 'q':
-					stop();
-					break;
-				default:
-					continue;
-			}
-			
-			isCommandProcessed = true;
-		}
-		
-		System.out.println();
-		
+		optionsMenu.show();
 		if (!isStopped())
 			resumeOutput();
 	}
 	
 	/**
-	 * This will return the policies that are registered. Then the user had to choose a valid policy and 
-	 * this will be the active policy of the deamon.
-	 * 
+	 * Ask the user to choose a new active policy.
 	 */
 	private void askForPolicy() {
-		// printing out the registered policies
-		System.out.println();
-		System.out.println("Available policies:");
-		List<String> policies = new ArrayList<>(daemon.getRegisteredPolicies());
-		for (int i = 1; i <= policies.size(); i++) {
-			System.out.println("\t" + i + " : " + policies.get(i - 1));
+		Map<String, IPolicy> policies = launcher.getRegisteredPolicies();
+		ConsoleMenu policyMenu = new ConsoleMenu("Available policies:", "Enter a choice: ");
+		int lastItem = 0;
+		for (String policyName : policies.keySet()) {
+			String commandString = Integer.toString(++lastItem);
+			policyMenu.addMenuAction(new ChangePolicyMenuAction(commandString, policyName, launcher));
 		}
-		
-		// Here you can choose which policy to run.
-		boolean isCommandProcessed = false;
-		while (! isCommandProcessed) {
-			System.out.print("Enter the new policy number: ");
-			String policyNumberString = console.nextLine();
-			try {
-				int policyNumber = Integer.parseInt(policyNumberString);
-				if (policyNumber < 1 || policyNumber > policies.size()) {
-					System.out.println("The number has to be greater then zero or smaller then " + policies.size());
-					continue;
-				}
+		String commandString = Integer.toString(++lastItem);
+		policyMenu.addMenuAction(new ConsoleMenuAction(commandString, "Compose a new sorting policy...") {
+			@Override
+			protected void execute() {
+				String policyName;
+				do {
+					System.out.print("Enter a name for the new composite sorting policy: ");
+					policyName = console.nextLine();
+				} while (policyName == null || policyName.isEmpty());
 				
-				// Active policy is chosen correctly and the process will continue
-				daemon.setActivePolicy(policies.get(policyNumber - 1));
-				isCommandProcessed = true;
-			} catch (NumberFormatException e) {
-				System.out.println("The number you were providing was not a number. Please give a valid number");
+				IPolicy policy = askForCompositePolicy();
+				launcher.setActivePolicy(policyName, policy);
 			}
+		});
+	
+		policyMenu.show();
+	}
+	
+	private CompositeSortingPolicy askForCompositePolicy() {
+		final CompositeSortingPolicyBuilder policyBuilder = new CompositeSortingPolicyBuilder();
+		Map<String, IPolicy> policies = launcher.getRegisteredPolicies();
+		int lastActionNb = 0;
+		ConsoleMenu menu = new ConsoleMenu("Choose an action for the new composite policy:", "Enter a choice: ");
+		for (String policyName : policies.keySet()) {
+			final IPolicy policy = policies.get(policyName);
+			if (! (policy instanceof SortingPolicy))
+				continue;
+			
+			menu.addMenuAction(createAddPolicyMenuAction(++lastActionNb, policyName, (SortingPolicy)policy, policyBuilder));
+		}
+		menu.addMenuAction(new ConsoleMenuAction(Integer.toString(++lastActionNb), "Add a new composite policy...") {
+			@Override
+			protected void execute() {
+				policyBuilder.addChildPolicy(askForCompositePolicy());
+			}
+		});
+		
+		final boolean[] keepAsking = { true };
+		menu.addMenuAction(new ConsoleMenuAction(Integer.toString(++lastActionNb), "Stop adding and select the new composite policy") {
+			@Override
+			protected void execute() {
+				keepAsking[0] = false;
+			}
+		});
+		
+		while (keepAsking[0]) {
+			menu.show();
 		}
 		
-		System.out.println();
+		return policyBuilder.getCompositeSortingPolicy();
+	}
+	
+	private ConsoleMenuAction createAddPolicyMenuAction(int actionNb, 
+			final String policyName, final SortingPolicy policy, final CompositeSortingPolicyBuilder policyBuilder) {
+		String title = "Add the \"" + policyName + "\" policy";
+		return new ConsoleMenuAction(Integer.toString(actionNb), title) {
+			@Override
+			protected void execute() {
+				policyBuilder.addChildPolicy(policy);
+			}
+		};
 	}
 	
 	protected void outputln() {
