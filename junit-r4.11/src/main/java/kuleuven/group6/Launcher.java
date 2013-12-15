@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.runner.notification.RunNotifier;
-
 import kuleuven.group6.Daemon;
 import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.TestRunCreator;
@@ -111,41 +110,31 @@ public class Launcher {
 
 	/**
 	 * This is the main method. The first argument is the suite of tests, the
-	 * second is the directory were the code is that will be tested and the
+	 * second is the directory where the code is that will be tested and the
 	 * third argument is the directory where the tests that will be executed are
 	 * situated.
 	 */
 	public static void main(String[] args) {
-		// This will check if there are three arguments given. It will give an
-		// error and a description of how to use it
-		// if there are not enough or to many arguments.
 		if (args.length != 3) {
 			System.err.println("Invalid number of arguments.");
 			System.err
 					.println("Example usage: "
-							+ "java kuleuven.group6.Daemon <suite class> <code directory> <test directory>");
+							+ "java kuleuven.group6.Launcher <suite class> <code directory> <test directory>");
 			return;
 		}
 
-		// This will check if the second argument is a valid directory for the
-		// code.
 		File codeDirectory = new File(args[1]);
 		if (!codeDirectory.exists() || !codeDirectory.isDirectory()) {
 			System.err.println("Not a valid code directory.");
 			return;
 		}
 
-		// This will check if the third argument is a valid directory for the
-		// tests.
 		File testDirectory = new File(args[2]);
 		if (!testDirectory.exists() || !testDirectory.isDirectory()) {
 			System.err.println("Not a valid test directory.");
 			return;
 		}
 
-		// If the arguments are correct, the deamon class will be created and
-		// given the three parameters and a console
-		// of his deamon will be started.
 		Launcher launcher = Launcher.createConfiguredLauncher(args[0], codeDirectory,
 				testDirectory);
 		new ConsoleView(launcher).start();
