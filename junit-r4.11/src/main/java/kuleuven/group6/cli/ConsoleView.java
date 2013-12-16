@@ -145,7 +145,7 @@ public class ConsoleView {
 	}
 	
 	private CompositeSortingPolicy askForCompositePolicy() {
-		final CompositeSortingPolicyBuilder policyBuilder = new CompositeSortingPolicyBuilder();
+		final CompositeSortingPolicy compositePolicy = new CompositeSortingPolicy();
 		Map<String, IPolicy> policies = launcher.getRegisteredPolicies();
 		int lastActionNb = 0;
 		ConsoleMenu menu = new ConsoleMenu("Choose an action for the new composite policy:", "Enter a choice: ");
@@ -154,12 +154,12 @@ public class ConsoleView {
 			if (! (policy instanceof SortingPolicy))
 				continue;
 			
-			menu.addMenuAction(createAddPolicyMenuAction(++lastActionNb, policyName, (SortingPolicy)policy, policyBuilder));
+			menu.addMenuAction(createAddPolicyMenuAction(++lastActionNb, policyName, (SortingPolicy)policy, compositePolicy));
 		}
 		menu.addMenuAction(new ConsoleMenuAction(Integer.toString(++lastActionNb), "Add a new composite policy...") {
 			@Override
 			protected void execute() {
-				policyBuilder.addChildPolicy(askForCompositePolicy());
+				compositePolicy.addChildPolicy(askForCompositePolicy());
 			}
 		});
 		
@@ -175,16 +175,16 @@ public class ConsoleView {
 			menu.show();
 		}
 		
-		return policyBuilder.getCompositeSortingPolicy();
+		return compositePolicy;
 	}
 	
 	private ConsoleMenuAction createAddPolicyMenuAction(int actionNb, 
-			final String policyName, final SortingPolicy policy, final CompositeSortingPolicyBuilder policyBuilder) {
+			final String policyName, final SortingPolicy policy, final CompositeSortingPolicy compositePolicy) {
 		String title = "Add the \"" + policyName + "\" policy";
 		return new ConsoleMenuAction(Integer.toString(actionNb), title) {
 			@Override
 			protected void execute() {
-				policyBuilder.addChildPolicy(policy);
+				compositePolicy.addChildPolicy(policy);
 			}
 		};
 	}
