@@ -20,9 +20,10 @@ public abstract class SortingPolicy implements IPolicy {
 	public Request apply(Request request) {
 		return request.sortWith(getComparator());
 	}
-
+	
 	abstract protected Comparator<Description> getComparator();
 
+	
 	public void addChildPolicy(SortingPolicy childPolicy)
 			throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("The child could not be added.");
@@ -30,14 +31,13 @@ public abstract class SortingPolicy implements IPolicy {
 
 	public void removeChildPolicy(SortingPolicy childPolicy)
 			throws UnsupportedOperationException {
-		throw new UnsupportedOperationException(
-				"The child could not be removed");
+		throw new UnsupportedOperationException("The child could not be removed");
 	}
-
-	public int getNbChildPolicies() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException(
-				"Could not determine the number of child policies.");
+	
+	public SortingPolicy getChildAt(int index) {
+		return null;
 	}
+	
 
 	/**
 	 * Get the ordered subset of the descriptions in the given request that have

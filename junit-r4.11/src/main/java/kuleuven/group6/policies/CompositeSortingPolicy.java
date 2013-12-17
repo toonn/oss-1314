@@ -13,21 +13,20 @@ public class CompositeSortingPolicy extends SortingPolicy {
 	protected List<Description> orderedDescriptions;
 
 	@Override
-	public void addChildPolicy(SortingPolicy childPolicy)
-			throws UnsupportedOperationException {
+	public void addChildPolicy(SortingPolicy childPolicy) {
 		childPolicies.add(childPolicy);
 	}
 
 	@Override
-	public void removeChildPolicy(SortingPolicy childPolicy)
-			throws UnsupportedOperationException {
+	public void removeChildPolicy(SortingPolicy childPolicy) {
 		childPolicies.remove(childPolicy);
 	}
-
+	
 	@Override
-	public int getNbChildPolicies() throws UnsupportedOperationException {
-		return childPolicies.size();
+	public SortingPolicy getChildAt(int index) {
+		return childPolicies.get(index);
 	}
+
 
 	protected void mergeChildOrders(Request request) {
 		LinkedList<List<Description>> childLists = new LinkedList<List<Description>>();
