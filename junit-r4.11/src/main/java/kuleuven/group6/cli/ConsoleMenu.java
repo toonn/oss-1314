@@ -22,7 +22,7 @@ public class ConsoleMenu {
 	}
 	
 	
-	public String askChoiceString() {
+	public String getAskChoiceString() {
 		return askChoiceString;
 	}
 	

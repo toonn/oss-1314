@@ -8,7 +8,6 @@ import kuleuven.group6.policies.*;
 import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 
 /**
- * 
  * Daemon will execute the testruns. It can make use of different policies to 
  * manipulate the way tests are run. For example, a SortingPolicy will make
  * sure the tests are run in a specific order.
@@ -54,10 +53,7 @@ public class Daemon {
 		return runThread != null;
 	}
 
-	/**
-	 * This method will be called once a policy has been chosen through the
-	 * consoleView.
-	 */
+	
 	public void start() {
 		if (isRunning())
 			return;
@@ -71,7 +67,7 @@ public class Daemon {
 		runThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				startCore();
+				startRunning();
 			}
 		});
 		runThread.start();
@@ -114,7 +110,7 @@ public class Daemon {
 		mayRunSemaphore.release();
 	}
 
-	protected void startCore() {
+	protected void startRunning() {
 		boolean keepRunning = true;
 		while (keepRunning) {
 			try {
