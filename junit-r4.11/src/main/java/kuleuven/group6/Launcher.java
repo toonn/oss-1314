@@ -6,12 +6,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.runner.notification.RunListener;
-import org.junit.runner.notification.RunNotifier;
-import kuleuven.group6.Daemon;
-import kuleuven.group6.RunNotificationSubscriber;
-import kuleuven.group6.TestRunCreator;
-import kuleuven.group6.cli.ConsoleView;
 import kuleuven.group6.collectors.DataEnroller;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.policies.ChangedCodeFirst;
@@ -21,6 +15,9 @@ import kuleuven.group6.policies.IPolicy;
 import kuleuven.group6.policies.LastFailureFirst;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.StatisticProvider;
+
+import org.junit.runner.notification.RunListener;
+import org.junit.runner.notification.RunNotifier;
 
 public class Launcher {
 	protected String rootSuiteClassName;
@@ -132,38 +129,5 @@ public class Launcher {
 	
 	public void queueNewTestRun() {
 		daemon.queueNewTestRun();
-	}
-	
-
-	/**
-	 * This is the main method. The first argument is the suite of tests, the
-	 * second is the directory where the code is that will be tested and the
-	 * third argument is the directory where the tests that will be executed are
-	 * situated.
-	 */
-	public static void main(String[] args) {
-		if (args.length != 3) {
-			System.err.println("Invalid number of arguments.");
-			System.err
-					.println("Example usage: "
-							+ "java kuleuven.group6.Launcher <suite class> <code directory> <test directory>");
-			return;
-		}
-
-		File codeDirectory = new File(args[1]);
-		if (!codeDirectory.exists() || !codeDirectory.isDirectory()) {
-			System.err.println("Not a valid code directory.");
-			return;
-		}
-
-		File testDirectory = new File(args[2]);
-		if (!testDirectory.exists() || !testDirectory.isDirectory()) {
-			System.err.println("Not a valid test directory.");
-			return;
-		}
-
-		Launcher launcher = Launcher.createConfiguredLauncher(
-				args[0], codeDirectory, testDirectory);
-		new ConsoleView(launcher).start();
 	}
 }

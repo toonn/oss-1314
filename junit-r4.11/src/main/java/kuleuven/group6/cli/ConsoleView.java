@@ -1,5 +1,6 @@
 package kuleuven.group6.cli;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -299,5 +300,36 @@ public class ConsoleView {
 		}
 		
 	}
-	
+
+	/**
+	 * This is the main method. The first argument is the suite of tests, the
+	 * second is the directory where the code is that will be tested and the
+	 * third argument is the directory where the tests that will be executed are
+	 * situated.
+	 */
+	public static void main(String[] args) {
+		if (args.length != 3) {
+			System.err.println("Invalid number of arguments.");
+			System.err
+					.println("Example usage: "
+							+ "java kuleuven.group6.Launcher <suite class> <code directory> <test directory>");
+			return;
+		}
+
+		File codeDirectory = new File(args[1]);
+		if (!codeDirectory.exists() || !codeDirectory.isDirectory()) {
+			System.err.println("Not a valid code directory.");
+			return;
+		}
+
+		File testDirectory = new File(args[2]);
+		if (!testDirectory.exists() || !testDirectory.isDirectory()) {
+			System.err.println("Not a valid test directory.");
+			return;
+		}
+
+		Launcher launcher = Launcher.createConfiguredLauncher(
+				args[0], codeDirectory, testDirectory);
+		new ConsoleView(launcher).start();
+	}
 }
