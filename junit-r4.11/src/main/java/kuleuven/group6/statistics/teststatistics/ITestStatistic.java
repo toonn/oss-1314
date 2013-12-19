@@ -1,4 +1,4 @@
-package kuleuven.group6.testcharacteristics.teststatistics;
+package kuleuven.group6.statistics.teststatistics;
 
 import org.junit.runner.Description;
 

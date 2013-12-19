@@ -1,4 +1,4 @@
-package kuleuven.group6.testcharacteristics.testdatas;
+package kuleuven.group6.collectors.testdatas;
 
 import java.util.Collections;
 import java.util.List;

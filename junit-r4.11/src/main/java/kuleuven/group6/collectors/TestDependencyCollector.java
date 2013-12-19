@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import kuleuven.group6.testcharacteristics.testdatas.ITestData;
-import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.collectors.testdatas.ITestData;
+import kuleuven.group6.collectors.testdatas.MethodCalls;
 import kuleuven.group6.testrun.RunNotificationSubscriber;
 
 import org.junit.runner.Description;

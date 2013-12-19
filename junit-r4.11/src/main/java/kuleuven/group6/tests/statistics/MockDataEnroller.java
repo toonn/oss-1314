@@ -4,7 +4,7 @@ import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.DataCollector;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.collectors.NoSuitableCollectorException;
-import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.collectors.testdatas.ITestData;
 
 /**
  * 

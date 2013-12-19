@@ -11,7 +11,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.TestFailureCollector;
-import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.collectors.testdatas.TestFailure;
 import kuleuven.group6.testrun.RunNotificationSubscriber;
 import kuleuven.group6.tests.testsubject.tests.AllTests;
 

@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 import static java.nio.file.StandardWatchEventKinds.*;
-import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
-import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.collectors.testdatas.CodeChange;
+import kuleuven.group6.collectors.testdatas.ITestData;
+
 import org.junit.runner.Description;
 
 /**

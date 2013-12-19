@@ -1,8 +1,8 @@
 package kuleuven.group6.tests.statistics;
 
 import kuleuven.group6.collectors.DataCollector;
-import kuleuven.group6.testcharacteristics.testdatas.ITestData;
-import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
+import kuleuven.group6.collectors.testdatas.ITestData;
+import kuleuven.group6.collectors.testdatas.TestFailure;
 
 /**
  * 

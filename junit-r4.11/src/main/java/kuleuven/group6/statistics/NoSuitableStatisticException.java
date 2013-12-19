@@ -1,6 +1,6 @@
 package kuleuven.group6.statistics;
 
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
 
 /**
  * IStatisticProvider's should throw this exception when they can't find a

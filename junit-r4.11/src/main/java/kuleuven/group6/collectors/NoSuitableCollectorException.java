@@ -1,6 +1,6 @@
 package kuleuven.group6.collectors;
 
-import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.collectors.testdatas.ITestData;
 
 /**
  * This exception should be thrown when an IDataEnroller can't find a collector

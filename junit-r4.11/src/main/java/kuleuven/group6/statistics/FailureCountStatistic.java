@@ -3,9 +3,9 @@ package kuleuven.group6.statistics;
 import org.junit.runner.Description;
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
-import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.collectors.testdatas.TestFailure;
+import kuleuven.group6.statistics.teststatistics.FailureCount;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
 
 /**
  * This statistic collects the number of times a certain test has failed.

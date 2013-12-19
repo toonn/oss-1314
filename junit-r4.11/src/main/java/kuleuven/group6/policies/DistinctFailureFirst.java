@@ -12,7 +12,8 @@ import java.util.Set;
 import org.junit.Assert;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.Statistic;
-import kuleuven.group6.testcharacteristics.teststatistics.FailureTrace;
+import kuleuven.group6.statistics.teststatistics.FailureTrace;
+
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 

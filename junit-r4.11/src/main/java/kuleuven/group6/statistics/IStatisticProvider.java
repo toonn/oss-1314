@@ -1,6 +1,6 @@
 package kuleuven.group6.statistics;
 
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
 
 /**
  * This interface provides a way to get a Statistic that collects a specific

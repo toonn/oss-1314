@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
 import kuleuven.group6.testrun.RunNotificationSubscriber;
 
 /**

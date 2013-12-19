@@ -1,4 +1,4 @@
-package kuleuven.group6.testcharacteristics.testdatas;
+package kuleuven.group6.collectors.testdatas;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;

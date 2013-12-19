@@ -14,7 +14,7 @@ import java.util.List;
 
 import kuleuven.group6.collectors.CodeChangeCollector;
 import kuleuven.group6.collectors.IDataCollectedListener;
-import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
+import kuleuven.group6.collectors.testdatas.CodeChange;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import kuleuven.group6.tests.testsubject.tests.AllTests;
 import kuleuven.group6.tests.testsubject.tests.TestsLocator;

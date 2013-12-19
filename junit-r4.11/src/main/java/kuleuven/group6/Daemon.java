@@ -4,8 +4,8 @@ import java.util.concurrent.Semaphore;
 
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
+import kuleuven.group6.collectors.testdatas.CodeChange;
 import kuleuven.group6.policies.*;
-import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
 import kuleuven.group6.testrun.TestRun;
 import kuleuven.group6.testrun.TestRunCreator;
 

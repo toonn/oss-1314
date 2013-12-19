@@ -2,12 +2,13 @@ package kuleuven.group6.tests.statistics;
 
 import static org.junit.Assert.*;
 
+import kuleuven.group6.collectors.testdatas.TestFailure;
 import kuleuven.group6.statistics.MaxFailureCountStatistic;
-import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
-import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
-import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
-import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
+import kuleuven.group6.statistics.teststatistics.FailureCount;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.LastDependencyChange;
+import kuleuven.group6.statistics.teststatistics.LastFailureDate;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Description;

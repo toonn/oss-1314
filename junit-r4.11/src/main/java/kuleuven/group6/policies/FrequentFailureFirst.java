@@ -4,7 +4,8 @@ import java.util.Comparator;
 
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.Statistic;
-import kuleuven.group6.testcharacteristics.teststatistics.FailureCount;
+import kuleuven.group6.statistics.teststatistics.FailureCount;
+
 import org.junit.runner.Description;
 
 /**

@@ -3,7 +3,8 @@ package kuleuven.group6.statistics;
 import java.util.HashMap;
 import java.util.Map;
 
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
+
 import org.junit.runner.Description;
 
 /**

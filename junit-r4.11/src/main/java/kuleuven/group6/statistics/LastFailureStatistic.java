@@ -4,9 +4,10 @@ import java.util.Date;
 
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.testdatas.TestFailure;
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
-import kuleuven.group6.testcharacteristics.teststatistics.LastFailureDate;
+import kuleuven.group6.collectors.testdatas.TestFailure;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.LastFailureDate;
+
 import org.junit.runner.Description;
 
 /**

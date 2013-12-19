@@ -8,10 +8,11 @@ import java.util.Set;
 
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.IDataEnroller;
-import kuleuven.group6.testcharacteristics.testdatas.CodeChange;
-import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
-import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
-import kuleuven.group6.testcharacteristics.teststatistics.LastDependencyChange;
+import kuleuven.group6.collectors.testdatas.CodeChange;
+import kuleuven.group6.collectors.testdatas.MethodCalls;
+import kuleuven.group6.statistics.teststatistics.ITestStatistic;
+import kuleuven.group6.statistics.teststatistics.LastDependencyChange;
+
 import org.junit.runner.Description;
 
 /**
