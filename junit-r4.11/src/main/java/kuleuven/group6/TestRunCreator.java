@@ -1,4 +1,4 @@
-package kuleuven.group6.testrun;
+package kuleuven.group6;
 
 import java.io.IOException;
 import java.net.URL;
@@ -8,6 +8,8 @@ import org.junit.runner.Request;
 import org.junit.runner.notification.RunNotifier;
 
 import kuleuven.group6.policies.IPolicy;
+import kuleuven.group6.testrun.FlattenedRequest;
+import kuleuven.group6.testrun.TestRun;
 
 public class TestRunCreator {
 	protected String rootSuiteClassName;

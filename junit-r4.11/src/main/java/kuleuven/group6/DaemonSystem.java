@@ -16,7 +16,6 @@ import kuleuven.group6.policies.LastFailureFirst;
 import kuleuven.group6.statistics.IStatisticProvider;
 import kuleuven.group6.statistics.StatisticProvider;
 import kuleuven.group6.testrun.RunNotificationSubscriber;
-import kuleuven.group6.testrun.TestRunCreator;
 
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
