@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Scanner;
 
-import kuleuven.group6.Launcher;
+import kuleuven.group6.DaemonSystem;
 import kuleuven.group6.policies.CompositeSortingPolicy;
 import kuleuven.group6.policies.IPolicy;
 import kuleuven.group6.policies.SortingPolicy;
@@ -20,16 +20,16 @@ import org.junit.runner.notification.RunListener;
  */
 public class ConsoleView {
 
-	protected Launcher launcher;
+	protected DaemonSystem daemonSystem;
 	protected boolean isOutputSuspended = false;
 	protected boolean isStopped = false;
 	protected Scanner console = null;
 	
 	protected ConsoleMenu optionsMenu;
 	
-	public ConsoleView(Launcher launcher) {
-		this.launcher = launcher;
-		this.launcher.addListener(new TestRunListener());
+	public ConsoleView(DaemonSystem daemonSystem) {
+		this.daemonSystem = daemonSystem;
+		this.daemonSystem.addListener(new TestRunListener());
 		initializeOptionsMenu();
 	}
 	
@@ -48,7 +48,7 @@ public class ConsoleView {
 		optionsMenu.addMenuAction(new ConsoleMenuAction("N", "Queue a new testrun") {
 			@Override
 			protected void execute() {
-				launcher.queueNewTestRun();
+				daemonSystem.queueNewTestRun();
 			}
 		});
 		optionsMenu.addMenuAction(new ConsoleMenuAction("Q", "Quit") {
@@ -87,12 +87,12 @@ public class ConsoleView {
 		showInfo();
 		askForPolicy();
 		
-		launcher.start();
+		daemonSystem.start();
 		while (!isStopped()) {
 			console.nextLine();
 			askForCommand();
 		}
-		launcher.stop();
+		daemonSystem.stop();
 	}
 	
 	protected void stop() {
@@ -120,12 +120,12 @@ public class ConsoleView {
 	 * Ask the user to choose a new active policy.
 	 */
 	private void askForPolicy() {
-		Map<String, IPolicy> policies = launcher.getRegisteredPolicies();
+		Map<String, IPolicy> policies = daemonSystem.getRegisteredPolicies();
 		ConsoleMenu policyMenu = new ConsoleMenu("Available policies:", "Enter a choice: ");
 		int lastItem = 0;
 		for (String policyName : policies.keySet()) {
 			String commandString = Integer.toString(++lastItem);
-			policyMenu.addMenuAction(new ChangePolicyMenuAction(commandString, policyName, launcher));
+			policyMenu.addMenuAction(new ChangePolicyMenuAction(commandString, policyName, daemonSystem));
 		}
 		String commandString = Integer.toString(++lastItem);
 		policyMenu.addMenuAction(new ConsoleMenuAction(commandString, "Compose a new sorting policy...") {
@@ -138,7 +138,7 @@ public class ConsoleView {
 				} while (policyName == null || policyName.isEmpty());
 				
 				IPolicy policy = askForCompositePolicy();
-				launcher.setActivePolicy(policyName, policy);
+				daemonSystem.setActivePolicy(policyName, policy);
 			}
 		});
 	
@@ -147,7 +147,7 @@ public class ConsoleView {
 	
 	private CompositeSortingPolicy askForCompositePolicy() {
 		final CompositeSortingPolicy compositePolicy = new CompositeSortingPolicy();
-		Map<String, IPolicy> policies = launcher.getRegisteredPolicies();
+		Map<String, IPolicy> policies = daemonSystem.getRegisteredPolicies();
 		int lastActionNb = 0;
 		ConsoleMenu menu = new ConsoleMenu("Choose an action for the new composite policy:", "Enter a choice: ");
 		for (String policyName : policies.keySet()) {
@@ -328,8 +328,8 @@ public class ConsoleView {
 			return;
 		}
 
-		Launcher launcher = Launcher.createConfiguredLauncher(
+		DaemonSystem daemonSystem = DaemonSystem.createConfiguredDaemonSystem(
 				args[0], codeDirectory, testDirectory);
-		new ConsoleView(launcher).start();
+		new ConsoleView(daemonSystem).start();
 	}
 }

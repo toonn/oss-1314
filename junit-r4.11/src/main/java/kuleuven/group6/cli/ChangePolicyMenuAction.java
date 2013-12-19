@@ -1,22 +1,22 @@
 package kuleuven.group6.cli;
 
-import kuleuven.group6.Launcher;
+import kuleuven.group6.DaemonSystem;
 
 public class ChangePolicyMenuAction extends ConsoleMenuAction {
 
 	protected String policyName;
-	protected Launcher launcher;
+	protected DaemonSystem daemonSystem;
 	
-	protected ChangePolicyMenuAction(String commandString, String policyName, Launcher launcher) {
+	protected ChangePolicyMenuAction(String commandString, String policyName, DaemonSystem daemonSystem) {
 		super(commandString, policyName);
 		
 		this.policyName = policyName;
-		this.launcher = launcher;
+		this.daemonSystem = daemonSystem;
 	}
 
 	@Override
 	protected void execute() {
-		launcher.setActivePolicy(policyName);
+		daemonSystem.setActivePolicy(policyName);
 	}
 	
 }

@@ -19,7 +19,7 @@ import kuleuven.group6.statistics.StatisticProvider;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
-public class Launcher {
+public class DaemonSystem {
 	protected String rootSuiteClassName;
 	protected File codeDirectory, testDirectory;
 	protected TestRunCreator testRunCreator;
@@ -32,7 +32,7 @@ public class Launcher {
 	
 	protected Daemon daemon;
 
-	public Launcher(String rootSuiteClassName, File codeDirectory, File testDirectory) {
+	public DaemonSystem(String rootSuiteClassName, File codeDirectory, File testDirectory) {
 		if (!codeDirectory.exists() || !codeDirectory.isDirectory()
 				|| !testDirectory.exists() || !testDirectory.isDirectory()) {
 			throw new IllegalArgumentException(
@@ -61,12 +61,12 @@ public class Launcher {
 		this.daemon = new Daemon(testRunCreator, dataEnroller);
 	}
 
-	public static Launcher createConfiguredLauncher(
+	public static DaemonSystem createConfiguredDaemonSystem(
 			String rootSuiteClassName, File codeDirectory, File testDirectory) {
-		Launcher launcher = new Launcher(
+		DaemonSystem daemonSystem = new DaemonSystem(
 				rootSuiteClassName, codeDirectory, testDirectory);
-		launcher.configurePolicies();
-		return launcher;
+		daemonSystem.configurePolicies();
+		return daemonSystem;
 	}
 
 	private void configurePolicies() {
