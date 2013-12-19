@@ -40,7 +40,7 @@ public class FrequentFailureFirst extends SortingPolicy {
 	}
 	
 	@Override
-	protected boolean hasOrderFor(Description description) {
+	protected boolean hasInfoFor(Description description) {
 		return (statistic.getTestStatistic(description).getFailureCount() != 0);
 	}
 }

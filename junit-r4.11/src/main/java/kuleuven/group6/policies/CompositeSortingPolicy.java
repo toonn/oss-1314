@@ -78,7 +78,7 @@ public class CompositeSortingPolicy extends SortingPolicy {
 	}
 
 	@Override
-	protected boolean hasOrderFor(Description description) {
+	protected boolean hasInfoFor(Description description) {
 		return orderedDescriptions.contains(description);
 	}
 

@@ -55,7 +55,7 @@ public abstract class SortingPolicy implements IPolicy {
 		return sortedDescriptions;
 	}
 
-	abstract protected boolean hasOrderFor(Description description);
+	abstract protected boolean hasInfoFor(Description description);
 
 	protected List<Description> getAllDescriptions(Description rootDescription) {
 		List<Description> allDescriptions = new LinkedList<Description>();

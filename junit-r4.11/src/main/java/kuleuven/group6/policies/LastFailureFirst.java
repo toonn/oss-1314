@@ -46,7 +46,7 @@ public class LastFailureFirst extends SortingPolicy {
 	}
 	
 	@Override
-	protected boolean hasOrderFor(Description description) {
+	protected boolean hasInfoFor(Description description) {
 		return (statistic.getTestStatistic(description) != null);
 	}
 
