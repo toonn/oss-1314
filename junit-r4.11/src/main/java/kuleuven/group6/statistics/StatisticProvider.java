@@ -3,9 +3,9 @@ package kuleuven.group6.statistics;
 import java.util.HashSet;
 import java.util.Set;
 
-import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.collectors.IDataEnroller;
 import kuleuven.group6.testcharacteristics.teststatistics.ITestStatistic;
+import kuleuven.group6.testrun.RunNotificationSubscriber;
 
 /**
  * (non-Javadoc)

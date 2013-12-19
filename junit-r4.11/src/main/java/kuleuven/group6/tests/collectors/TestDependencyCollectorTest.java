@@ -6,10 +6,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.collectors.IDataCollectedListener;
 import kuleuven.group6.collectors.TestDependencyCollector;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.testrun.RunNotificationSubscriber;
 import kuleuven.group6.tests.testsubject.source.Dummy;
 import kuleuven.group6.tests.testsubject.source.SourceLocator;
 import org.junit.After;

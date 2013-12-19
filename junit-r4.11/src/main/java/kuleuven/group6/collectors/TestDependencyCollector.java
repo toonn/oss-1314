@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
 import kuleuven.group6.testcharacteristics.testdatas.MethodCalls;
+import kuleuven.group6.testrun.RunNotificationSubscriber;
+
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 import be.kuleuven.cs.ossrewriter.Monitor;

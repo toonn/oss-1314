@@ -1,7 +1,7 @@
 package kuleuven.group6.tests;
 
 import static org.junit.Assert.*;
-import kuleuven.group6.FlattenedRequest;
+import kuleuven.group6.testrun.FlattenedRequest;
 import kuleuven.group6.tests.testsubject.tests.BasicAndFailingDummySuite;
 import org.junit.Test;
 import org.junit.runner.Description;

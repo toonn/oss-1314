@@ -5,7 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import kuleuven.group6.FlattenedRequest;
+import kuleuven.group6.testrun.FlattenedRequest;
+
 import org.junit.runner.Description;
 import org.junit.runner.Request;
 

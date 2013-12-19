@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import kuleuven.group6.RunNotificationSubscriber;
 import kuleuven.group6.testcharacteristics.testdatas.ITestData;
+import kuleuven.group6.testrun.RunNotificationSubscriber;
 
 /**
  * 

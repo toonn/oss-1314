@@ -1,4 +1,4 @@
-package kuleuven.group6;
+package kuleuven.group6.testrun;
 
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;

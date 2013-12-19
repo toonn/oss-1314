@@ -1,4 +1,4 @@
-package kuleuven.group6;
+package kuleuven.group6.testrun;
 
 import java.io.IOException;
 import java.net.URL;
