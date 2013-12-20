@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
@@ -65,8 +64,6 @@ public class CompositeSortingPolicyTest {
 	public void cluelessForwardReverseTest() {
 		List<Description> childDescriptions = cluelessSorted.getRunner().getDescription().getChildren();
 		List<Description> expected = reverse.getOrderedSubset(request);
-		// Remove the root suite.
-		expected.remove(0);
 		assertEquals(expected, childDescriptions);
 	}
 	

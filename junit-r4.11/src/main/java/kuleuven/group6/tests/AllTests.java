@@ -15,7 +15,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
 	FlattenedRequestTest.class,
 	AllCollectorTests.class,
-	AllStatisticTests.class
+	AllStatisticTests.class,
+	CompositeSortingPolicyTest.class
 })
 public class AllTests {
 

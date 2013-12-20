@@ -3,7 +3,6 @@ package kuleuven.group6.policies;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import kuleuven.group6.testrun.FlattenedRequest;
 
@@ -52,23 +51,18 @@ public abstract class SortingPolicy implements IPolicy {
 		flattenedRequest = apply(flattenedRequest);
 		Description sortedDescription = flattenedRequest.getRunner()
 				.getDescription();
-		List<Description> sortedDescriptions = getAllDescriptions(sortedDescription);
+		List<Description> sortedDescriptions = getAllChildDescriptions(sortedDescription);
 		return sortedDescriptions;
 	}
 
 	abstract protected boolean hasInfoFor(Description description);
 
-	protected List<Description> getAllDescriptions(Description rootDescription) {
+	protected List<Description> getAllChildDescriptions(Description rootDescription) {
 		List<Description> allDescriptions = new LinkedList<Description>();
-		LinkedList<Description> descriptionsToVisit = new LinkedList<Description>();
-
-		descriptionsToVisit.push(rootDescription);
-		while (!descriptionsToVisit.isEmpty()) {
-			Description currentDescription = descriptionsToVisit.pop();
-			allDescriptions.add(currentDescription);
-			descriptionsToVisit.addAll(currentDescription.getChildren());
+		for (Description childDescription : rootDescription.getChildren()) {
+			allDescriptions.add(childDescription);
+			allDescriptions.addAll(getAllChildDescriptions(childDescription));
 		}
-
 		return allDescriptions;
 	}
 

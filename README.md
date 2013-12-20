@@ -8,7 +8,7 @@ The script uses the `java` command. Because our project requires Java 7, this `j
 
 To use our daemon on a different project, use the following command (with the current directory being the root folder, which contains the junit-r4.11 directory):
 ```
-java -classpath junit-r4.11/bin/:junit-r4.11/lib/hamcrest-core-1.3.jar -javaagent:junit-r4.11/lib/ossrewriter-1.0.jar kuleuven.group6.Daemon <testSuiteClass> <sourceBinDirectory> <testBinDirectory>
+java -classpath junit-r4.11/bin/:junit-r4.11/lib/hamcrest-core-1.3.jar -javaagent:junit-r4.11/lib/ossrewriter-1.0.jar kuleuven.group6.cli.ConsoleView <testSuiteClass> <sourceBinDirectory> <testBinDirectory>
 ```
 
 Compiling the project with Eclipse
@@ -38,7 +38,6 @@ Configure the following:
     - For the tests folder (2), specify the output folder: `junit-r4.11/testsubjectbin/tests`
   - These output folders possibly have to be created.
     
-Report and class diagram
-------------------------
-Our report and the full class diagram is located in this directory. 
-They are `Report group 6.pdf` and `ClassDiagram.png`, respectively.
+Report
+------
+Our report is located in this directory: `Report group 6.pdf`.
