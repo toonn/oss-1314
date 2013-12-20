@@ -42,11 +42,15 @@ public abstract class ConsoleMenuAction {
 		this.nextAction = nextAction;
 	}
 	
-	public ConsoleMenuAction getLastAction() {
-		if (!hasNextAction())
-			return this;
-		
-		return getNextAction().getLastAction();
+	/**
+	 * Add the given ConsoleMenuAction in this chain of menu actions. 
+	 * @param lastAction
+	 */
+	public void addAction(ConsoleMenuAction lastAction) {
+		if (hasNextAction())
+			getNextAction().addAction(lastAction);
+		else
+			setNextAction(lastAction);
 	}
 	
 	
