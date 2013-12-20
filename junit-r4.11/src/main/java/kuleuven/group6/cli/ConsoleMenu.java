@@ -39,8 +39,7 @@ public class ConsoleMenu {
 		if (isEmpty()) {
 			this.firstMenuAction = menuAction;
 		} else {
-			ConsoleMenuAction currentLastAction = firstMenuAction.getLastAction();
-			currentLastAction.setNextAction(menuAction);
+			this.firstMenuAction.addAction(menuAction);
 		}
 	}
 	
