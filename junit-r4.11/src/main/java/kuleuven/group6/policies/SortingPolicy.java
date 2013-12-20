@@ -60,7 +60,7 @@ public abstract class SortingPolicy implements IPolicy {
 
 	protected List<Description> getAllDescriptions(Description rootDescription) {
 		List<Description> allDescriptions = new LinkedList<Description>();
-		Stack<Description> descriptionsToVisit = new Stack<Description>();
+		LinkedList<Description> descriptionsToVisit = new LinkedList<Description>();
 
 		descriptionsToVisit.push(rootDescription);
 		while (!descriptionsToVisit.isEmpty()) {

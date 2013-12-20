@@ -41,7 +41,7 @@ public class CompositeSortingPolicyTest {
 		csp.addChildPolicy(reverse);
 		csp.addChildPolicy(smartForward);
 		ccsp.addChildPolicy(reverse);
-		//ccsp.addChildPolicy(cluelessForward);
+		ccsp.addChildPolicy(cluelessForward);
 		// Apply
 		smartSorted = csp.apply(request);
 		cluelessSorted = ccsp.apply(request);
@@ -64,16 +64,10 @@ public class CompositeSortingPolicyTest {
 	@Test
 	public void cluelessForwardReverseTest() {
 		List<Description> childDescriptions = cluelessSorted.getRunner().getDescription().getChildren();
-		String firstName = childDescriptions.get(0).getMethodName();
-		String secondName = childDescriptions.get(1).getMethodName();
-		for(int i=0;i<childDescriptions.size();i++){
-			System.out.println(ccsp.apply(request).getRunner().getDescription().getChildren().get(i).getMethodName());
-			System.out.println(ccsp.getOrderedSubset(request).get(i).getMethodName());
-			//System.out.println(ccsp.getChildAt(0).getOrderedSubset(request).get(i).getMethodName());
-			//System.out.println(childDescriptions.get(i).getMethodName());
-		}
-		assertTrue(firstName.equals("t5"));
-		assertTrue(secondName.equals("t4"));
+		List<Description> expected = reverse.getOrderedSubset(request);
+		// Remove the root suite.
+		expected.remove(0);
+		assertEquals(expected, childDescriptions);
 	}
 	
 	private class ForwardSortingPolicy extends SortingPolicy {
